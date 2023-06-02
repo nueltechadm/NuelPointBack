@@ -1,0 +1,21 @@
+{
+  "name": "checkpoint_api",
+  "version": "1.0.0",
+  "description": "adm_sys",
+  "main": "Index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "adriano.marino1992@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "crypto-js": "^4.1.1",
+    "jsonwebtoken": "^9.0.0",
+    "myorm_pg": "^2.2.0",
+    "web_api_base": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
+    "@types/jsonwebtoken": "^9.0.2"
+  }
+}
