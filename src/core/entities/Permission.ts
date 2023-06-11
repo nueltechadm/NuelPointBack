@@ -25,8 +25,7 @@ export default class Permission
 
 
 export enum PermissionName
-{
-    EMPLOYERS = "EMPLOYERS_CONTROLLER", 
+{    
     USERS = "USERS_CONTROLLER",
     PERMISSIONS = "PERMISSIONS_CONTROLLER",
     JOBS = "JOBS_CONTROLLERS"

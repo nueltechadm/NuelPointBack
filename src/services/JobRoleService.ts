@@ -5,6 +5,7 @@ import JobRole from "../core/entities/JobRole";
 
 export default class JobRoleService  extends AbstractJobRoleService
 {
+    
     @Inject()
     private _context : Context;
 
@@ -12,6 +13,11 @@ export default class JobRoleService  extends AbstractJobRoleService
     {
         super();
         this._context = context;
+    }
+
+    public override IsCompatible(obj: any): obj is JobRole {
+        
+        return "Description" in obj && "Folder" in obj;  
     }
 
     public async GetByIdAsync(id: number): Promise<JobRole | undefined> {       

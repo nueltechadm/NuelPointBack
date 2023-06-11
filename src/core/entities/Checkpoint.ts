@@ -1,5 +1,6 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, OneToOne} from 'myorm_pg'; 
-import Employer from './Employer';
+import User from './User';
+
 
 
 @Table()
@@ -15,23 +16,23 @@ export default class Checkpoint
     public Date : Date;    
 
     @Column()
-    @OneToOne(()=> Employer)
-    public Employer : Employer;
+    @OneToOne(()=> User)
+    public User : User;
 
     @Column()
-    public X : Number;
+    public X : number;
 
     @Column()
-    public Y : Number;
+    public Y : number;
 
     @Column()
     public Picture : string;
     
-    constructor(employer : Employer, x : number, y : number, picture : string)
+    constructor(user : User, x : number, y : number, picture : string)
     {
         this.Id = -1;
         this.Date = new Date();
-        this.Employer = employer;
+        this.User = user;
         this.X = x;
         this.Y = y;
         this.Picture = picture;

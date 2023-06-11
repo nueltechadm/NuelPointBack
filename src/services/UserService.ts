@@ -7,6 +7,7 @@ import ObjectNotFoundExcpetion from "../exceptions/ObjectNotFoundExcpetion";
 
 export default class UserService  extends AbstractUserService
 {
+   
     
     @Inject()
     private _context : Context;
@@ -15,6 +16,11 @@ export default class UserService  extends AbstractUserService
     {
         super();
         this._context = context;
+    }
+
+    public IsCompatible(obj: any): obj is User {
+
+        return "Username" in obj && "Name" in obj && "Email" in obj && "Password" in obj;  
     }
 
     public override async GetByIdAsync(id: number): Promise<User| undefined> {

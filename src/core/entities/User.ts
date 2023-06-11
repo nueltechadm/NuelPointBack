@@ -1,5 +1,6 @@
-import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany} from 'myorm_pg'; 
+import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany, ManyToOne} from 'myorm_pg'; 
 import Permission from './Permission';
+import JobRole from './JobRole';
 
 @Table("user_tb")
 export default class User
@@ -25,13 +26,19 @@ export default class User
     @ManyToMany(() => Permission)
     public Permissions : Permission[];
 
-    constructor(name : string, email : string, username : string, password : string)
+    @Column()
+    @ManyToOne(()=> JobRole, "Users")
+    public JobRole: JobRole;
+
+    constructor(name : string, email : string, username : string, password : string, job : JobRole)
     {
         this.Id = -1;
         this.Name = name;
         this.Email = email;
         this.Username = username;
-        this.Password = password; 
+        this.Password = password;
+        this.JobRole = job; 
         this.Permissions = [];
+
     }
 }

@@ -2,8 +2,8 @@
 import File from 'fs';
 import FileAsync from 'fs/promises';
 import Path from 'path';
-
 import FileServiceBase from "./abstractions/AbstractFileService";
+
 
 
 export default class FileService extends FileServiceBase
@@ -16,7 +16,10 @@ export default class FileService extends FileServiceBase
         {           
             try{
 
-               return resolve(File.mkdirSync(path));
+               if(!await this.DirectoryExists(path))
+                    return resolve(File.mkdirSync(path));
+                
+                return resolve();
 
             }catch(err)
             {
@@ -110,9 +113,11 @@ export default class FileService extends FileServiceBase
             {
                 reject(err);
             }
-        })
+        });
         
     }
+
+   
     
 }
 

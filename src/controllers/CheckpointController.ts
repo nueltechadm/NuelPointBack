@@ -1,13 +1,14 @@
 
 import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, Use, Validate } from "web_api_base";
-import CheckpointDTO from "../dto/CheckpointDTO";
+import Formidable from "formidable";
 import {IsLogged} from '../filters/AuthFilter';
 import AbstractCheckpointService from "../core/abstractions/AbstractCheckpointService";
-import Checkpoint from "../core/entities/Checkpoint";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractFileService from "../services/abstractions/AbstractFileService";
-import EmployerService from "../services/EmployerService";
-import AbstractEmployerService from "../core/abstractions/AbstractEmployerService";
+import AbstractUserService from "../core/abstractions/AbstractUserService";
+import InvalidEntityException from "../exceptions/InvalidEntityException";
+import { InsertCheckpointDTO } from "../dto/InsertCheckpointDTO";
+
 
 @Use(IsLogged)
 @Validate()
@@ -17,47 +18,89 @@ export default class CheckpointController extends ControllerBase
     private _checkpointService : AbstractCheckpointService;
 
     @Inject()
-    private _employerService : AbstractEmployerService;
+    private _userService : AbstractUserService;
 
     @Inject()
     private _fileService : AbstractFileService;
 
-    constructor(service : AbstractCheckpointService, fileService : AbstractFileService, employerService : AbstractEmployerService)
+    constructor(service : AbstractCheckpointService, fileService : AbstractFileService, userService : AbstractUserService)
     {
         super();                    
         this._checkpointService = service;
-        this._employerService = employerService;
+        this._userService = userService;
         this._fileService = fileService;
     }    
         
     
     @POST("insert")
-    public async InsertAsync(@FromBody()checkpoint : CheckpointDTO) : Promise<void>
+    public async InsertAsync() : Promise<void>
     {  
-        try{
-          
-           let employer = await this._employerService.GetByIdAsync(checkpoint.EmployerId);
+        try{          
 
-           if(!employer)
-                return this.BadRequest(`The employer with Id #${checkpoint.EmployerId} not exists`);
-            
-            let folder = employer.JobRole.Folder;
-            let id = checkpoint.EmployerId;
-            this.Request
+            Formidable({multiples : false}).parse(this.Request as any, async (err, fields, incomming) => 
+            {
+                
+                try{
+
+                    if(err)
+                        return this.Error(err);
+
+                    let data = JSON.parse(fields.data.toString());
+                    
+                    if(!fields.data || !this._checkpointService.IsCompatible(data))
+                        return this.BadRequest(`The checkpoint data is required`);  
+                        
+                    let checkpointDTO = InsertCheckpointDTO.MapToDTO(data);                
+        
+                    let user = await this._userService.GetByIdAsync(checkpointDTO.UserId);
+        
+                    if(!user)
+                        return this.BadRequest(`The user with Id #${checkpointDTO.UserId} not exists`);
+                    
+                    let checkpoint = checkpointDTO.MapToCheckpoint(user);
+                    
+                    await this._checkpointService.AddAsync(checkpoint);
+                    
+                    let info = await this._checkpointService.GetFolderAndFileName(checkpoint);
+
+                    let temp = (incomming.file as Formidable.File).filepath;                    
+                    
+                    await this._fileService.CreateDirectory(info.Folder);
+
+                    await this._fileService.CopyAsync(temp, info.File);
+
+                    return this.Created();
+
+                }
+                catch(exception)
+                {
+                    if(exception instanceof InvalidEntityException)
+                    {
+                        return this.BadRequest(exception.message);
+                    }
+                    else if(exception instanceof EntityNotFoundException)
+                    {
+                        return this.BadRequest(exception.message);
+                    }                    
+                    else{
+
+                        if(process.env.ENVIROMENT == "DEBUG")
+                            return this.Error(exception);
+                        else
+                            return this.Error("Error while processing the request");
+                    }
+                }
+                
+            });
+           
 
         }catch(exception)
         {
-            if(exception instanceof EntityNotFoundException)
-            {
-                return this.BadRequest(exception.message);
-            }
-            else{
-
-                if(process.env.ENVIROMENT == "DEBUG")
-                    return this.Error(exception);
-                else
-                    return this.Error("Error while processing the request");
-            }
+            if(process.env.ENVIROMENT == "DEBUG")
+                 return this.Error(exception);
+            else
+                return this.Error("Error while processing the request");
+            
         }
               
     }

@@ -10,7 +10,7 @@ export default abstract class AbstractFileService
     public abstract DirectoryExists(path: string): Promise<boolean>;
     public abstract CreateDirectory(path: string): Promise<void>;
     public abstract CreateDirectory(path: string): Promise<void>;
-    public abstract SaveFile(folderName : string, employerId : number, request : Request ) : Promise<string>;
+    
    
 }
 

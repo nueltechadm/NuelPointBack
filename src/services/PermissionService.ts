@@ -5,6 +5,7 @@ import Permission, {PermissionName} from "../core/entities/Permission";
 
 export default class PermissionService  extends AbstractPermissionService
 {
+    
     @Inject()
     private _context : Context;
 
@@ -12,6 +13,11 @@ export default class PermissionService  extends AbstractPermissionService
     {
         super();
         this._context = context;
+    }
+
+    public IsCompatible(obj: any): obj is Permission {
+
+        return "Description" in obj && "Name" in obj;  
     }
 
     public async GetByIdAsync(id: number): Promise<Permission | undefined> {       

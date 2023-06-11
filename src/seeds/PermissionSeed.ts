@@ -17,8 +17,7 @@ export default class PermissionSeed extends AbstractSeed
             return;
 
         let permissions = 
-        [
-            new Permission(PermissionName.EMPLOYERS, "Access the employers control"), 
+        [             
             new Permission(PermissionName.PERMISSIONS, "Access the permission control"),
             new Permission(PermissionName.USERS, "Access the user control"),
             new Permission(PermissionName.JOBS, "Access the jobs control")

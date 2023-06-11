@@ -4,10 +4,12 @@ import AbstractCheckpointService from "../core/abstractions/AbstractCheckpointSe
 import Checkpoint from "../core/entities/Checkpoint";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import { Operation } from "myorm_pg";
+import Path from 'path';
+import InvalidEntityException from "../exceptions/InvalidEntityException";
 
 export default class CheckpointService  extends AbstractCheckpointService
 {
-    
+   
     @Inject()
     private _context : Context;
 
@@ -17,14 +19,46 @@ export default class CheckpointService  extends AbstractCheckpointService
         this._context = context;
     }
 
+    public override async GetFolderAndFileName(checkpoint: Checkpoint): Promise<{ Folder: string; File: string; }> {
+       
+        let uId = checkpoint.User.Id;        
+        let folder = Path.join(process.env["ROOT"]!.toString(), `_${uId}_`);
+        let file = Path.join(folder, `_${checkpoint.Id}.png`);
+
+        return Promise.resolve({ Folder : folder, File : file});
+    }
+    
+    public override IsCompatible(obj: any): obj is Checkpoint {
+        
+        return ("User" in obj || "UserId" in obj) && "X" in obj && "Y" in obj;  
+    }
+
+    private CheckCheckpoint(obj: Checkpoint) : void
+    {
+        if(!obj.User)
+        throw new InvalidEntityException(`User of checkpoint is required`);
+
+        if(!obj.X)
+            throw new InvalidEntityException(`X point of checkpoint is required`);
+
+        if(!obj.Y)
+            throw new InvalidEntityException(`Y point of checkpoint is required`);        
+    }
+
     public async GetByIdAsync(id: number): Promise<Checkpoint | undefined> {       
         return await this._context.Checkpoints.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }
     
-    public async AddAsync(obj: Checkpoint): Promise<Checkpoint> {
+    public async AddAsync(obj: Checkpoint): Promise<Checkpoint> {        
+
+        this.CheckCheckpoint(obj);
+
         return this._context.Checkpoints.AddAsync(obj);
     }
     public async UpdateAsync(obj: Checkpoint): Promise<Checkpoint> {
+
+        this.CheckCheckpoint(obj);
+        
         return this._context.Checkpoints.UpdateAsync(obj);
     }
     public async DeleteAsync(obj: Checkpoint): Promise<Checkpoint> {
@@ -34,17 +68,17 @@ export default class CheckpointService  extends AbstractCheckpointService
         return await this._context.Checkpoints.OrderDescendingBy("Date").ToListAsync();
     }  
 
-    public async GetByRangeAndEmployer(employer: number, begin: Date, end?: Date | undefined): Promise<Checkpoint[]> {
+    public async GetByRangeAndEmployer(userId: number, begin: Date, end?: Date | undefined): Promise<Checkpoint[]> {
 
-        let emp = await this._context.Employers.WhereField("Id").IsEqualTo(employer).FirstOrDefaultAsync();
+        let user = await this._context.Users.WhereField("Id").IsEqualTo(userId).FirstOrDefaultAsync();
 
-        if(!emp)
-            throw new EntityNotFoundException(`Has no one employer with id: #${employer} in the database`);
+        if(!user)
+            throw new EntityNotFoundException(`Has no one employer with id: #${userId} in the database`);
 
        return await this._context.Checkpoints
        .Where({
-            Field : "Employer", 
-            Value : emp!})
+            Field : "User", 
+            Value : user!})
        .And({
             Field : "Date", 
             Kind : Operation.GREATHEROREQUALS, 
