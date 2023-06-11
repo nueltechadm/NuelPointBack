@@ -38,19 +38,16 @@ export default class CheckpointController extends ControllerBase
         try{          
 
             Formidable({multiples : false}).parse(this.Request as any, async (err, fields, incomming) => 
-            {
-                
+            {                
                 try{
 
                     if(err)
-                        return this.Error(err);
-
-                    let data = JSON.parse(fields.data.toString());
+                        return this.Error(err);                    
                     
-                    if(!fields.data || !this._checkpointService.IsCompatible(data))
+                    if(!fields.data || !this._checkpointService.IsCompatible(JSON.parse(fields.data.toString())))
                         return this.BadRequest(`The checkpoint data is required`);  
                         
-                    let checkpointDTO = InsertCheckpointDTO.MapToDTO(data);                
+                    let checkpointDTO = InsertCheckpointDTO.MapToDTO(JSON.parse(fields.data.toString()));                
         
                     let user = await this._userService.GetByIdAsync(checkpointDTO.UserId);
         
