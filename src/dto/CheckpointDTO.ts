@@ -2,7 +2,7 @@ import Checkpoint from "../core/entities/Checkpoint";
 import User from "../core/entities/User";
 
 
-export class InsertCheckpointDTO 
+export class CheckpointDTO 
 {
     public UserId : number;
     public X : number;
@@ -19,12 +19,12 @@ export class InsertCheckpointDTO
 
     public MapToCheckpoint(user : User)
     {
-        return new Checkpoint(user, this.X, this.Y, this.Picture);
+        return new Checkpoint(user, this.X, this.Y, this.Picture, user.Company!, user.Period!);
     }
 
-    public static MapToDTO(obj : any) : InsertCheckpointDTO
+    public static MapToDTO(obj : any) : CheckpointDTO
     {
-       let r = Reflect.construct(InsertCheckpointDTO, []);
+       let r = Reflect.construct(CheckpointDTO, []);
 
        for(let k in obj)
        {

@@ -1,6 +1,8 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany, ManyToOne} from 'myorm_pg'; 
 import Permission from './Permission';
 import JobRole from './JobRole';
+import Company from './Company';
+import Period from './Period';
 
 @Table("user_tb")
 export default class User
@@ -30,6 +32,14 @@ export default class User
     @ManyToOne(()=> JobRole, "Users")
     public JobRole: JobRole;
 
+    @Column()
+    @ManyToOne(() => Company)
+    public Company? : Company;
+
+    @Column()
+    @ManyToOne(() => Period)
+    public Period? : Period;
+
     constructor(name : string, email : string, username : string, password : string, job : JobRole)
     {
         this.Id = -1;
@@ -39,6 +49,7 @@ export default class User
         this.Password = password;
         this.JobRole = job; 
         this.Permissions = [];
-
+        this.Company = undefined;
+        this.Period = undefined;
     }
 }

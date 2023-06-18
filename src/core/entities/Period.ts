@@ -16,18 +16,26 @@ export default class Period
     public Description : string;   
 
     @Column()
+    public Begin : Date;
+
+    @Column()
+    public Over? : Date;
+
+    @Column()
     public Start : number;
 
     @Column()
     public End : number;
 
-    constructor(name : string, description : string, start : number, end : number)
+    constructor(name : string, description : string, start : number, end : number, begin : Date, over? : Date)
     {
         this.Id = -1;
         this.Name = name;
         this.Description = description;
         this.Start = start;
         this.End = end;
+        this.Begin = begin;
+        this.Over = over;
     }
 }
 

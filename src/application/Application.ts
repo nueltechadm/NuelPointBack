@@ -16,6 +16,16 @@ import FileService from '../services/FileService';
 import AbstractCheckpointService from '../core/abstractions/AbstractCheckpointService';
 import CheckpointService from '../services/CheckpointService';
 
+import AbstractCompanyService from '../core/abstractions/AbstractCompanyService';
+import CompanyService from '../services/CompanyService';
+
+import AbstractJorneyService from '../core/abstractions/AbstractJorneyService';
+import JourneyService from '../services/JourneyService';
+
+import AbstractPeriodService from '../core/abstractions/AbstractPeriodService';
+import PeriodService from '../services/PeriodService';
+
+
 export default class App extends Application
 {
 
@@ -34,6 +44,9 @@ export default class App extends Application
         appConfig.AddScoped(AbstractJobRoleService, JobRoleService);       
         appConfig.AddScoped(AbstractCheckpointService, CheckpointService);
         appConfig.AddScoped(AbstractFileService, FileService);
+        appConfig.AddScoped(AbstractCompanyService, CompanyService);
+        appConfig.AddScoped(AbstractJorneyService, JourneyService);
+        appConfig.AddScoped(AbstractPeriodService, PeriodService);
        
         await DependecyService.ResolveCtor(Context)!.UpdateDatabaseAsync();    
        

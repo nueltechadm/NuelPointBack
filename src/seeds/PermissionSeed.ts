@@ -1,19 +1,20 @@
 import AbstractSeed from "./ISeed";
-import AbstractPermissionService from "../core/abstractions/AbstractPermissionService";
 import Permission, { PermissionName } from "../core/entities/Permission";
+import Context from "../data/Context";
 
 export default class PermissionSeed extends AbstractSeed
 {
-    private _service : AbstractPermissionService;
+    private _context : Context;
 
-    constructor(service : AbstractPermissionService)
+    constructor(context : Context)
     {
         super();
-        this._service = service;
+        this._context = context;
     }
+    
     public async SeedAsync()
     {
-        if((await this._service.GetAllAsync()).length > 0)
+        if((await this._context.Permissions.CountAsync()) > 0)
             return;
 
         let permissions = 
@@ -25,7 +26,7 @@ export default class PermissionSeed extends AbstractSeed
 
         for(let p of permissions)
         {
-            await this._service.AddAsync(p);
+            await this._context.Permissions.AddAsync(p);
         }
     }
 }

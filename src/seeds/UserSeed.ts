@@ -1,31 +1,29 @@
 import AbstractSeed from "./ISeed";
-import AbstractUserService from "../core/abstractions/AbstractUserService";
-import AbstractPermissionService from "../core/abstractions/AbstractPermissionService";
 import User from "../core/entities/User";
-import JobRole from "../core/entities/JobRole";
-import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
+import Context from "../data/Context";
 
 export default class UserSeed extends AbstractSeed
 {
-    private _userService : AbstractUserService;
-    private _permissionService : AbstractPermissionService;
-    private _jobRoleService : AbstractJobRoleService;
-    
+    private _context : Context;
 
-    constructor(userService : AbstractUserService, permissionService : AbstractPermissionService, jobRoleService : AbstractJobRoleService)
+    constructor(context : Context)
     {
         super();
-        this._userService = userService;
-        this._permissionService = permissionService;
-        this._jobRoleService = jobRoleService;
+        this._context = context;
     }
+    
     public async SeedAsync()
     {
-        let adm = new User("Adriano Marino Balera", "adriano.marino1992@gmail.com", "adriano", "adriano", (await this._jobRoleService.GetAllAsync())[0]);
-        adm.Permissions = await this._permissionService.GetAllAsync();
 
-        if((await this._userService.GetByNameAsync(adm.Name)).length == 0)
-            await this._userService.AddAsync(adm);
+        if((await this._context.Users.CountAsync()) > 0)
+            return;
+
+        let adm = new User("Adriano Marino Balera", "adriano.marino1992@gmail.com", "adriano", "adriano", (await this._context.JobRoles.FirstOrDefaultAsync())!);
+        adm.Permissions = await this._context.Permissions.ToListAsync();
+        adm.Company = await this._context.Companies.FirstOrDefaultAsync();
+        adm.Period = await this._context.Periods.FirstOrDefaultAsync();
+        await this._context.Users.AddAsync(adm);
+            
                
     }
 }

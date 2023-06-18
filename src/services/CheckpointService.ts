@@ -8,7 +8,7 @@ import Path from 'path';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 
 export default class CheckpointService  extends AbstractCheckpointService
-{
+{   
    
     @Inject()
     private _context : Context;
@@ -17,6 +17,11 @@ export default class CheckpointService  extends AbstractCheckpointService
     {
         super();
         this._context = context;
+    }
+
+    public async CountAsync(): Promise<number> {
+        
+        return await this._context.Checkpoints.CountAsync();
     }
 
     public override async GetFolderAndFileName(checkpoint: Checkpoint): Promise<{ Folder: string; File: string; }> {
@@ -32,32 +37,20 @@ export default class CheckpointService  extends AbstractCheckpointService
         
         return ("User" in obj || "UserId" in obj) && "X" in obj && "Y" in obj;  
     }
-
-    private CheckCheckpoint(obj: Checkpoint) : void
-    {
-        if(!obj.User)
-        throw new InvalidEntityException(`User of checkpoint is required`);
-
-        if(!obj.X)
-            throw new InvalidEntityException(`X point of checkpoint is required`);
-
-        if(!obj.Y)
-            throw new InvalidEntityException(`Y point of checkpoint is required`);        
-    }
-
+   
     public async GetByIdAsync(id: number): Promise<Checkpoint | undefined> {       
-        return await this._context.Checkpoints.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
+        return await this._context.Checkpoints.WhereField("Id").IsEqualTo(id).AndLoadAll("User").AndLoadAll("Period").FirstOrDefaultAsync();
     }
     
     public async AddAsync(obj: Checkpoint): Promise<Checkpoint> {        
 
-        this.CheckCheckpoint(obj);
+        this.CommomValidations(obj);
 
         return this._context.Checkpoints.AddAsync(obj);
     }
     public async UpdateAsync(obj: Checkpoint): Promise<Checkpoint> {
 
-        this.CheckCheckpoint(obj);
+        this.CommomValidations(obj);
         
         return this._context.Checkpoints.UpdateAsync(obj);
     }
@@ -87,7 +80,25 @@ export default class CheckpointService  extends AbstractCheckpointService
             Field : "Date", 
             Kind : Operation.SMALLEROREQUALS, 
             Value : end ?? new Date()})    
+        .Join("User")
+        .Join("Period")
         .OrderDescendingBy("Date")
         .ToListAsync();
     }
+
+    private CommomValidations(obj: Checkpoint) : void
+    {
+        if(!this.IsCompatible(obj))
+            throw new InvalidEntityException(`This object is not of ${Checkpoint.name} type`);
+
+        if(!obj.User)
+            throw new InvalidEntityException(`User of checkpoint is required`);
+
+        if(!obj.X)
+            throw new InvalidEntityException(`X point of checkpoint is required`);
+
+        if(!obj.Y)
+            throw new InvalidEntityException(`Y point of checkpoint is required`);   
+    }
+
 }

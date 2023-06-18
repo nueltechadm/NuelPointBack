@@ -4,6 +4,8 @@ import Context from "../data/Context";
 import {Inject} from'web_api_base'
 import {MD5} from '../utils/Cryptography';
 import ObjectNotFoundExcpetion from "../exceptions/ObjectNotFoundExcpetion";
+import Type from "../utils/Type";
+import InvalidEntityException from "../exceptions/InvalidEntityException";
 
 export default class UserService  extends AbstractUserService
 {
@@ -19,8 +21,12 @@ export default class UserService  extends AbstractUserService
     }
 
     public IsCompatible(obj: any): obj is User {
+        return Type.HasKeys<User>(obj, "Username", "Name", "Email", "Password");
+    }
 
-        return "Username" in obj && "Name" in obj && "Email" in obj && "Password" in obj;  
+    public async CountAsync(): Promise<number> {
+        
+        return await this._context.Users.CountAsync();
     }
 
     public override async GetByIdAsync(id: number): Promise<User| undefined> {
@@ -31,12 +37,14 @@ export default class UserService  extends AbstractUserService
                                             Value : id
                                         })
                                         .Join("Permissions")
+                                        .Join("Company")
+                                        .Join("Period")
                                         .FirstOrDefaultAsync();
         
     }
     public override async GetByNameAsync(name: string): Promise<User[]> {
 
-        return await this._context.Users.WhereField("Name").Constains(name).Join("Permissions").ToListAsync() ?? [];
+        return await this._context.Users.WhereField("Name").Constains(name).Join("Permissions").Join("Company").Join("Period").ToListAsync() ?? [];
     }
 
     public override async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<User | undefined> {
@@ -45,6 +53,8 @@ export default class UserService  extends AbstractUserService
                                 .WhereField("Username").IsEqualTo(username)
                                 .AndField("Password").IsEqualTo(MD5(password))
                                 .AndLoadAll("Permissions")
+                                .AndLoadAll("Company")
+                                .AndLoadAll("Period")
                                 .FirstOrDefaultAsync();           
      
     }
@@ -57,12 +67,20 @@ export default class UserService  extends AbstractUserService
                                                 Value : email
                                             })
                                             .Join("Permissions")
+                                            .Join("Company")
+                                            .Join("Period")
                                             .FirstOrDefaultAsync();
     }
 
     public override async AddAsync(obj: User): Promise<User> 
     { 
         await this.SyncPermissionsAsync(obj);
+
+        if(!obj.Company)
+            throw new InvalidEntityException("The company of the user is required");
+
+        if(!obj.JobRole)
+            throw new InvalidEntityException("The jobrole of the user is required");        
 
         obj.Password = MD5(obj.Password);
 
@@ -80,6 +98,12 @@ export default class UserService  extends AbstractUserService
             obj.Password = MD5(obj.Password);
         
         await this.SyncPermissionsAsync(obj);
+
+        if(!obj.Company)
+            throw new InvalidEntityException("The company of the user is required");
+
+        if(!obj.JobRole)
+            throw new InvalidEntityException("The jobrole of the user is required");         
 
         return await this._context.Users.UpdateAsync(obj)!;
     }

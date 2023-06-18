@@ -7,7 +7,7 @@ import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractFileService from "../services/abstractions/AbstractFileService";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import { InsertCheckpointDTO } from "../dto/InsertCheckpointDTO";
+import { CheckpointDTO } from "../dto/CheckpointDTO";
 
 
 @Use(IsLogged)
@@ -47,7 +47,7 @@ export default class CheckpointController extends ControllerBase
                     if(!fields.data || !this._checkpointService.IsCompatible(JSON.parse(fields.data.toString())))
                         return this.BadRequest(`The checkpoint data is required`);  
                         
-                    let checkpointDTO = InsertCheckpointDTO.MapToDTO(JSON.parse(fields.data.toString()));                
+                    let checkpointDTO = CheckpointDTO.MapToDTO(JSON.parse(fields.data.toString()));                
         
                     let user = await this._userService.GetByIdAsync(checkpointDTO.UserId);
         

@@ -1,21 +1,21 @@
 import AbstractSeed from "./ISeed";
-import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
 import JobRole from "../core/entities/JobRole";
+import Context from "../data/Context";
 
 export default class JobRoleSeed extends AbstractSeed
 {
-    private _service : AbstractJobRoleService;
+    private _context : Context;
 
-    constructor(service : AbstractJobRoleService)
+    constructor(context : Context)
     {
         super();
-        this._service = service;
+        this._context = context;
     }
     public async SeedAsync()
     {
-        if((await this._service.GetAllAsync()).length > 0)
+        if((await this._context.JobRoles.CountAsync()) > 0)
             return;
 
-            await this._service.AddAsync(new JobRole("Developer", "developers"));
+        await this._context.JobRoles.AddAsync(new JobRole("Developer", (await this._context.Companies.FirstOrDefaultAsync())!));
     }
 }

@@ -2,25 +2,31 @@
 import PermissionSeed from './seeds/PermissionSeed';
 import UserSeed from './seeds/UserSeed';
 import JobRoleSeed from './seeds/JobRoleSeed';
-import PermissionService from './services/PermissionService';
 import Context from './data/Context';
-import JobRoleService from './services/JobRoleService';
-import UserService from './services/UserService';
+import CompanySeed from './seeds/CompanySeed';
+import DepartamentSeed from './seeds/DepartamentSeed';
+import PeriodSeed from './seeds/PeriodSeed';
+import { ApplicationConfiguration } from 'web_api_base';
 
 
 (async ()=>
 {
     console.log("Starting seed");
 
-    let context = new Context();
-    let permissonService = new PermissionService(context);
-    let jobRoleService = new JobRoleService(context);
-    let userService = new UserService(context);
+    await new ApplicationConfiguration().LoadAsync();
 
-    await new PermissionSeed(permissonService).SeedAsync();
-    await new JobRoleSeed(jobRoleService).SeedAsync();
-    await new UserSeed(userService, permissonService, jobRoleService).SeedAsync();
+    let context = new Context();   
+    
+    context["_manager"].SetLogger((msg, tp) => console.log(msg));
 
+    await context.UpdateDatabaseAsync();
+
+    await new CompanySeed(context).SeedAsync();
+    await new DepartamentSeed(context).SeedAsync();
+    await new JobRoleSeed(context).SeedAsync();
+    await new PeriodSeed(context).SeedAsync();    
+    await new PermissionSeed(context).SeedAsync();    
+    await new UserSeed(context).SeedAsync();
 
     console.log("Seed process finished");
 

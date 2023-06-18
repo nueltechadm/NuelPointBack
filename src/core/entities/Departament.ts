@@ -1,10 +1,10 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, OneToMany, ManyToOne} from 'myorm_pg'; 
-import User from './User';
 import Company from './Company';
+import JobRole from './JobRole';
 
 
 @Table()
-export default class JobRole
+export default class Departament
 {
     @Column()
     @PrimaryKey()
@@ -12,21 +12,21 @@ export default class JobRole
     public Id : number;
 
     @Column()
-    public Description : string;
+    public Name : string;
 
     @Column()
-    @OneToMany(()=> User)
-    public Users : User[];
-
-    @Column()
-    @ManyToOne(() => Company)
+    @ManyToOne(()=> Company)
     public Company : Company;
+
+    @Column()
+    @OneToMany(() => JobRole)
+    public JobRoles : JobRole[];
     
-    constructor(description : string, company : Company)
+    constructor(name : string, company : Company)
     {
         this.Id = -1;
-        this.Description = description;        
-        this.Users = [];
+        this.Name = name;        
+        this.JobRoles = [];
         this.Company = company;
         
     }

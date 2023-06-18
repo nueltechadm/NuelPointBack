@@ -1,5 +1,6 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, OneToMany} from 'myorm_pg'; 
 import User from './User';
+import Departament from './Departament';
 
 
 @Table()
@@ -21,15 +22,17 @@ export default class Company
     public Users : User[];
 
     @Column()
-    public Folder : string;
+    @OneToMany(()=> Departament)
+    public Departaments : Departament[];
     
-    constructor(name : string, description : string, folder : string)
+    
+    constructor(name : string, description : string)
     {
         this.Id = -1;
         this.Name = name;
-        this.Description = description;
-        this.Folder = folder;
+        this.Description = description;       
         this.Users = [];
+        this.Departaments= [];
         
     }
 }
