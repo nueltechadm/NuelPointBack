@@ -14,6 +14,18 @@ export default class User
     
     @Column()
     public Name : string;
+
+    @Column()
+    @DataType(DBTypes.DATE)
+    public Birthdate : Date;
+
+    @Column()
+    @DataType(DBTypes.DATE)
+    public AdmisionDate : Date;
+
+    @Column()
+    @DataType(DBTypes.DATE)
+    public DemissionDate? : Date;
     
     @Column()
     public Email : string;
@@ -44,6 +56,9 @@ export default class User
     {
         this.Id = -1;
         this.Name = name;
+        this.Birthdate = new Date();
+        this.AdmisionDate = new Date();
+        this.DemissionDate = undefined;
         this.Email = email;
         this.Username = username;
         this.Password = password;

@@ -16,6 +16,6 @@ export default class CompanySeed extends AbstractSeed
         if((await this._context.Companies.CountAsync()) > 0)
             return;
 
-        await this._context.Companies.AddAsync(new Company("Development","Development company"));
+        await this._context.Companies.AddAsync(new Company("Development","Development company", "123456789"));
     }
 }

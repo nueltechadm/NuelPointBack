@@ -16,6 +16,6 @@ export default class JobRoleSeed extends AbstractSeed
         if((await this._context.JobRoles.CountAsync()) > 0)
             return;
 
-        await this._context.JobRoles.AddAsync(new JobRole("Developer", (await this._context.Companies.FirstOrDefaultAsync())!));
+        await this._context.JobRoles.AddAsync(new JobRole("Developer", (await this._context.Companies.FirstOrDefaultAsync())!, (await this._context.Departaments.FirstOrDefaultAsync())!));
     }
 }

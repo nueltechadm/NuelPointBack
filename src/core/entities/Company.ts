@@ -18,6 +18,12 @@ export default class Company
     public Description : string;
 
     @Column()
+    public Document : string;
+
+    @Column()
+    public Logo? : string;
+
+    @Column()
     @OneToMany(()=> User)
     public Users : User[];
 
@@ -26,13 +32,15 @@ export default class Company
     public Departaments : Departament[];
     
     
-    constructor(name : string, description : string)
+    constructor(name : string, description : string, document: string)
     {
         this.Id = -1;
         this.Name = name;
-        this.Description = description;       
+        this.Description = description;   
+        this.Document = document;    
+        this.Logo = undefined; 
         this.Users = [];
-        this.Departaments= [];
+        this.Departaments= [];       
         
     }
 }
