@@ -3,6 +3,8 @@ import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, Us
 import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
 import JobRole from "../core/entities/JobRole";
 import {IsLogged} from '../filters/AuthFilter';
+import InvalidEntityException from "../exceptions/InvalidEntityException";
+import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 
 @Use(IsLogged)
 @Validate()
@@ -54,16 +56,18 @@ export default class JobRoleController extends ControllerBase
     
     @PUT("update")   
     public async UpdateAsync(@FromBody()jobRole : JobRole) : Promise<void>
-    {        
-        if(jobRole.Id == undefined || jobRole.Id <= 0)
-            return this.BadRequest({ Message : "The ID must be greater than 0"});
-        
-        let update = await this._service.GetByIdAsync(jobRole.Id);
+    {  
+        try{
 
-        if(!update)
-            return this.NotFound({Message : "Job role not found"});
-
-        this.OK(await this._service.UpdateAsync(jobRole));
+            this.OK(await this._service.UpdateAsync(jobRole));
+        }
+        catch(ex)
+        {
+            if(ex instanceof InvalidEntityException || ex instanceof EntityNotFoundException)
+                return this.BadRequest({Message : ex.message});
+            
+            return this.Error("Error while processing the request");
+        }
     }
 
     @DELETE("delete")    

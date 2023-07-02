@@ -3,6 +3,7 @@ import Permission from './Permission';
 import JobRole from './JobRole';
 import Company from './Company';
 import Period from './Period';
+import Access from './Access';
 
 @Table("user_tb")
 export default class User
@@ -40,7 +41,11 @@ export default class User
     @ManyToOne(() => Period)
     public Period? : Period;
 
-    constructor(name : string, email : string, username : string, password : string, job : JobRole)
+    @Column()
+    @ManyToOne(() => Access)
+    public Access? : Access;
+
+    constructor(name : string, email : string, username : string, password : string, job : JobRole, access : Access)
     {
         this.Id = -1;
         this.Name = name;

@@ -6,6 +6,8 @@ import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import { Operation } from "myorm_pg";
 import Path from 'path';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
+import Company from "../core/entities/Company";
+import User from "../core/entities/User";
 
 export default class CheckpointService  extends AbstractCheckpointService
 {   
@@ -26,9 +28,34 @@ export default class CheckpointService  extends AbstractCheckpointService
 
     public override async GetFolderAndFileName(checkpoint: Checkpoint): Promise<{ Folder: string; File: string; }> {
        
-        let uId = checkpoint.User.Id;        
-        let folder = Path.join(process.env["ROOT"]!.toString(), `_${uId}_`);
-        let file = Path.join(folder, `_${checkpoint.Id}.png`);
+        if(!this.IsCompatible(checkpoint))
+            throw new InvalidEntityException(`This object is not of ${Checkpoint.name} type`);
+
+        if(!checkpoint.User)
+            throw new InvalidEntityException(`User is required`);
+
+        let company : Company;
+
+        if(!checkpoint.User.Company)
+        {
+            let r = await this._context.Join(Company, User)
+                                       .On(Company, "Users", User, "Company")
+                                       .Where(User, {Field: "Id", Value : checkpoint.User.Id})
+                                       .Select(Company)
+                                       .ToListAsync();
+
+            if(r.length == 0)
+                throw new InvalidEntityException(`The user of this checkpoint has no company`);
+            
+            company = r[0];
+        }
+        else 
+            company = checkpoint.User.Company!;
+
+        let uId = checkpoint.User.Id;
+        let cId = company.Id;        
+        let folder = Path.join(process.env["ROOT"]!.toString(), `_${cId}_` ,`_${uId}_`);
+        let file = Path.join(folder, `_${checkpoint.Id}_.png`);
 
         return Promise.resolve({ Folder : folder, File : file});
     }
@@ -45,6 +72,9 @@ export default class CheckpointService  extends AbstractCheckpointService
     public async AddAsync(obj: Checkpoint): Promise<Checkpoint> {        
 
         this.CommomValidations(obj);
+
+        if(!obj.User.Company)
+            throw new InvalidEntityException(`The user of this checkpoint has no company`);
 
         return this._context.Checkpoints.AddAsync(obj);
     }

@@ -6,6 +6,7 @@ import {MD5} from '../utils/Cryptography';
 import ObjectNotFoundExcpetion from "../exceptions/ObjectNotFoundExcpetion";
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
+import Access from "../core/entities/Access";
 
 export default class UserService  extends AbstractUserService
 {
@@ -21,7 +22,7 @@ export default class UserService  extends AbstractUserService
     }
 
     public IsCompatible(obj: any): obj is User {
-        return Type.HasKeys<User>(obj, "Username", "Name", "Email", "Password");
+        return Type.HasKeys<User>(obj, "Name", "Email");
     }
 
     public async CountAsync(): Promise<number> {
@@ -37,6 +38,7 @@ export default class UserService  extends AbstractUserService
                                             Value : id
                                         })
                                         .Join("Permissions")
+                                        .Join("Access")
                                         .Join("Company")
                                         .Join("Period")
                                         .FirstOrDefaultAsync();
@@ -49,13 +51,12 @@ export default class UserService  extends AbstractUserService
 
     public override async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<User | undefined> {
 
-       return await this._context.Users
-                                .WhereField("Username").IsEqualTo(username)
-                                .AndField("Password").IsEqualTo(MD5(password))
-                                .AndLoadAll("Permissions")
-                                .AndLoadAll("Company")
-                                .AndLoadAll("Period")
-                                .FirstOrDefaultAsync();           
+       return await this._context.Join(User, Access)
+                                    .On(User, "Access", Access, "User")
+                                    .Where(Access, { Field : "Username", Value : username})
+                                    .And(Access, { Field : "Password", Value : password})       
+                                    .Select(User)
+                                    .ToListAsync();   
      
     }
 

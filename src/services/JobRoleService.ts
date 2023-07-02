@@ -43,6 +43,9 @@ export default class JobRoleService  extends AbstractJobRoleService
 
         this.CommonValidation(obj);
 
+        if(!obj.Id)
+            throw new InvalidEntityException(`ID must be greater than 0`);
+
         return this._context.JobRoles.UpdateAsync(obj);
     }
     public async DeleteAsync(obj: JobRole): Promise<JobRole> {

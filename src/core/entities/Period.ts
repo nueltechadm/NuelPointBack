@@ -22,9 +22,11 @@ export default class Period
     public Over? : Date;
 
     @Column()
+    @DataType(DBTypes.DOUBLE)
     public Start : number;
 
     @Column()
+    @DataType(DBTypes.DOUBLE)
     public End : number;
 
     constructor(name : string, description : string, start : number, end : number, begin : Date, over? : Date)
