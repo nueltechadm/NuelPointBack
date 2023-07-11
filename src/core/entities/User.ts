@@ -29,17 +29,7 @@ export default class User
     public DemissionDate? : Date;
     
     @Column()
-    public Email : string;
-    
-    @Column()
-    public Username : string;
-    
-    @Column()
-    public Password : string;    
-   
-    @Column()
-    @ManyToMany(() => Permission)
-    public Permissions : Permission[];
+    public Email : string; 
 
     @Column()
     @ManyToOne(()=> JobRole, "Users")
@@ -57,19 +47,17 @@ export default class User
     @ManyToOne(() => Access)
     public Access? : Access;
 
-    constructor(name : string, email : string, username : string, password : string, job : JobRole, access : Access)
+    constructor(name : string, email : string, job : JobRole)
     {
         this.Id = -1;
         this.Name = name;
         this.Birthdate = new Date();
         this.AdmisionDate = new Date();
         this.DemissionDate = undefined;
-        this.Email = email;
-        this.Username = username;
-        this.Password = password;
-        this.JobRole = job; 
-        this.Permissions = [];
+        this.Email = email;        
+        this.JobRole = job;         
         this.Company = undefined;
         this.Period = undefined;
+        this.Access = undefined;
     }
 }

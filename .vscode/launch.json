@@ -13,6 +13,17 @@
             ],            
             "runtimeExecutable": "node", 
             "runtimeArgs": ["${workspaceFolder}//dist/Index.js"]
+        }, 
+
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Seed",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],            
+            "runtimeExecutable": "node", 
+            "runtimeArgs": ["${workspaceFolder}//dist/Seed.js"]
         }
     ]
 }

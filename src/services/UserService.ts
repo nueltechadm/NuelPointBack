@@ -36,8 +36,7 @@ export default class UserService  extends AbstractUserService
                                         {
                                             Field : "Id", 
                                             Value : id
-                                        })
-                                        .Join("Permissions")
+                                        })                                        
                                         .Join("Access")
                                         .Join("Company")
                                         .Join("Period")
@@ -46,17 +45,27 @@ export default class UserService  extends AbstractUserService
     }
     public override async GetByNameAsync(name: string): Promise<User[]> {
 
-        return await this._context.Users.WhereField("Name").Constains(name).Join("Permissions").Join("Company").Join("Period").ToListAsync() ?? [];
+        return await this._context.Users.WhereField("Name").Constains(name).Join("Company").Join("Period").ToListAsync() ?? [];
     }
 
     public override async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<User | undefined> {
 
-       return await this._context.Join(User, Access)
+       let access = await this._context.Join(User, Access)
                                     .On(User, "Access", Access, "User")
                                     .Where(Access, { Field : "Username", Value : username})
-                                    .And(Access, { Field : "Password", Value : password})       
-                                    .Select(User)
-                                    .ToListAsync();   
+                                    .And(Access, { Field : "Password", Value : MD5(password)})       
+                                    .Select(Access)                                    
+                                    .Join("User")
+                                    .Join("Permissions")
+                                    .Join("Departaments")
+                                    .FirstOrDefaultAsync();   
+        if(!access)
+            return undefined;
+
+        access.User.Access = access;
+        delete (access as any).Password;        
+        delete (access as any).User;        
+        return access.User;
      
     }
 
@@ -66,8 +75,7 @@ export default class UserService  extends AbstractUserService
                                             {
                                                 Field : "Email", 
                                                 Value : email
-                                            })
-                                            .Join("Permissions")
+                                            })                                            
                                             .Join("Company")
                                             .Join("Period")
                                             .FirstOrDefaultAsync();
@@ -75,7 +83,7 @@ export default class UserService  extends AbstractUserService
 
     public override async AddAsync(obj: User): Promise<User> 
     { 
-        await this.SyncPermissionsAsync(obj);
+        await this.SyncPermissionsAsync(obj.Access!);
 
         if(!obj.Company)
             throw new InvalidEntityException("The company of the user is required");
@@ -83,7 +91,7 @@ export default class UserService  extends AbstractUserService
         if(!obj.JobRole)
             throw new InvalidEntityException("The jobrole of the user is required");        
 
-        obj.Password = MD5(obj.Password);
+        obj.Access!.Password = MD5(obj.Access!.Password);
 
         return await this._context.Users.AddAsync(obj)!;        
     }
@@ -95,10 +103,10 @@ export default class UserService  extends AbstractUserService
         if(!curr)
             throw new ObjectNotFoundExcpetion(`This user do not exists on database`);
 
-        if(curr.Password != obj.Password)
-            obj.Password = MD5(obj.Password);
+        if(curr.Access!.Password != obj.Access!.Password)
+            obj.Access!.Password = MD5(obj.Access!.Password);
         
-        await this.SyncPermissionsAsync(obj);
+        await this.SyncPermissionsAsync(obj.Access!);
 
         if(!obj.Company)
             throw new InvalidEntityException("The company of the user is required");
@@ -119,7 +127,7 @@ export default class UserService  extends AbstractUserService
         return await this._context.Users.OrderBy("Name").ToListAsync()!;
     }   
 
-    private async SyncPermissionsAsync(obj : User) : Promise<void>
+    private async SyncPermissionsAsync(obj : Access) : Promise<void>
     {
         let permissionsIds = obj.Permissions != undefined ? obj.Permissions.map(s => s.Id) : [];
 

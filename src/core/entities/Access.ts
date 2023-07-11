@@ -3,9 +3,10 @@ import Permission from './Permission';
 import JobRole from './JobRole';
 import Company from './Company';
 import Departament from './Departament';
+import User from './User';
 
 @Table("access_tb")
-export default class User
+export default class Access
 {
     @Column()
     @PrimaryKey()
@@ -28,13 +29,13 @@ export default class User
 
     @Column()
     @ManyToOne(() => Company)
-    public Companies : Company[];
+    public Company? : Company;
 
     @Column()
     @OneToMany(()=> Departament)
     public Departaments : Departament[];
 
-    constructor(user : User, username : string, password : string, job : JobRole)
+    constructor(user : User, username : string, password : string)
     {
         this.Id = -1;  
         this.User = user;      
@@ -42,6 +43,6 @@ export default class User
         this.Password = password;
         this.Departaments = []; 
         this.Permissions = [];
-        this.Companies = [];        
+        this.Company = undefined;        
     }
 }
