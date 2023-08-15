@@ -5,3 +5,5 @@ export default abstract class AbstractJorneyService extends AbstractService<Jour
 {
     abstract GetByIdAsync(id : number) : Promise<Journey | undefined>;    
 }
+
+

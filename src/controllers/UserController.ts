@@ -1,10 +1,10 @@
 
-import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, Use, Validate } from "web_api_base";
+import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import User from "../core/entities/User";
 import {IsLogged} from '../filters/AuthFilter';
 
-@Use(IsLogged)
+@UseBefore(IsLogged)
 @Validate()
 export default class UserController extends ControllerBase
 {   
@@ -41,7 +41,7 @@ export default class UserController extends ControllerBase
     }
     
     @PUT("update")   
-    public async UpdateAsync(@FromBody()user : User) : Promise<void>
+    public async UpdateAsync(@FromBody()user : User) 
     {        
         if(user.Id == undefined || user.Id <= 0)
             return this.BadRequest({ Message : "The ID must be greater than 0"});
@@ -55,7 +55,7 @@ export default class UserController extends ControllerBase
     }
 
     @DELETE("delete")    
-    public async DeleteAsync(@FromQuery()id : number) : Promise<void>
+    public async DeleteAsync(@FromQuery()id : number) 
     {  
         if(!id)
             return this.BadRequest({ Message : "The ID must be greater than 0"});
@@ -75,6 +75,16 @@ export default class UserController extends ControllerBase
 
         delete (user as any).Password;
         delete (user as any)._orm_metadata_;
+        
+        if(user.Access)
+            delete (user.Access as any)._orm_metadata_;
+
+        if(user.Company)
+            delete (user.Company as any)._orm_metadata_;
+
+        if(user.Contacts)
+            delete (user.Contacts as any)._orm_metadata_;
+
         return user;
     }
 }

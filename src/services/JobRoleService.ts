@@ -27,12 +27,12 @@ export default class JobRoleService  extends AbstractJobRoleService
         return await this._context.JobRoles.CountAsync();
     }
     public async GetByIdAsync(id: number): Promise<JobRole | undefined> {       
-        return await this._context.JobRoles.WhereField("Id").IsEqualTo(id).AndLoadAll("Company").FirstOrDefaultAsync();
+        return await this._context.JobRoles.WhereField("Id").IsEqualTo(id).LoadRelationOn("Company").FirstOrDefaultAsync();
     }
     
     public async AddAsync(obj: JobRole): Promise<JobRole> {
 
-        this.CommonValidation(obj);
+        this.ValidateObject(obj);
 
         if(!obj.Company)
             throw new InvalidEntityException(`The company of ${JobRole.name} is required`); 
@@ -41,7 +41,7 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
     public async UpdateAsync(obj: JobRole): Promise<JobRole> {
 
-        this.CommonValidation(obj);
+        this.ValidateObject(obj);
 
         if(!obj.Id)
             throw new InvalidEntityException(`ID must be greater than 0`);
@@ -64,7 +64,7 @@ export default class JobRoleService  extends AbstractJobRoleService
         return await this._context.JobRoles.OrderBy("Description").ToListAsync();
     }  
 
-    private CommonValidation(obj: JobRole) : void
+    public ValidateObject(obj: JobRole) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${JobRole.name} type`);

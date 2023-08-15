@@ -35,7 +35,7 @@ export default class DepartamentService  extends AbstractDepartamentService
     
     public async AddAsync(obj: Departament): Promise<Departament> {
 
-        this.CommonValidation(obj);
+        this.ValidateObject(obj);
 
         if(!obj.Company)
             throw new InvalidEntityException(`The company of ${Departament.name} is required`); 
@@ -44,7 +44,7 @@ export default class DepartamentService  extends AbstractDepartamentService
     }
     public async UpdateAsync(obj: Departament): Promise<Departament> {
 
-        this.CommonValidation(obj);
+        this.ValidateObject(obj);
 
         return this._context.Departaments.UpdateAsync(obj);
     }
@@ -64,7 +64,7 @@ export default class DepartamentService  extends AbstractDepartamentService
         return await this._context.Departaments.OrderBy("Name").ToListAsync();
     }  
 
-    private CommonValidation(obj: Departament) : void
+    public ValidateObject(obj: Departament) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${Departament.name} type`);

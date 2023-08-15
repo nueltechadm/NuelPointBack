@@ -1,5 +1,5 @@
 
-import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, Use, Validate } from "web_api_base";
+import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
 import Formidable from "formidable";
 import {IsLogged} from '../filters/AuthFilter';
 import AbstractCheckpointService from "../core/abstractions/AbstractCheckpointService";
@@ -10,7 +10,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import { CheckpointDTO } from "../dto/CheckpointDTO";
 
 
-@Use(IsLogged)
+@UseBefore(IsLogged)
 @Validate()
 export default class CheckpointController extends ControllerBase
 {   
@@ -33,7 +33,7 @@ export default class CheckpointController extends ControllerBase
         
     
     @POST("insert")
-    public async InsertAsync() : Promise<void>
+    public async InsertAsync() 
     {  
         try{          
 

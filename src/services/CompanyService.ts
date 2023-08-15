@@ -26,17 +26,17 @@ export default class CompanyService  extends AbstractCompanyService
         return Type.HasKeys<Company>(obj, "Name");
     }
     public async GetByIdAsync(id: number): Promise<Company | undefined> {       
-        return await this._context.Companies.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
+        return await this._context.Companies.WhereField("Id").IsEqualTo(id).LoadRelationOn("Address").LoadRelationOn("Contacts").LoadRelationOn("Users").FirstOrDefaultAsync();
     }      
     public async AddAsync(obj: Company): Promise<Company> {
 
-        this.CommomValidations(obj);
+        this.ValidateObject(obj);
 
         return this._context.Companies.AddAsync(obj);
     }
     public async UpdateAsync(obj: Company): Promise<Company> {
 
-        this.CommomValidations(obj);
+        this.ValidateObject(obj);
 
         return this._context.Companies.UpdateAsync(obj);
     }
@@ -47,7 +47,7 @@ export default class CompanyService  extends AbstractCompanyService
         return await this._context.Companies.OrderBy("Description").ToListAsync();
     }    
     
-    private CommomValidations(obj : Company) : void
+    public ValidateObject(obj : Company) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${Company.name} type`);

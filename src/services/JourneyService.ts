@@ -29,13 +29,13 @@ export default class JourneyService  extends AbstractJorneyService
     }      
     public async AddAsync(obj: Journey): Promise<Journey> {
 
-        this.CommomValidations(obj);
+        this.ValidateObject(obj);
 
         return this._context.Journeys.AddAsync(obj);
     }
     public async UpdateAsync(obj: Journey): Promise<Journey> {
 
-        this.CommomValidations(obj);
+        this.ValidateObject(obj);
         
         return this._context.Journeys.UpdateAsync(obj);
     }
@@ -46,7 +46,7 @@ export default class JourneyService  extends AbstractJorneyService
         return await this._context.Journeys.OrderBy("Description").ToListAsync();
     }  
 
-    private CommomValidations(obj : Journey) : void
+    public ValidateObject(obj : Journey) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Journey.name} type`);
@@ -55,3 +55,6 @@ export default class JourneyService  extends AbstractJorneyService
             throw new InvalidEntityException("A period must have at less 1 day of the week");        
     }
 }
+
+
+

@@ -1,10 +1,10 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, OneToOne, ManyToOne} from 'myorm_pg'; 
 import User from './User';
 import Company from './Company';
-import Period from './Period';
+import Time from './Time';
 
 
-@Table()
+@Table("checkpoint_tb")
 export default class Checkpoint
 {
     @Column()
@@ -40,10 +40,10 @@ export default class Checkpoint
     public Company : Company;
 
     @Column()
-    @ManyToOne(() => Period)
-    public Period : Period;
+    @ManyToOne(() => Time)
+    public Time : Time;
     
-    constructor(user : User, x : number, y : number, picture : string, company : Company, period : Period)
+    constructor(user : User, x : number, y : number, picture : string, company : Company, time : Time)
     {
         this.Id = -1;
         this.Date = new Date();
@@ -52,7 +52,7 @@ export default class Checkpoint
         this.Y = y;
         this.Picture = picture;
         this.Company = company;
-        this.Period = period;
+        this.Time = time;
         this.Observation = "";
         this.CheckpointType = CheckpointType.NORMAL;
     }
@@ -63,5 +63,8 @@ export enum CheckpointType
 {
     NORMAL = 0, 
     EDIT = 1, 
-    DELETE = 2
+    DELETE = 2, 
+    NULL = 9999
 }
+
+

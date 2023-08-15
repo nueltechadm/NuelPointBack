@@ -21,9 +21,11 @@ import CompanyService from '../services/CompanyService';
 
 import AbstractJorneyService from '../core/abstractions/AbstractJorneyService';
 import JourneyService from '../services/JourneyService';
+import TimeService  from "../services/TimeService";
 
 import AbstractPeriodService from '../core/abstractions/AbstractPeriodService';
 import PeriodService from '../services/PeriodService';
+import AbstractTimeService from '../core/abstractions/AbstractTimeService';
 
 
 export default class App extends Application
@@ -47,8 +49,11 @@ export default class App extends Application
         appConfig.AddScoped(AbstractCompanyService, CompanyService);
         appConfig.AddScoped(AbstractJorneyService, JourneyService);
         appConfig.AddScoped(AbstractPeriodService, PeriodService);
+        appConfig.AddScoped(AbstractTimeService, TimeService);
        
-        await DependecyService.ResolveCtor(Context)!.UpdateDatabaseAsync();    
+        if(process.env.ENVIROMENT != 'DEBUG'){       
+            await DependecyService.ResolveCtor(Context)!.UpdateDatabaseAsync();
+        }    
        
     }
     

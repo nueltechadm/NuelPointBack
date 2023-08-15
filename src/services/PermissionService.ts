@@ -3,6 +3,7 @@ import Context from "../data/Context";
 import {Inject} from'web_api_base'
 import Permission, {PermissionName} from "../core/entities/Permission";
 import Type from "../utils/Type";
+import InvalidEntityException from "../exceptions/InvalidEntityException";
 
 export default class PermissionService  extends AbstractPermissionService
 {
@@ -44,4 +45,16 @@ export default class PermissionService  extends AbstractPermissionService
     public async GetAllAsync(): Promise<Permission[]> {
         return await this._context.Permissions.OrderBy("Description").ToListAsync();
     }  
+
+    public ValidateObject(obj : Permission) : void
+    {
+        if(!this.IsCompatible(obj))
+            throw new InvalidEntityException(`This object is not of ${Permission.name} type`); 
+
+        if(!obj.Description)
+          throw new InvalidEntityException(`The description of permission is required`);
+
+        if(!obj.Name)
+          throw new InvalidEntityException(`The name of permission is required`);
+    }
 }

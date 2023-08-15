@@ -1,9 +1,10 @@
-import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany, ManyToOne} from 'myorm_pg'; 
-import Permission from './Permission';
+import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany, ManyToOne, OneToMany, OneToOne} from 'myorm_pg'; 
 import JobRole from './JobRole';
 import Company from './Company';
-import Period from './Period';
+import Time from './Time';
 import Access from './Access';
+import Contact from './Contact';
+import Address from './Address';
 
 @Table("user_tb")
 export default class User
@@ -13,6 +14,9 @@ export default class User
     @DataType(DBTypes.SERIAL)
     public Id : number;
     
+    @Column()
+    public Active : boolean;
+
     @Column()
     public Name : string;
 
@@ -40,16 +44,25 @@ export default class User
     public Company? : Company;
 
     @Column()
-    @ManyToOne(() => Period)
-    public Period? : Period;
+    @ManyToOne(() => Time)
+    public Period? : Time;
 
     @Column()
     @ManyToOne(() => Access)
     public Access? : Access;
 
+    @Column()
+    @OneToMany(() => Contact)
+    public Contacts : Contact[];
+
+    @Column()
+    @ManyToOne(() => Address)
+    public Address? : Address;
+
     constructor(name : string, email : string, job : JobRole)
     {
         this.Id = -1;
+        this.Active = true;
         this.Name = name;
         this.Birthdate = new Date();
         this.AdmisionDate = new Date();
@@ -59,5 +72,10 @@ export default class User
         this.Company = undefined;
         this.Period = undefined;
         this.Access = undefined;
+        this.Contacts = [];
+        this.Address = undefined;
     }
 }
+
+
+

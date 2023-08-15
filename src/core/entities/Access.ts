@@ -1,6 +1,5 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany, ManyToOne, OneToOne, OneToMany} from 'myorm_pg'; 
 import Permission from './Permission';
-import JobRole from './JobRole';
 import Company from './Company';
 import Departament from './Departament';
 import User from './User';

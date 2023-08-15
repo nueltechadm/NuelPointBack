@@ -17,7 +17,7 @@ export default class LoginController extends ControllerBase
     
 
     @POST("login")
-    public async LoginAsync(@FromBody("username")username: string, @FromBody("password")password: string ) : Promise<void>
+    public async LoginAsync(@FromBody("username")username: string, @FromBody("password")password: string ) 
     {        
         let user =  await this._service.GetByUserNameAndPasswordAsync(username, password);
 

@@ -30,3 +30,4 @@ export function IsLogged(context : IHTTPRequestContext) : void
     context.Next();
 }
 
+

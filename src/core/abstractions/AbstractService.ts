@@ -8,5 +8,5 @@ export default abstract class AbstractService<T>
     abstract GetAllAsync() : Promise<T[]>;
     abstract CountAsync() : Promise<number>;
     abstract IsCompatible(obj : any) : obj is T;
-
+    abstract ValidateObject(obj : T) : void;
 }

@@ -1,6 +1,6 @@
 import AbstractSeed from "./ISeed";
 import Context from "../data/Context";
-import Period from "../core/entities/Period";
+import Time from "../core/entities/Time";
 
 export default class PeriodSeed extends AbstractSeed
 {
@@ -13,9 +13,9 @@ export default class PeriodSeed extends AbstractSeed
     }
     public async SeedAsync()
     {
-        if((await this._context.Periods.CountAsync()) > 0)
+        if((await this._context.Times.CountAsync()) > 0)
             return;
 
-        await this._context.Periods.AddAsync(new Period("Development periodo", "Some test journey", 8.30, 17.45, new Date()));
+        await this._context.Times.AddAsync(new Time("Development periodo", "Some test journey", 8, 12, 13, 17));
     }
 }

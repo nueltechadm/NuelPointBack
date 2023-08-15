@@ -1,15 +1,20 @@
-import {Table, Column, DataType, PrimaryKey, DBTypes, OneToMany} from 'myorm_pg'; 
+import {Table, Column, DataType, PrimaryKey, DBTypes, OneToMany, ManyToOne} from 'myorm_pg'; 
 import User from './User';
 import Departament from './Departament';
+import Address  from './Address';
+import Contact from './Contact';
 
 
-@Table()
+@Table("company_tb")
 export default class Company
 {
     @Column()
     @PrimaryKey()
     @DataType(DBTypes.SERIAL)
     public Id : number;
+
+    @Column()
+    public Active : boolean;
 
     @Column()
     public Name : string;
@@ -30,17 +35,29 @@ export default class Company
     @Column()
     @OneToMany(()=> Departament)
     public Departaments : Departament[];
+
+    @Column()
+    @OneToMany(() => Contact)
+    public Contacts : Contact[];
+
+    @Column()
+    @ManyToOne(() => Address)
+    public Address? : Address;
     
     
     constructor(name : string, description : string, document: string)
     {
         this.Id = -1;
+        this.Active = true;
         this.Name = name;
         this.Description = description;   
         this.Document = document;    
         this.Logo = undefined; 
         this.Users = [];
         this.Departaments= [];       
-        
+        this.Contacts = [];
+        this.Address = undefined;
     }
 }
+
+

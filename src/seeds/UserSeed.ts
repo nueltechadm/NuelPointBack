@@ -3,6 +3,8 @@ import User from "../core/entities/User";
 import Access from "../core/entities/Access";
 import Context from "../data/Context";
 import { MD5 } from "../utils/Cryptography";
+import Address from "../core/entities/Address";
+import Contact, { ContactType } from "../core/entities/Contact";
 
 export default class UserSeed extends AbstractSeed
 {
@@ -24,8 +26,34 @@ export default class UserSeed extends AbstractSeed
         adm.Access = new Access(adm, "adriano", MD5("adriano"));
         adm.Access.Permissions = await this._context.Permissions.ToListAsync();
         adm.Company = await this._context.Companies.FirstOrDefaultAsync();
-        adm.Period = await this._context.Periods.FirstOrDefaultAsync();
-        await this._context.Users.AddAsync(adm);            
+        adm.Period = await this._context.Times.FirstOrDefaultAsync();
+        let address = new Address("Public area", "1234-A", "Vizinhança de teste", "teste de complemento", "12312000", "Jacareí", "SP");
+        let contacts = 
+        [
+            new Contact("129888-6523", ContactType.PHONE),
+            new Contact("teste@gmail.com", ContactType.EMAIL)
+        ];
+
+        adm.Address = address;
+        adm.Contacts = contacts;
+        await this._context.Users.AddAsync(adm);   
+        
+        
+        let user = new User("Username", "username2@gmail.com", (await this._context.JobRoles.FirstOrDefaultAsync())!);
+        user.Access = new Access(adm, "user", MD5("user"));
+        user.Access.Permissions = await this._context.Permissions.ToListAsync();
+        user.Company = await this._context.Companies.FirstOrDefaultAsync();
+        user.Period = await this._context.Times.FirstOrDefaultAsync();
+        address = new Address("User area", "0101-A", "Company", "teste de complemento", "12312000", "Jacareí", "SP");
+        contacts = 
+        [
+            new Contact("121234101010", ContactType.PHONE),
+            new Contact("user@gmail.com", ContactType.EMAIL)
+        ];
+
+        user.Address = address;
+        user.Contacts = contacts;
+        await this._context.Users.AddAsync(user);      
                
     }
 }

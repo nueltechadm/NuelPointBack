@@ -1,9 +1,9 @@
 
-import { ControllerBase, GET, Inject, Use, Validate } from "web_api_base";
+import { ControllerBase, GET, Inject, UseBefore, Validate } from "web_api_base";
 import AbstractPermissionService from "../core/abstractions/AbstractPermissionService";
 import {IsLogged} from '../filters/AuthFilter';
 
-@Use(IsLogged)
+@UseBefore(IsLogged)
 @Validate()
 export default class PermissionController extends ControllerBase
 {   

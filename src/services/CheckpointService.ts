@@ -66,12 +66,12 @@ export default class CheckpointService  extends AbstractCheckpointService
     }
    
     public async GetByIdAsync(id: number): Promise<Checkpoint | undefined> {       
-        return await this._context.Checkpoints.WhereField("Id").IsEqualTo(id).AndLoadAll("User").AndLoadAll("Period").FirstOrDefaultAsync();
+        return await this._context.Checkpoints.WhereField("Id").IsEqualTo(id).LoadRelationOn("User").FirstOrDefaultAsync();
     }
     
     public async AddAsync(obj: Checkpoint): Promise<Checkpoint> {        
 
-        this.CommomValidations(obj);
+        this.ValidateObject(obj);
 
         if(!obj.User.Company)
             throw new InvalidEntityException(`The user of this checkpoint has no company`);
@@ -80,7 +80,7 @@ export default class CheckpointService  extends AbstractCheckpointService
     }
     public async UpdateAsync(obj: Checkpoint): Promise<Checkpoint> {
 
-        this.CommomValidations(obj);
+        this.ValidateObject(obj);
         
         return this._context.Checkpoints.UpdateAsync(obj);
     }
@@ -111,12 +111,11 @@ export default class CheckpointService  extends AbstractCheckpointService
             Kind : Operation.SMALLEROREQUALS, 
             Value : end ?? new Date()})    
         .Join("User")
-        .Join("Period")
         .OrderDescendingBy("Date")
         .ToListAsync();
     }
 
-    private CommomValidations(obj: Checkpoint) : void
+    public ValidateObject(obj: Checkpoint) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Checkpoint.name} type`);

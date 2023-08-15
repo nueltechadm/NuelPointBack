@@ -40,6 +40,7 @@ export default class UserService  extends AbstractUserService
                                         .Join("Access")
                                         .Join("Company")
                                         .Join("Period")
+                                        .Join("Contacts")
                                         .FirstOrDefaultAsync();
         
     }
@@ -125,7 +126,19 @@ export default class UserService  extends AbstractUserService
     public override async GetAllAsync(): Promise<User[]> {
 
         return await this._context.Users.OrderBy("Name").ToListAsync()!;
-    }   
+    }  
+    
+    public ValidateObject(obj : User) : void
+    {
+        if(!this.IsCompatible(obj))
+            throw new InvalidEntityException(`This object is not of ${User.name} type`); 
+
+        if(!obj.Email)
+          throw new InvalidEntityException(`The email of user is required`);
+
+        if(!obj.Name)
+          throw new InvalidEntityException(`The name of user is required`);
+    }
 
     private async SyncPermissionsAsync(obj : Access) : Promise<void>
     {

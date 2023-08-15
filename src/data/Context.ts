@@ -6,9 +6,11 @@ import Permission from '../core/entities/Permission';
 import JobRole from '../core/entities/JobRole';
 import Checkpoint from '../core/entities/Checkpoint';
 import Company from '../core/entities/Company';
-import Period from '../core/entities/Period';
+import Time from '../core/entities/Time';
 import Journey from '../core/entities/Journey';
 import Departament from '../core/entities/Departament';
+import Address from '../core/entities/Address';
+import Contact from '../core/entities/Contact';
 
 export default class Context extends PGDBContext
 {
@@ -21,8 +23,10 @@ export default class Context extends PGDBContext
     public Checkpoints : PGDBSet<Checkpoint>; 
     public Companies : PGDBSet<Company>; 
     public Departaments : PGDBSet<Departament>; 
-    public Periods : PGDBSet<Period>; 
+    public Times : PGDBSet<Time>; 
     public Journeys : PGDBSet<Journey>; 
+    public Addresses : PGDBSet<Address>; 
+    public Contacts : PGDBSet<Contact>; 
 
 
     constructor(manager? : PGDBManager)
@@ -36,8 +40,10 @@ export default class Context extends PGDBContext
         this.Departaments = new PGDBSet(Departament, this);
         this.Checkpoints = new PGDBSet(Checkpoint, this);   
         this.Companies = new PGDBSet(Company, this);
-        this.Periods = new PGDBSet(Period, this);
+        this.Times = new PGDBSet(Time, this);
         this.Journeys = new PGDBSet(Journey, this);
+        this.Addresses = new PGDBSet(Address, this);
+        this.Contacts = new PGDBSet(Contact, this);
         
     }
 

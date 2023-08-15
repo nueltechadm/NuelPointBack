@@ -17,7 +17,7 @@ import { ApplicationConfiguration } from 'web_api_base';
 
     let context = new Context();   
     
-    context["_manager"].SetLogger((msg, tp) => console.log(msg));
+    context["_manager"].SetLogger((msg, _) => console.log(msg));
 
     await context.UpdateDatabaseAsync();
 
