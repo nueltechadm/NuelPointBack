@@ -5,6 +5,7 @@ import JobRole from "../core/entities/JobRole";
 import {IsLogged} from '../filters/AuthFilter';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
+import Type from "../utils/Type";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -108,13 +109,10 @@ export class AcessController extends ControllerBase
     {
        let jobs = await this._service.GetAllAsync();
 
-       for(let j of jobs)
-       {
-            delete (j as any)._orm_metadata_;
+       for(let j of jobs)                 
             delete (j as any).Employers;
-       }
 
-       this.OK(jobs);
+       this.OK(Type.RemoveORMMetadata(jobs));
     }    
     
     @GET("getById")    
@@ -124,11 +122,10 @@ export class AcessController extends ControllerBase
 
        if(!job)
             return this.NotFound({Message : "Job role not found"});
-        
-        delete (job as any)._orm_metadata_;
+                
         delete (job as any).Employers;
 
-       this.OK(job);
+        this.OK(Type.RemoveORMMetadata(job));
     }          
     
     @POST("insert")

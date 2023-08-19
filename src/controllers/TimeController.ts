@@ -4,6 +4,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractTimeService from "../core/abstractions/AbstractTimeService";
 import Time from "../core/entities/Time";
+import Type from "../utils/Type";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -19,13 +20,9 @@ export default class TimeController extends ControllerBase {
 
     @GET("list")
     public async GetAllAsync(): Promise<void> {
+
         let times = await this._service.GetAllAsync();
-
-        for (let j of times) {
-            delete (j as any)._orm_metadata_;
-        }
-
-        this.OK(times);
+        this.OK(Type.RemoveORMMetadata(times));
     }
 
     @GET("getById")
@@ -35,9 +32,7 @@ export default class TimeController extends ControllerBase {
         if (!time)
             return this.NotFound({ Message: "Time not found" });
 
-        delete (time as any)._orm_metadata_;       
-
-        this.OK(time);
+        this.OK(Type.RemoveORMMetadata(time));
     }
 
     @POST("insert")

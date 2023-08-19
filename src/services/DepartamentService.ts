@@ -24,16 +24,16 @@ export default class DepartamentService  extends AbstractDepartamentService
         return Type.HasKeys<Departament>(obj, "Name", "Company");  
     }
 
-    public async CountAsync(): Promise<number> {
+    public override async CountAsync(): Promise<number> {
         
         return await this._context.Departaments.CountAsync();
     }
 
-    public async GetByIdAsync(id: number): Promise<Departament | undefined> {       
+    public override async GetByIdAsync(id: number): Promise<Departament | undefined> {       
         return await this._context.Departaments.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }
     
-    public async AddAsync(obj: Departament): Promise<Departament> {
+    public override async AddAsync(obj: Departament): Promise<Departament> {
 
         this.ValidateObject(obj);
 
@@ -42,13 +42,13 @@ export default class DepartamentService  extends AbstractDepartamentService
 
         return this._context.Departaments.AddAsync(obj);
     }
-    public async UpdateAsync(obj: Departament): Promise<Departament> {
+    public override async UpdateAsync(obj: Departament): Promise<Departament> {
 
         this.ValidateObject(obj);
 
         return this._context.Departaments.UpdateAsync(obj);
     }
-    public async DeleteAsync(obj: Departament): Promise<Departament> {
+    public override async DeleteAsync(obj: Departament): Promise<Departament> {
         
         if(!obj.Id || obj == undefined)
             throw new InvalidEntityException(`Id is required to delete a ${Departament.name}`);
@@ -60,11 +60,11 @@ export default class DepartamentService  extends AbstractDepartamentService
 
         return this._context.Departaments.DeleteAsync(curr);
     }
-    public async GetAllAsync(): Promise<Departament[]> {
+    public override async GetAllAsync(): Promise<Departament[]> {
         return await this._context.Departaments.OrderBy("Name").ToListAsync();
     }  
 
-    public ValidateObject(obj: Departament) : void
+    public override ValidateObject(obj: Departament) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${Departament.name} type`);

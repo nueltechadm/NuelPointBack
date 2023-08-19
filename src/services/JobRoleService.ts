@@ -22,15 +22,15 @@ export default class JobRoleService  extends AbstractJobRoleService
         return Type.HasKeys<JobRole>(obj, "Description", "Company");  
     }
 
-    public async CountAsync(): Promise<number> {
+    public override async CountAsync(): Promise<number> {
         
         return await this._context.JobRoles.CountAsync();
     }
-    public async GetByIdAsync(id: number): Promise<JobRole | undefined> {       
+    public override async GetByIdAsync(id: number): Promise<JobRole | undefined> {       
         return await this._context.JobRoles.WhereField("Id").IsEqualTo(id).LoadRelationOn("Company").FirstOrDefaultAsync();
     }
     
-    public async AddAsync(obj: JobRole): Promise<JobRole> {
+    public override async AddAsync(obj: JobRole): Promise<JobRole> {
 
         this.ValidateObject(obj);
 
@@ -39,7 +39,7 @@ export default class JobRoleService  extends AbstractJobRoleService
 
         return this._context.JobRoles.AddAsync(obj);
     }
-    public async UpdateAsync(obj: JobRole): Promise<JobRole> {
+    public override async UpdateAsync(obj: JobRole): Promise<JobRole> {
 
         this.ValidateObject(obj);
 
@@ -48,7 +48,7 @@ export default class JobRoleService  extends AbstractJobRoleService
 
         return this._context.JobRoles.UpdateAsync(obj);
     }
-    public async DeleteAsync(obj: JobRole): Promise<JobRole> {
+    public override async DeleteAsync(obj: JobRole): Promise<JobRole> {
         
         if(!obj.Id || obj == undefined)
             throw new InvalidEntityException(`Id is required to delete a ${JobRole.name}`);
@@ -60,11 +60,11 @@ export default class JobRoleService  extends AbstractJobRoleService
 
         return this._context.JobRoles.DeleteAsync(curr);
     }
-    public async GetAllAsync(): Promise<JobRole[]> {
+    public override async GetAllAsync(): Promise<JobRole[]> {
         return await this._context.JobRoles.OrderBy("Description").ToListAsync();
     }  
 
-    public ValidateObject(obj: JobRole) : void
+    public override ValidateObject(obj: JobRole) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${JobRole.name} type`);

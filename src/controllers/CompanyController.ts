@@ -4,6 +4,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
 import Company from "../core/entities/Company";
+import Type from "../utils/Type";
 
 
 @UseBefore(IsLogged)
@@ -21,11 +22,9 @@ export default class CompanyController extends ControllerBase {
     @GET("list")
     public async GetAllAsync(): Promise<void> {
 
-        let companies = await this._service.GetAllAsync();
+        let companies = await this._service.GetAllAsync();        
 
-        this.RemoveMetadata(companies);
-
-        this.OK(companies);
+        this.OK(Type.RemoveORMMetadata(companies));
     }
 
     @GET("getById")
@@ -35,9 +34,7 @@ export default class CompanyController extends ControllerBase {
         if (!company)
             return this.NotFound({ Message: "Company not found" });
 
-        this.RemoveMetadata([company]);
-
-        this.OK(company);
+        this.OK(Type.RemoveORMMetadata(company));
     }
 
     @POST("insert")
@@ -72,17 +69,7 @@ export default class CompanyController extends ControllerBase {
         this.OK(await this._service.DeleteAsync(del));
     }
 
-    private RemoveMetadata(companies : Company[])
-    {
-        for (let j of companies) {
-            delete (j as any)._orm_metadata_;
-
-            for(let u of j.Users)
-            {
-                delete (u as any)._orm_metadata_;
-            }
-        }
-    }
+    
 
 
 }

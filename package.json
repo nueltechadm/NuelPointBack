@@ -5,8 +5,8 @@
   "main": "Index.js",
   "scripts": {
     "test": "jest",
-    "start": "tsc -p . && node ./dist/Index",
-    "seed": "tsc -p . && node ./dist/Seed"
+    "start": "node ./dist/Index",
+    "seed": "node ./dist/Seed"
   },
   "author": "adriano.marino1992@gmail.com",
   "license": "ISC",

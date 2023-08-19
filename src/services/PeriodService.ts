@@ -22,34 +22,34 @@ export default class CompanyService  extends AbstractPeriodService
         return Type.HasKeys<Time>(obj, "Description", "Time1", "Time2", "Time3", "Time4");
     }
 
-    public async CountAsync(): Promise<number> {
+    public override async CountAsync(): Promise<number> {
         
         return await this._context.Times.CountAsync();
     }
-    public async GetByIdAsync(id: number): Promise<Time | undefined> {       
+    public override async GetByIdAsync(id: number): Promise<Time | undefined> {       
         return await this._context.Times.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }      
-    public async AddAsync(obj: Time): Promise<Time> {
+    public override async AddAsync(obj: Time): Promise<Time> {
 
         this.ValidateObject(obj);
 
         return this._context.Times.AddAsync(obj);
     }
-    public async UpdateAsync(obj: Time): Promise<Time> {
+    public override async UpdateAsync(obj: Time): Promise<Time> {
 
         this.ValidateObject(obj);
         
         return this._context.Times.UpdateAsync(obj);
     }
-    public async DeleteAsync(obj: Time): Promise<Time> {
+    public override async DeleteAsync(obj: Time): Promise<Time> {
         return this._context.Times.DeleteAsync(obj);
     }
-    public async GetAllAsync(): Promise<Time[]> {
+    public override async GetAllAsync(): Promise<Time[]> {
         return await this._context.Times.OrderBy("Description").ToListAsync();
     }  
 
     
-    public ValidateObject(obj : Time) : void
+    public override ValidateObject(obj : Time) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Time.name} type`); 

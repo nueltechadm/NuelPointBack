@@ -3,6 +3,8 @@ import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, Us
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import User from "../core/entities/User";
 import {IsLogged} from '../filters/AuthFilter';
+import Type from "../utils/Type";
+import Access from "../core/entities/Access";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -73,18 +75,13 @@ export default class UserController extends ControllerBase
         if(!user)
             return undefined;
 
-        delete (user as any).Password;
-        delete (user as any)._orm_metadata_;
-        
         if(user.Access)
-            delete (user.Access as any)._orm_metadata_;
+            delete (user.Access as any).Password;        
 
-        if(user.Company)
-            delete (user.Company as any)._orm_metadata_;
-
-        if(user.Contacts)
-            delete (user.Contacts as any)._orm_metadata_;
-
-        return user;
+        return Type.RemoveORMMetadata(user);
     }
 }
+
+
+
+

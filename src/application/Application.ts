@@ -54,6 +54,7 @@ export default class App extends Application
         if(process.env.ENVIROMENT != 'DEBUG'){       
             await DependecyService.ResolveCtor(Context)!.UpdateDatabaseAsync();
         }    
+        
        
     }
     

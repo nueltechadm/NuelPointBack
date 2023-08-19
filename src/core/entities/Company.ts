@@ -42,7 +42,7 @@ export default class Company
 
     @Column()
     @ManyToOne(() => Address)
-    public Address? : Address;
+    public Address? : Address;   
     
     
     constructor(name : string, description : string, document: string)

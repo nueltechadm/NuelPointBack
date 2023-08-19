@@ -1,6 +1,7 @@
-import { Table, Column, DataType, PrimaryKey, DBTypes, ManyToOne, OneToMany } from 'myorm_pg';
+import { Table, Column, DataType, PrimaryKey, DBTypes, ManyToOne, OneToMany, OneToOne } from 'myorm_pg';
 import Time from './Time';
 import Checkpoint from './Checkpoint';
+import User from './User';
 
 
 
@@ -17,20 +18,29 @@ export class Appointment {
     public Time: Time;
 
     @Column()
+    @DataType(DBTypes.DATETIME)
+    public Date : Date; 
+
+    @Column()
     @OneToMany(() => Checkpoint)
     public Checkpoints: Checkpoint[];
 
     @Column()
     public DayOfWeek: DayOfWeek;
 
-    public constructor(time: Time) {
+    @Column()
+    @OneToOne(()=> User)
+    public User : User;
+
+    public constructor(time: Time, user : User) {
         this.Id = -1;
         this.Checkpoints = [];
         this.DayOfWeek = new Date().getDay() as DayOfWeek;
         this.Time = time;
+        this.Date = new Date();
+        this.User = user;
     }
-
-
+      
 }
 
 export enum DayOfWeek {

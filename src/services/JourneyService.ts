@@ -20,33 +20,33 @@ export default class JourneyService  extends AbstractJorneyService
     public override IsCompatible(obj: any): obj is Journey {     
         return Type.HasKeys<Journey>(obj, "Description", "Days");
     }    
-    public async CountAsync(): Promise<number> {
+    public override async CountAsync(): Promise<number> {
         
         return await this._context.Journeys.CountAsync();
     }
-    public async GetByIdAsync(id: number): Promise<Journey | undefined> {       
+    public override async GetByIdAsync(id: number): Promise<Journey | undefined> {       
         return await this._context.Journeys.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }      
-    public async AddAsync(obj: Journey): Promise<Journey> {
+    public override async AddAsync(obj: Journey): Promise<Journey> {
 
         this.ValidateObject(obj);
 
         return this._context.Journeys.AddAsync(obj);
     }
-    public async UpdateAsync(obj: Journey): Promise<Journey> {
+    public override async UpdateAsync(obj: Journey): Promise<Journey> {
 
         this.ValidateObject(obj);
         
         return this._context.Journeys.UpdateAsync(obj);
     }
-    public async DeleteAsync(obj: Journey): Promise<Journey> {
+    public override async DeleteAsync(obj: Journey): Promise<Journey> {
         return this._context.Journeys.DeleteAsync(obj);
     }
-    public async GetAllAsync(): Promise<Journey[]> {
+    public override async GetAllAsync(): Promise<Journey[]> {
         return await this._context.Journeys.OrderBy("Description").ToListAsync();
     }  
 
-    public ValidateObject(obj : Journey) : void
+    public override ValidateObject(obj : Journey) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Journey.name} type`);

@@ -65,11 +65,11 @@ export default class CheckpointService  extends AbstractCheckpointService
         return ("User" in obj || "UserId" in obj) && "X" in obj && "Y" in obj;  
     }
    
-    public async GetByIdAsync(id: number): Promise<Checkpoint | undefined> {       
+    public override async GetByIdAsync(id: number): Promise<Checkpoint | undefined> {       
         return await this._context.Checkpoints.WhereField("Id").IsEqualTo(id).LoadRelationOn("User").FirstOrDefaultAsync();
     }
     
-    public async AddAsync(obj: Checkpoint): Promise<Checkpoint> {        
+    public override async AddAsync(obj: Checkpoint): Promise<Checkpoint> {        
 
         this.ValidateObject(obj);
 
@@ -78,20 +78,20 @@ export default class CheckpointService  extends AbstractCheckpointService
 
         return this._context.Checkpoints.AddAsync(obj);
     }
-    public async UpdateAsync(obj: Checkpoint): Promise<Checkpoint> {
+    public override async UpdateAsync(obj: Checkpoint): Promise<Checkpoint> {
 
         this.ValidateObject(obj);
         
         return this._context.Checkpoints.UpdateAsync(obj);
     }
-    public async DeleteAsync(obj: Checkpoint): Promise<Checkpoint> {
+    public override async DeleteAsync(obj: Checkpoint): Promise<Checkpoint> {
         return this._context.Checkpoints.DeleteAsync(obj);
     }
-    public async GetAllAsync(): Promise<Checkpoint[]> {
+    public override async GetAllAsync(): Promise<Checkpoint[]> {
         return await this._context.Checkpoints.OrderDescendingBy("Date").ToListAsync();
     }  
 
-    public async GetByRangeAndEmployer(userId: number, begin: Date, end?: Date | undefined): Promise<Checkpoint[]> {
+    public override async GetByRangeAndEmployer(userId: number, begin: Date, end?: Date | undefined): Promise<Checkpoint[]> {
 
         let user = await this._context.Users.WhereField("Id").IsEqualTo(userId).FirstOrDefaultAsync();
 
@@ -115,7 +115,7 @@ export default class CheckpointService  extends AbstractCheckpointService
         .ToListAsync();
     }
 
-    public ValidateObject(obj: Checkpoint) : void
+    public override ValidateObject(obj: Checkpoint) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Checkpoint.name} type`);

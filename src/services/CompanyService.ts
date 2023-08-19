@@ -25,29 +25,29 @@ export default class CompanyService  extends AbstractCompanyService
     public override IsCompatible(obj: any): obj is Company {
         return Type.HasKeys<Company>(obj, "Name");
     }
-    public async GetByIdAsync(id: number): Promise<Company | undefined> {       
+    public override async GetByIdAsync(id: number): Promise<Company | undefined> {       
         return await this._context.Companies.WhereField("Id").IsEqualTo(id).LoadRelationOn("Address").LoadRelationOn("Contacts").LoadRelationOn("Users").FirstOrDefaultAsync();
     }      
-    public async AddAsync(obj: Company): Promise<Company> {
+    public override async AddAsync(obj: Company): Promise<Company> {
 
         this.ValidateObject(obj);
 
         return this._context.Companies.AddAsync(obj);
     }
-    public async UpdateAsync(obj: Company): Promise<Company> {
+    public override async UpdateAsync(obj: Company): Promise<Company> {
 
         this.ValidateObject(obj);
 
         return this._context.Companies.UpdateAsync(obj);
     }
-    public async DeleteAsync(obj: Company): Promise<Company> {
+    public override async DeleteAsync(obj: Company): Promise<Company> {
         return this._context.Companies.DeleteAsync(obj);
     }
-    public async GetAllAsync(): Promise<Company[]> {
+    public override async GetAllAsync(): Promise<Company[]> {
         return await this._context.Companies.OrderBy("Description").ToListAsync();
     }    
     
-    public ValidateObject(obj : Company) : void
+    public override ValidateObject(obj : Company) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${Company.name} type`);

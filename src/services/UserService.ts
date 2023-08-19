@@ -21,11 +21,11 @@ export default class UserService  extends AbstractUserService
         this._context = context;
     }
 
-    public IsCompatible(obj: any): obj is User {
+    public override IsCompatible(obj: any): obj is User {
         return Type.HasKeys<User>(obj, "Name", "Email");
     }
 
-    public async CountAsync(): Promise<number> {
+    public override async CountAsync(): Promise<number> {
         
         return await this._context.Users.CountAsync();
     }
@@ -84,7 +84,15 @@ export default class UserService  extends AbstractUserService
 
     public override async AddAsync(obj: User): Promise<User> 
     { 
-        await this.SyncPermissionsAsync(obj.Access!);
+        if(!obj.Access || obj.Access.Id < 1)
+            throw new InvalidEntityException("Access is required");
+
+        obj.Access = await this.GetAccessByIdAsync(obj.Access.Id);
+
+        if(!obj.Access)
+            throw new InvalidEntityException("To create a user, you must select a valid access object");
+
+        await this.SyncPermissionsAsync(obj.Access);
 
         if(!obj.Company)
             throw new InvalidEntityException("The company of the user is required");
@@ -128,7 +136,7 @@ export default class UserService  extends AbstractUserService
         return await this._context.Users.OrderBy("Name").ToListAsync()!;
     }  
     
-    public ValidateObject(obj : User) : void
+    public override ValidateObject(obj : User) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${User.name} type`); 
@@ -138,6 +146,14 @@ export default class UserService  extends AbstractUserService
 
         if(!obj.Name)
           throw new InvalidEntityException(`The name of user is required`);
+    }
+
+    private async GetAccessByIdAsync(id : number) : Promise<Access | undefined>
+    {
+        if(id < 1)
+            return undefined;
+
+        return await this._context.Access.Where({ Field : "Id", Value : id}).FirstOrDefaultAsync();
     }
 
     private async SyncPermissionsAsync(obj : Access) : Promise<void>

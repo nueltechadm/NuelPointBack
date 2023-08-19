@@ -12,7 +12,7 @@ import { CheckpointDTO } from "../dto/CheckpointDTO";
 
 @UseBefore(IsLogged)
 @Validate()
-export default class CheckpointController extends ControllerBase
+export default class AppointamentController extends ControllerBase
 {   
     @Inject()
     private _checkpointService : AbstractCheckpointService;
