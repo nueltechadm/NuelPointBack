@@ -4,10 +4,12 @@ import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Time from "../core/entities/Time";
 import AbstractTimeService from "../core/abstractions/AbstractTimeService";
+import User from "../core/entities/User";
 
 
 
-export default class TimeService extends AbstractTimeService {
+export default class TimeService extends AbstractTimeService {  
+   
 
     @Inject()
     private _context: Context;
@@ -48,6 +50,19 @@ export default class TimeService extends AbstractTimeService {
     }
     public override async GetAllAsync(): Promise<Time[]> {
         return await this._context.Times.OrderBy("Description").ToListAsync();
+    }
+
+    public override async GetByDayOfWeekAsync(userId: number, day: number): Promise<Time | undefined> {
+        
+        let u = await this._context.Users.WhereField("Id").IsEqualTo(userId).FirstOrDefaultAsync();
+
+        let d = u?.Journey?.DaysOfWeek.filter(s => s.Day == day);
+
+        if(d && d?.length > 0)
+            return d[0].Time;
+        else
+            return undefined;
+
     }
 
     public override ValidateObject(obj: Time): void {

@@ -1,10 +1,10 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany, ManyToOne, OneToMany, OneToOne} from 'myorm_pg'; 
 import JobRole from './JobRole';
 import Company from './Company';
-import Time from './Time';
 import Access from './Access';
 import Contact from './Contact';
 import Address from './Address';
+import Journey from './Journey';
 
 @Table("user_tb")
 export default class User
@@ -44,8 +44,8 @@ export default class User
     public Company? : Company;
 
     @Column()
-    @ManyToOne(() => Time)
-    public Period? : Time;
+    @ManyToOne(() => Journey)
+    public Journey? : Journey;
 
     @Column()
     @ManyToOne(() => Access)
@@ -70,7 +70,7 @@ export default class User
         this.Email = email;        
         this.JobRole = job;         
         this.Company = undefined;
-        this.Period = undefined;
+        this.Journey = undefined;
         this.Access = undefined;
         this.Contacts = [];
         this.Address = undefined;

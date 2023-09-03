@@ -7,6 +7,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 
 export default class CompanyService  extends AbstractCompanyService
 {
+   
     
     @Inject()
     private _context : Context;
@@ -56,6 +57,10 @@ export default class CompanyService  extends AbstractCompanyService
     public override async GetAllAsync(): Promise<Company[]> {
         return await this._context.Companies.OrderBy("Description").ToListAsync();
     }    
+
+    public override async GetByNameAsync(name: string): Promise<Company | undefined> {        
+        return await this._context.Companies.Where({Field: "Name", Value : name}).FirstOrDefaultAsync();
+    }
     
     public override ValidateObject(obj : Company) : void
     {

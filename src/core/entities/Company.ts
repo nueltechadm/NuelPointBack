@@ -18,7 +18,7 @@ export default class Company
     public Active : boolean;
 
     @Column()
-    public Name : string;
+    public Name : string;    
 
     @Column()
     public Description : string;

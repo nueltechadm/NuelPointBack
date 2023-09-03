@@ -34,6 +34,18 @@ export default class CompanyController extends AbstractController {
         this.OK(Type.RemoveORMMetadata(companies));
     }
 
+    @GET("getByName")    
+    @SetDatabaseFromToken()
+    public async GetByNameAsync(@FromQuery("name") name : string) {
+
+        let company = await this._service.GetByNameAsync(name);   
+        
+        if(!company)
+            return this.NotFound(`Company not found`);
+        else
+            return this.OK(Type.RemoveORMMetadata(company));        
+    }
+
     @GET("getById")    
     @SetDatabaseFromToken()
     public async GetByIdAsync(@FromQuery() id: number) {

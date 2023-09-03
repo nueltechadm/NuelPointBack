@@ -28,11 +28,10 @@ export default class LoginController extends AbstractController
     public async LoginAsync(
         @FromBody("username")username: string, 
         @FromBody("password")password: string, 
-        @FromBody("company")company: string, 
-        @FromBody("company_id")company_id : string) 
+        @FromBody("link")link: string)
     {
         
-        await this._service.SetClientDatabaseAsync(new Authorization(username, company, company_id).GetClientDatabase());
+        await this._service.SetClientDatabaseAsync(new Authorization(username, link).GetClientDatabase());        
            
         let access =  await this._service.GetByUserNameAndPasswordAsync(username, password);
 
@@ -47,7 +46,7 @@ export default class LoginController extends AbstractController
         if(!access.Company)
             return this.Unauthorized({ Message : "Invalid access, no one company is referenced"});        
 
-        let token = Generate(new Authorization(access.Username, access.Company!.Name, access.Company!.Id.toString()), 1);
+        let token = Generate(new Authorization(access.Username, link), 1);
 
         this.OK({User : Type.RemoveORMMetadata(access), Token : token});
         

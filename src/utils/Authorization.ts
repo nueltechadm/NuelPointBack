@@ -4,19 +4,16 @@ import { Generate } from './JWT';
 export default class Authorization {
 
     public User: string;
-    public Company: string;
-    public CompanyId: string;
+    public Link: string;
 
-
-    constructor(user: string, company: string, companyId: string) {
+    constructor(user: string, link: string) {
         this.User = user;
-        this.Company = company;
-        this.CompanyId = companyId;
+        this.Link = link    
     }
 
     public GetClientDatabase() : string
     {
-        return `emp_${this.CompanyId}`;
+        return `emp_${this.Link}`.trim();
     }
 
     public static GenerateToken(auth: Authorization, duration: number): string {
@@ -41,9 +38,7 @@ export default class Authorization {
 
             let auth = new Authorization
             (payload.User.toString(),
-             payload.Company.toString(),
-             payload.CompanyId.toString());
- 
+             payload.Link.toString()); 
              return auth;
  
          } catch {

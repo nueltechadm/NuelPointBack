@@ -1,4 +1,3 @@
-
 import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RunBefore } from "web_api_base";
 import Formidable from "formidable";
 import {IsLogged} from '../filters/AuthFilter';
@@ -14,6 +13,9 @@ import Type from "../utils/Type";
 import AbstractController from "./AbstractController";
 import Authorization from "../utils/Authorization";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
+import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
+import AbstractTimeService from "../core/abstractions/AbstractTimeService";
+import Checkpoint from "../core/entities/Checkpoint";
 
 
 @UseBefore(IsLogged)
@@ -27,6 +29,11 @@ export default class AppointamentController extends AbstractController
     @Inject()
     private _userService : AbstractUserService;
 
+    @Inject()
+    private _companyService : AbstractCompanyService;
+
+    @Inject()
+    private _timeService : AbstractTimeService;
 
     @Inject()
     private _appointamentService : AbstractAppointmentService;
@@ -38,12 +45,16 @@ export default class AppointamentController extends AbstractController
         checkpoinService : AbstractCheckpointService, 
         fileService : AbstractFileService, 
         userService : AbstractUserService, 
+        timeService : AbstractTimeService, 
+        companyService : AbstractCompanyService,
         appointamentService : AbstractAppointmentService
         )
     {
         super();                    
         this._checkpointService = checkpoinService;
         this._userService = userService;
+        this._companyService = companyService;
+        this._timeService = timeService;
         this._fileService = fileService;
         this._appointamentService = appointamentService;
     }    
@@ -56,78 +67,39 @@ export default class AppointamentController extends AbstractController
     
     @POST("insert")    
     @SetDatabaseFromToken()
-    public async InsertAsync() 
+    public async InsertAsync(@FromBody()dto : {x : number, y : number, picture : string}) 
     {  
-        try{          
-
-            Formidable({multiples : false}).parse(this.Request as any, async (err, fields, incomming) => 
-            {                
-                try{
-
-                    if(err)
-                        return this.Error(err);                    
-                    
-                    if(!fields.data || !this._checkpointService.IsCompatible(JSON.parse(fields.data.toString())))
-                        return this.BadRequest(`The checkpoint data is required`);  
-                        
-                    let checkpointDTO = CheckpointDTO.MapToDTO(JSON.parse(fields.data.toString()));                
         
-                    let user = await this._userService.GetByIdAsync(checkpointDTO.UserId);
-        
-                    if(!user)
-                        return this.BadRequest(`The user with Id #${checkpointDTO.UserId} not exists`);
-                    
-                    let checkpoint = checkpointDTO.MapToCheckpoint(user);
-                    
-                    await this._checkpointService.AddAsync(checkpoint);
-                    
-                    let info = await this._checkpointService.GetFolderAndFileName(checkpoint);
+        let user = await this._userService.GetByIdAsync(this.Request.APIAUTH.User);
 
-                    let temp = (incomming.file as Formidable.File).filepath;                    
-                    
-                    await this._fileService.CreateDirectory(info.Folder);
+        if(!user)
+            return this.BadRequest(`The user with Id #${this.Request.APIAUTH.User} not exists`);       
 
-                    await this._fileService.CopyAsync(temp, info.File);
+        let time = await this._timeService.GetByDayOfWeekAsync(user.Id, new Date().getDay());
 
-                    return this.Created();
+        if(!time)
+            return this.BadRequest(`No one time is registered`);
 
-                }
-                catch(exception)
-                {
-                    if(exception instanceof InvalidEntityException)
-                    {
-                        return this.BadRequest(exception.message);
-                    }
-                    else if(exception instanceof EntityNotFoundException)
-                    {
-                        return this.BadRequest(exception.message);
-                    }                    
-                    else{
+        let currentDayOfUser = await this._appointamentService.GetCurrentDayByUser(user);
 
-                        if(process.env.ENVIROMENT == "DEBUG")
-                            return this.Error(exception);
-                        else
-                            return this.Error("Error while processing the request");
-                    }
-                }
-                
-            });
-           
+        if(!currentDayOfUser)
+            currentDayOfUser = new Appointment(time, user);
 
-        }catch(exception)
-        {
-            if(process.env.ENVIROMENT == "DEBUG")
-                 return this.Error(exception);
-            else
-                return this.Error("Error while processing the request");
-            
-        }
+        currentDayOfUser.Checkpoints.push(new Checkpoint(user, dto.x, dto.y, dto.picture, user.Company!, time));
+
+        if(currentDayOfUser.Id <= 0)
+            await this._appointamentService.AddAsync(currentDayOfUser);
+        else
+            await this._appointamentService.UpdateAsync(currentDayOfUser);
+
+        this.Created({Message : "Checkpoint created"});
               
     }
 
     @PUT("update")    
     @SetDatabaseFromToken()
     public async UpdateAsync(@FromBody() appointament: Appointment) {
+
         try {
 
             this.OK(await this._appointamentService.UpdateAsync(appointament));
