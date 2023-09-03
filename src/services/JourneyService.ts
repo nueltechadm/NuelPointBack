@@ -17,6 +17,10 @@ export default class JourneyService  extends AbstractJorneyService
         this._context = context;
     }
 
+    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+        this._context.SetDatabaseAsync(client);
+    }
+
     public override IsCompatible(obj: any): obj is Journey {     
         return Type.HasKeys<Journey>(obj, "Description", "Days");
     }    

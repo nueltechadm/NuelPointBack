@@ -8,6 +8,7 @@ import Path from 'path';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Company from "../core/entities/Company";
 import User from "../core/entities/User";
+import { AbstractAppointmentService } from "../core/abstractions/AbstractAppointmentService";
 
 export default class CheckpointService  extends AbstractCheckpointService
 {   
@@ -21,8 +22,11 @@ export default class CheckpointService  extends AbstractCheckpointService
         this._context = context;
     }
 
-    public async CountAsync(): Promise<number> {
-        
+    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+        this._context.SetDatabaseAsync(client);
+    }
+
+    public async CountAsync(): Promise<number> {        
         return await this._context.Checkpoints.CountAsync();
     }
 
@@ -131,3 +135,8 @@ export default class CheckpointService  extends AbstractCheckpointService
     }
 
 }
+
+
+
+
+

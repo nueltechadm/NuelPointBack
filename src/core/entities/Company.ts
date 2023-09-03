@@ -3,6 +3,7 @@ import User from './User';
 import Departament from './Departament';
 import Address  from './Address';
 import Contact from './Contact';
+import Access from './Access';
 
 
 @Table("company_tb")
@@ -41,6 +42,10 @@ export default class Company
     public Contacts : Contact[];
 
     @Column()
+    @OneToMany(() => Access)
+    public Accesses : Access[];
+
+    @Column()
     @ManyToOne(() => Address)
     public Address? : Address;   
     
@@ -56,6 +61,7 @@ export default class Company
         this.Users = [];
         this.Departaments= [];       
         this.Contacts = [];
+        this.Accesses = [];
         this.Address = undefined;
     }
 }

@@ -17,6 +17,9 @@ export default class Access
     public User : User;
 
     @Column()
+    public Description : string;
+
+    @Column()
     public Username : string;
     
     @Column()
@@ -34,7 +37,7 @@ export default class Access
     @OneToMany(()=> Departament)
     public Departaments : Departament[];
 
-    constructor(user : User, username : string, password : string)
+    constructor(user : User, username : string, password : string, description? : string)
     {
         this.Id = -1;  
         this.User = user;      
@@ -42,6 +45,7 @@ export default class Access
         this.Password = password;
         this.Departaments = []; 
         this.Permissions = [];
-        this.Company = undefined;        
+        this.Company = undefined;
+        this.Description = description ?? "";        
     }
 }

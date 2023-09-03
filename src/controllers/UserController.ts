@@ -1,14 +1,16 @@
 
-import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import User from "../core/entities/User";
 import {IsLogged} from '../filters/AuthFilter';
 import Type from "../utils/Type";
-import Access from "../core/entities/Access";
+import AbstractController from "./AbstractController";
+import Authorization from "../utils/Authorization";
+import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
 
 @UseBefore(IsLogged)
 @Validate()
-export default class UserController extends ControllerBase
+export default class UserController extends AbstractController
 {   
     @Inject()
     private _service : AbstractUserService;
@@ -19,8 +21,12 @@ export default class UserController extends ControllerBase
         this._service = service;
     }    
     
+    public override async SetClientDatabaseAsync(): Promise<void> {
+        await this._service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
+    }
 
     @GET("list")
+    @SetDatabaseFromToken()
     public async GetAllAsync() : Promise<void>
     {       
        let users =  await this._service.GetAllAsync();
@@ -30,19 +36,22 @@ export default class UserController extends ControllerBase
        this.OK(users);
     }    
     
-    @GET("getById")    
+    @GET("getById")   
+    @SetDatabaseFromToken() 
     public async GetByIdAsync(@FromQuery()id : number) : Promise<void>
     { 
        this.OK(this.RemovePassWordAndMetadata(await this._service.GetByIdAsync(id)));
     }          
     
     @POST("insert")
+    @SetDatabaseFromToken()
     public async InsertAsync(@FromBody()user : User) : Promise<void>
     {  
         this.OK(await this._service.AddAsync(user));
     }
     
-    @PUT("update")   
+    @PUT("update")  
+    @SetDatabaseFromToken() 
     public async UpdateAsync(@FromBody()user : User) 
     {        
         if(user.Id == undefined || user.Id <= 0)
@@ -56,7 +65,8 @@ export default class UserController extends ControllerBase
         this.OK(await this._service.UpdateAsync(user));
     }
 
-    @DELETE("delete")    
+    @DELETE("delete")   
+    @SetDatabaseFromToken() 
     public async DeleteAsync(@FromQuery()id : number) 
     {  
         if(!id)
@@ -81,7 +91,6 @@ export default class UserController extends ControllerBase
         return Type.RemoveORMMetadata(user);
     }
 }
-
 
 
 

@@ -6,7 +6,7 @@ import User from './User';
 
 
 @Table("appointament_tb")
-export class Appointment {
+export default class Appointment {
     @Column()
     @PrimaryKey()
     @DataType(DBTypes.SERIAL)

@@ -17,8 +17,11 @@ export default class CompanyService  extends AbstractCompanyService
         this._context = context;
     }
 
-    public async CountAsync(): Promise<number> {
-        
+    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+       await this._context.SetDatabaseAsync(client);
+    }
+
+    public async CountAsync(): Promise<number> {        
         return await this._context.Companies.CountAsync();
     }
 
@@ -26,7 +29,14 @@ export default class CompanyService  extends AbstractCompanyService
         return Type.HasKeys<Company>(obj, "Name");
     }
     public override async GetByIdAsync(id: number): Promise<Company | undefined> {       
-        return await this._context.Companies.WhereField("Id").IsEqualTo(id).LoadRelationOn("Address").LoadRelationOn("Contacts").LoadRelationOn("Users").FirstOrDefaultAsync();
+        return await this._context.Companies
+        .WhereField("Id")
+        .IsEqualTo(id)
+        .LoadRelationOn("Address")
+        .LoadRelationOn("Accesses")
+        .LoadRelationOn("Contacts")
+        .LoadRelationOn("Users")
+        .FirstOrDefaultAsync();
     }      
     public override async AddAsync(obj: Company): Promise<Company> {
 

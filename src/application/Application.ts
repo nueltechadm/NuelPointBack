@@ -26,6 +26,10 @@ import TimeService  from "../services/TimeService";
 import AbstractPeriodService from '../core/abstractions/AbstractPeriodService';
 import PeriodService from '../services/PeriodService';
 import AbstractTimeService from '../core/abstractions/AbstractTimeService';
+import AcessService from '../services/AcessService';
+import { AbstractAccessService } from '../core/abstractions/AbstractAccessService';
+import { AbstractAppointmentService } from '../core/abstractions/AbstractAppointmentService';
+import AppointmentService from '../services/AppointmentService';
 
 
 export default class App extends Application
@@ -36,6 +40,17 @@ export default class App extends Application
         this.UseCors();
 
         this.UseControllers();     
+       
+        this.ApplicationErrorHandler = (request, response, exception) => 
+        {
+            console.error(exception);
+            response.status(500);
+
+            if(appConfig.EnviromentVariables["ENVIROMENT"] == "DEBUG")
+                response.json(exception);
+            else
+                response.json({Message: "Error while processing the request"});
+        }      
 
         appConfig.AddScoped(Context);
 
@@ -50,11 +65,8 @@ export default class App extends Application
         appConfig.AddScoped(AbstractJorneyService, JourneyService);
         appConfig.AddScoped(AbstractPeriodService, PeriodService);
         appConfig.AddScoped(AbstractTimeService, TimeService);
-       
-        if(process.env.ENVIROMENT != 'DEBUG'){       
-            await DependecyService.ResolveCtor(Context)!.UpdateDatabaseAsync();
-        }    
-        
+        appConfig.AddScoped(AbstractAccessService, AcessService);
+        appConfig.AddScoped(AbstractAppointmentService, AppointmentService);  
        
     }
     

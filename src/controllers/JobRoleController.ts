@@ -1,15 +1,18 @@
 
-import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, UseAfter } from "web_api_base";
+import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, UseAfter, RunBefore } from "web_api_base";
 import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
 import JobRole from "../core/entities/JobRole";
 import {IsLogged} from '../filters/AuthFilter';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import Type from "../utils/Type";
+import AbstractController from "./AbstractController";
+import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
+import Authorization from "../utils/Authorization";
 
 @UseBefore(IsLogged)
 @Validate()
-export default class JobRoleController extends ControllerBase
+export default class JobRoleController extends AbstractController
 {   
     @Inject()
     private _service : AbstractJobRoleService;
@@ -20,8 +23,12 @@ export default class JobRoleController extends ControllerBase
         this._service = service;
     }    
     
+    public override async SetClientDatabaseAsync(): Promise<void> {
+        await this._service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());        
+    }
 
-    @GET("list")
+    @GET("list")    
+    @SetDatabaseFromToken()
     public async GetAllAsync() : Promise<void>
     {
        let jobs = await this._service.GetAllAsync();
@@ -35,7 +42,8 @@ export default class JobRoleController extends ControllerBase
        this.OK(jobs);
     }    
     
-    @GET("getById")    
+    @GET("getById")  
+    @SetDatabaseFromToken()
     public async GetByIdAsync(@FromQuery()id : number) 
     { 
        let job = await this._service.GetByIdAsync(id);
@@ -49,13 +57,15 @@ export default class JobRoleController extends ControllerBase
        this.OK(job);
     }          
     
-    @POST("insert")
+    @POST("insert")     
+    @SetDatabaseFromToken()
     public async InsertAsync(@FromBody()jobRole : JobRole) 
     {  
         this.OK(await this._service.AddAsync(jobRole));
     }
     
-    @PUT("update")   
+    @PUT("update")       
+    @SetDatabaseFromToken()
     public async UpdateAsync(@FromBody()jobRole : JobRole) 
     {  
         try{
@@ -71,7 +81,8 @@ export default class JobRoleController extends ControllerBase
         }
     }
 
-    @DELETE("delete")    
+    @DELETE("delete")     
+    @SetDatabaseFromToken()    
     public async DeleteAsync(@FromQuery()id : number) 
     {  
         if(!id)
@@ -89,83 +100,6 @@ export default class JobRoleController extends ControllerBase
 }
 
 
-
-@UseBefore(IsLogged)
-@Validate()
-export class AcessController extends ControllerBase
-{   
-    @Inject()
-    private _service : AbstractJobRoleService;
-
-    constructor(service : AbstractJobRoleService)
-    {
-        super();                    
-        this._service = service;
-    }    
-    
-
-    @GET("list")
-    public async GetAllAsync() : Promise<void>
-    {
-       let jobs = await this._service.GetAllAsync();
-
-       for(let j of jobs)                 
-            delete (j as any).Employers;
-
-       this.OK(Type.RemoveORMMetadata(jobs));
-    }    
-    
-    @GET("getById")    
-    public async GetByIdAsync(@FromQuery()id : number) 
-    { 
-       let job = await this._service.GetByIdAsync(id);
-
-       if(!job)
-            return this.NotFound({Message : "Job role not found"});
-                
-        delete (job as any).Employers;
-
-        this.OK(Type.RemoveORMMetadata(job));
-    }          
-    
-    @POST("insert")
-    public async InsertAsync(@FromBody()jobRole : JobRole) 
-    {  
-        this.OK(await this._service.AddAsync(jobRole));
-    }
-    
-    @PUT("update")   
-    public async UpdateAsync(@FromBody()jobRole : JobRole) 
-    {  
-        try{
-
-            this.OK(await this._service.UpdateAsync(jobRole));
-        }
-        catch(ex)
-        {
-            if(ex instanceof InvalidEntityException || ex instanceof EntityNotFoundException)
-                return this.BadRequest({Message : ex.message});
-            
-            return this.Error("Error while processing the request");
-        }
-    }
-
-    @DELETE("delete")    
-    public async DeleteAsync(@FromQuery()id : number) 
-    {  
-        if(!id)
-            return this.BadRequest({ Message : "The ID must be greater than 0"});
-
-        let del = await this._service.GetByIdAsync(id);
-
-        if(!del)
-            return this.NotFound({Message : "Job role not found"});
-
-        this.OK(await this._service.DeleteAsync(del));
-    }
-
-    
-}
 
 
 

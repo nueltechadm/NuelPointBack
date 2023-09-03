@@ -25,6 +25,10 @@ export default class UserService  extends AbstractUserService
         return Type.HasKeys<User>(obj, "Name", "Email");
     }
 
+    public override async SetClientDatabaseAsync(client: string): Promise<void> {    
+        await this._context.SetDatabaseAsync(client);
+    }
+
     public override async CountAsync(): Promise<number> {
         
         return await this._context.Users.CountAsync();
@@ -49,7 +53,7 @@ export default class UserService  extends AbstractUserService
         return await this._context.Users.WhereField("Name").Constains(name).Join("Company").Join("Period").ToListAsync() ?? [];
     }
 
-    public override async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<User | undefined> {
+    public override async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<Access | undefined> {
 
        let access = await this._context.Join(User, Access)
                                     .On(User, "Access", Access, "User")
@@ -59,14 +63,13 @@ export default class UserService  extends AbstractUserService
                                     .Join("User")
                                     .Join("Permissions")
                                     .Join("Departaments")
+                                    .Join("Company")
                                     .FirstOrDefaultAsync();   
         if(!access)
             return undefined;
-
-        access.User.Access = access;
-        delete (access as any).Password;        
-        delete (access as any).User;        
-        return access.User;
+        
+        delete (access as any).Password;
+        return access;
      
     }
 

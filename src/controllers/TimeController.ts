@@ -5,10 +5,13 @@ import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractTimeService from "../core/abstractions/AbstractTimeService";
 import Time from "../core/entities/Time";
 import Type from "../utils/Type";
+import AbstractController from "./AbstractController";
+import Authorization from "../utils/Authorization";
+import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
 
 @UseBefore(IsLogged)
 @Validate()
-export default class TimeController extends ControllerBase {
+export default class TimeController extends AbstractController {
     @Inject()
     private _service: AbstractTimeService;
 
@@ -17,8 +20,12 @@ export default class TimeController extends ControllerBase {
         this._service = service;
     }
 
+    public override async SetClientDatabaseAsync(): Promise<void> {
+        await this._service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
+    }
 
-    @GET("list")
+    @GET("list")     
+    @SetDatabaseFromToken()
     public async GetAllAsync(): Promise<void> {
 
         let times = await this._service.GetAllAsync();
@@ -26,6 +33,7 @@ export default class TimeController extends ControllerBase {
     }
 
     @GET("getById")
+    @SetDatabaseFromToken()
     public async GetByIdAsync(@FromQuery() id: number) {
         let time = await this._service.GetByIdAsync(id);
 
@@ -36,11 +44,13 @@ export default class TimeController extends ControllerBase {
     }
 
     @POST("insert")
+    @SetDatabaseFromToken()
     public async InsertAsync(@FromBody() time: Time) {
         this.OK(await this._service.AddAsync(time));
     }
 
     @PUT("update")
+    @SetDatabaseFromToken()
     public async UpdateAsync(@FromBody() time: Time) {
         try {
 
@@ -55,6 +65,7 @@ export default class TimeController extends ControllerBase {
     }
 
     @DELETE("delete")
+    @SetDatabaseFromToken()
     public async DeleteAsync(@FromQuery() id: number) {
         if (!id)
             return this.BadRequest({ Message: "The ID must be greater than 0" });

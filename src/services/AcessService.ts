@@ -7,7 +7,9 @@ import { AbstractAccessService } from "../core/abstractions/AbstractAccessServic
 
 
 
+
 export default class AcessService extends AbstractAccessService {
+  
    
     @Inject()
     private _context: Context;
@@ -15,6 +17,10 @@ export default class AcessService extends AbstractAccessService {
     constructor(context: Context) {
         super();
         this._context = context;
+    }
+
+    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+        this._context.SetDatabaseAsync(client);
     }
 
     public override IsCompatible(obj: any): obj is Access {
@@ -25,7 +31,14 @@ export default class AcessService extends AbstractAccessService {
         return await this._context.Access.CountAsync();
     }
     public override async GetByIdAsync(id: number): Promise<Access | undefined> {
-        return await this._context.Access.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
+        return await this._context.Access
+        .WhereField("Id")
+        .IsEqualTo(id)
+        .LoadRelationOn("Company")
+        .LoadRelationOn("Departaments")
+        .LoadRelationOn("Permissions")
+        .LoadRelationOn("User")
+        .FirstOrDefaultAsync();
     }
     public override async AddAsync(obj: Access): Promise<Access> {
 
@@ -46,16 +59,11 @@ export default class AcessService extends AbstractAccessService {
         return await this._context.Access.OrderBy("Company").ToListAsync();
     }
 
-    public override async GetByCompanyIdAsync(id: number) {
-        throw new Error("Method not implemented.");
-    }
-
     public override ValidateObject(obj: Access): void {
         if (!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Access.name} type`);
 
-    }
-
-    
+    }    
 
 }
+

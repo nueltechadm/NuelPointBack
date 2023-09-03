@@ -1,1 +1,1 @@
-{"Host":"0.0.0.0","Port":60000,"EnviromentVariables":{"ENVIROMENT":"DEBUG","DB_HOST":"localhost","DB_USER":"supervisor","DB_PASS":"sup","DB_NAME":"checkpoint","DB_PORT":"5434"},"RootPath":"C:\\Users\\LuisDev\\Desktop\\file_server\\checkpoint"}
+{"Host":"0.0.0.0","Port":60000,"EnviromentVariables":{"ENVIROMENT":"DEBUG"},"RootPath":"C:\\Users\\LuisDev\\Desktop\\file_server\\checkpoint"}

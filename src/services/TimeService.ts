@@ -17,6 +17,10 @@ export default class TimeService extends AbstractTimeService {
         this._context = context;
     }
 
+    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+        this._context.SetDatabaseAsync(client);
+    }
+
     public override IsCompatible(obj: any): obj is Time {
         return Type.HasKeys<Time>(obj, "Description", "Time1", "Time2", "Time3", "Time4");
     }

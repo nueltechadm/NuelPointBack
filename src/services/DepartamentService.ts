@@ -24,6 +24,10 @@ export default class DepartamentService  extends AbstractDepartamentService
         return Type.HasKeys<Departament>(obj, "Name", "Company");  
     }
 
+    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+        this._context.SetDatabaseAsync(client);
+    }
+
     public override async CountAsync(): Promise<number> {
         
         return await this._context.Departaments.CountAsync();

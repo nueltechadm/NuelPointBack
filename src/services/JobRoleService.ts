@@ -18,6 +18,10 @@ export default class JobRoleService  extends AbstractJobRoleService
         this._context = context;
     }
 
+    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+        this._context.SetDatabaseAsync(client);
+    }
+
     public override IsCompatible(obj: any): obj is JobRole {        
         return Type.HasKeys<JobRole>(obj, "Description", "Company");  
     }

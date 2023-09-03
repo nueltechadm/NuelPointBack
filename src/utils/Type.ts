@@ -15,7 +15,7 @@ export default class Type
         return true;
     }
 
-    public static RemoveORMMetadata<T extends object>(obj : T ) : T 
+    public static RemoveORMMetadata<T extends object>(obj? : T ) : T | undefined
     {
         if(obj == undefined || obj == null)
             return obj;

@@ -2,6 +2,7 @@
 
 export default abstract class AbstractService<T>
 {
+    abstract SetClientDatabaseAsync(client : string) : Promise<void>;
     abstract AddAsync(obj : T) : Promise<T>;
     abstract UpdateAsync(obj : T) : Promise<T>;
     abstract DeleteAsync(obj : T) : Promise<T>;

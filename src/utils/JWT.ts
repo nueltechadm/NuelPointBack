@@ -1,16 +1,17 @@
 import JWT from 'jsonwebtoken';
+import Authorization from './Authorization';
 
 const private_key = "adrianoonairda";
 
 
-export function Generate<T>(payload : T, duration : number) : string
+export function Generate(authorization : Authorization, duration : number) : string
 {
     if(duration <= 0 || duration >= 24)
         duration = 24;
 
     let d = new Date();
     d.setHours(d.getHours() + 1);   
-    return JWT.sign({ Payload : payload, ExpiresIn : d}, private_key);
+    return JWT.sign({ Payload : authorization, ExpiresIn : d}, private_key);
 }
 
 
@@ -44,3 +45,5 @@ export enum DecodeResult
     EXPIRED, 
     VALID
 }
+
+
