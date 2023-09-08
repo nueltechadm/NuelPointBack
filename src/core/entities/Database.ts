@@ -1,5 +1,7 @@
-import { Column, DataType, PrimaryKey, DBTypes } from 'myorm_pg';
+import { Column, DataType, PrimaryKey, DBTypes, Table } from 'myorm_pg';
 
+
+@Table("database_tb")
 export default class Database {
     @Column()
     @PrimaryKey()

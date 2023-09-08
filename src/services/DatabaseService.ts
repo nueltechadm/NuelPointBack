@@ -5,6 +5,7 @@ import Database, { DababaseStatus } from '../core/entities/Database';
 import Access from '../core/entities/Access';
 import User from '../core/entities/User';
 import AbstractDatabaseService from './abstractions/AbstractDatabaseService';
+import { MD5 } from '../utils/Cryptography';
 
 
 
@@ -73,7 +74,9 @@ export class DatabaseService extends AbstractDatabaseService{
 
         user.Name = dabataseName;            
 
-        user.Access = new Access(user, dabataseName, dabataseName);
+        user.Access = new Access(user, dabataseName, MD5(`${dabataseName}123`));
+
+        user.IsSuperUser = true;
 
         await this._context.SetDatabaseAsync(dabataseName);
 

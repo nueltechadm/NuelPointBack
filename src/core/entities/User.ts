@@ -25,6 +25,9 @@ export default class User
     public Birthdate : Date;
 
     @Column()
+    public IsSuperUser : Boolean;
+
+    @Column()
     @DataType(DBTypes.DATE)
     public AdmisionDate : Date;
 
@@ -74,6 +77,7 @@ export default class User
         this.Access = undefined;
         this.Contacts = [];
         this.Address = undefined;
+        this.IsSuperUser = false;
     }
 }
 

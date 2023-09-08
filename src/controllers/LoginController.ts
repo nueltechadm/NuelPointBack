@@ -55,10 +55,7 @@ export default class LoginController extends AbstractController
         delete (access as any).Password;        
 
         if(!access.User)        
-            return this.Unauthorized({ Message : "Invalid access, no one user is referenced"});        
-
-        if(!access.Company)
-            return this.Unauthorized({ Message : "Invalid access, no one company is referenced"});        
+            return this.Unauthorized({ Message : "Invalid access, no one user is referenced"});  
 
         let token = Generate(new Authorization(access.Username, link), 1);
 
