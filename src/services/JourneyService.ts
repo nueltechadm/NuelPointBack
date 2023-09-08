@@ -22,7 +22,7 @@ export default class JourneyService  extends AbstractJorneyService
     }
 
     public override IsCompatible(obj: any): obj is Journey {     
-        return Type.HasKeys<Journey>(obj, "Description", "Days");
+        return Type.HasKeys<Journey>(obj, "Description");
     }    
     public override async CountAsync(): Promise<number> {
         
@@ -55,8 +55,7 @@ export default class JourneyService  extends AbstractJorneyService
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Journey.name} type`);
         
-        if(!obj.Days || obj.Days.length == 0)
-            throw new InvalidEntityException("A period must have at less 1 day of the week");        
+               
     }
 }
 

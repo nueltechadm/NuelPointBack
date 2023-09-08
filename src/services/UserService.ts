@@ -42,16 +42,14 @@ export default class UserService  extends AbstractUserService
                                             Value : id
                                         })                                        
                                         .Join("Access")
-                                        .Join("Company")
-                                        .Join("Period")
-                                        .Join("Contacts")
-                                        .Join("")
+                                        .Join("Company")                                        
+                                        .Join("Contacts")                                        
                                         .FirstOrDefaultAsync();
         
     }
     public override async GetByNameAsync(name: string): Promise<User[]> {
 
-        return await this._context.Users.WhereField("Name").Constains(name).Join("Company").Join("Period").ToListAsync() ?? [];
+        return await this._context.Users.WhereField("Name").Constains(name).Join("Company").ToListAsync() ?? [];
     }
 
     public override async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<Access | undefined> {
@@ -81,8 +79,7 @@ export default class UserService  extends AbstractUserService
                                                 Field : "Email", 
                                                 Value : email
                                             })                                            
-                                            .Join("Company")
-                                            .Join("Period")
+                                            .Join("Company")                                            
                                             .FirstOrDefaultAsync();
     }
 

@@ -30,6 +30,9 @@ import AcessService from '../services/AcessService';
 import { AbstractAccessService } from '../core/abstractions/AbstractAccessService';
 import { AbstractAppointmentService } from '../core/abstractions/AbstractAppointmentService';
 import AppointmentService from '../services/AppointmentService';
+import { ControlContext } from '../data/ControlContext';
+import { DatabaseService } from '../services/DatabaseService';
+import AbstractDatabaseService from '../services/abstractions/AbstractDatabaseService';
 
 
 export default class App extends Application
@@ -41,7 +44,7 @@ export default class App extends Application
 
         this.UseControllers();     
        
-        this.ApplicationErrorHandler = (request, response, exception) => 
+        this.ApplicationThreadExeptionHandler = (request, response, exception) => 
         {
             console.error(exception);
             response.status(500);
@@ -53,9 +56,10 @@ export default class App extends Application
         }      
 
         appConfig.AddScoped(Context);
+        appConfig.AddScoped(ControlContext);        
 
         process.env["ROOT"] = appConfig.EnviromentVariables["ROOT"];
-
+        
         appConfig.AddScoped(AbstractUserService, UserService);
         appConfig.AddScoped(AbstractPermissionService, PermissionService);
         appConfig.AddScoped(AbstractJobRoleService, JobRoleService);       
@@ -66,7 +70,14 @@ export default class App extends Application
         appConfig.AddScoped(AbstractPeriodService, PeriodService);
         appConfig.AddScoped(AbstractTimeService, TimeService);
         appConfig.AddScoped(AbstractAccessService, AcessService);
-        appConfig.AddScoped(AbstractAppointmentService, AppointmentService);  
+        appConfig.AddScoped(AbstractAppointmentService, AppointmentService);
+        appConfig.AddScoped(AbstractDatabaseService, DatabaseService);       
+
+        (async()=>{
+
+            await DependecyService.Resolve<ControlContext>(ControlContext)?.UpdateDatabaseAsync();
+
+        })();
        
     }
     

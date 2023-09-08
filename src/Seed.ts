@@ -1,11 +1,11 @@
 
-import PermissionSeed from './seeds/PermissionSeed';
-import UserSeed from './seeds/UserSeed';
-import JobRoleSeed from './seeds/JobRoleSeed';
+import PermissionSeed from './devSeeds/PermissionSeed';
+import UserSeed from './devSeeds/UserSeed';
+import JobRoleSeed from './devSeeds/JobRoleSeed';
 import Context from './data/Context';
-import CompanySeed from './seeds/CompanySeed';
-import DepartamentSeed from './seeds/DepartamentSeed';
-import PeriodSeed from './seeds/PeriodSeed';
+import CompanySeed from './devSeeds/CompanySeed';
+import DepartamentSeed from './devSeeds/DepartamentSeed';
+import PeriodSeed from './devSeeds/PeriodSeed';
 import { ApplicationConfiguration } from 'web_api_base';
 
 

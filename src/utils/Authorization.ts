@@ -13,7 +13,7 @@ export default class Authorization {
 
     public GetClientDatabase() : string
     {
-        return `emp_${this.Link}`.trim();
+        return this.Link.trim().toLocaleLowerCase();
     }
 
     public static GenerateToken(auth: Authorization, duration: number): string {

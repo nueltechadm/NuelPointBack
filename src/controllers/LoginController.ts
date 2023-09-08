@@ -1,27 +1,33 @@
 
-import { ControllerBase, POST, Inject, FromBody, UseBefore, RunBefore, GET } from "web_api_base";
+import { POST, Inject, FromBody, UseBefore, RunBefore, GET } from "web_api_base";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import {Generate} from '../utils/JWT';
 import { IsLogged } from "../filters/AuthFilter";
 import Type from "../utils/Type";
 import Authorization from "../utils/Authorization";
-import DatabaseException from "../exceptions/DatabaseException";
 import AbstractController from "./AbstractController";
+import { ControlContext } from "../data/ControlContext";
+import AbstractDatabaseService from "../services/abstractions/AbstractDatabaseService";
+import { DababaseStatus } from "../core/entities/Database";
 
 
 export default class LoginController extends AbstractController
 {   
     @Inject()
-    private _service : AbstractUserService;
+    private _userService : AbstractUserService;
 
-    constructor(service : AbstractUserService)
+    @Inject()
+    private _databaseService : AbstractDatabaseService;
+
+    constructor(userService : AbstractUserService, databaseService: AbstractDatabaseService)
     {
         super();                    
-        this._service = service;
+        this._userService = userService;
+        this._databaseService = databaseService;
     }    
     
     public override async SetClientDatabaseAsync(): Promise<void> {
-        await this._service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
+        await this._userService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
     }
 
     @POST("login")
@@ -31,9 +37,17 @@ export default class LoginController extends AbstractController
         @FromBody("link")link: string)
     {
         
-        await this._service.SetClientDatabaseAsync(new Authorization(username, link).GetClientDatabase());        
+        let db = await this._databaseService.GetDabaseAsync(link);
+
+        if(!db)
+            return this.NotFound();
+    
+        if(db.Status != DababaseStatus.CREATED)
+            return this.Unauthorized({ Message : "Access denied", Database : db});
+
+        await this._userService.SetClientDatabaseAsync(new Authorization(username, link).GetClientDatabase());        
            
-        let access =  await this._service.GetByUserNameAndPasswordAsync(username, password);
+        let access =  await this._userService.GetByUserNameAndPasswordAsync(username, password);
 
         if(!access)
            return this.Unauthorized({ Message : "Invalid username or password"});
@@ -62,3 +76,5 @@ export default class LoginController extends AbstractController
     
    
 }
+
+

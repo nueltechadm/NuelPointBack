@@ -13,7 +13,7 @@ import Address from '../core/entities/Address';
 import Contact from '../core/entities/Contact';
 import Appointment from '../core/entities/Appointment';
 import DatabaseException from '../exceptions/DatabaseException';
-import Exception from 'web_api_base/dist/exceptions/Exception';
+
 
 export default class Context extends PGDBContext
 {
@@ -65,3 +65,4 @@ export default class Context extends PGDBContext
     }
 
 }
+

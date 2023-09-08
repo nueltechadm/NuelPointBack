@@ -17,10 +17,7 @@ export class CheckpointDTO
         this.Picture = picture;
     }
 
-    public MapToCheckpoint(user : User)
-    {
-        return new Checkpoint(user, this.X, this.Y, this.Picture, user.Company!, user.Period!);
-    }
+    
 
     public static MapToDTO(obj : any) : CheckpointDTO
     {
