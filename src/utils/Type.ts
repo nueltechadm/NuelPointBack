@@ -1,3 +1,6 @@
+import Schema from '../../node_modules/myorm_pg/lib/core/decorators/SchemasDecorators';
+import TP  from '../../node_modules/myorm_pg/lib/core/design/Type';
+
 
 export default class Type
 {
@@ -50,6 +53,50 @@ export default class Type
         };
 
         removeRecursive(obj);
+
+        return obj;
+    }
+
+    public static CreateTemplateFrom<T extends object>(ctor : new (...args: any[]) => T) : T
+    {
+        let base = Reflect.construct(ctor, []) as T;
+
+        for(let map of TP.GetColumnNameAndType(ctor))
+        {
+            let relation = Schema.GetRelationAttribute(ctor, map.Field);
+            let designType = TP.GetDesingType(ctor, map.Field);
+
+            if(relation && designType)
+            {
+                if(designType != Array)                
+                    (base as any)[map.Field] = Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object);
+                else
+                    (base as any)[map.Field] = [Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object)];
+            }
+        }
+
+        return Type.FillObject(base);
+    }
+
+    public static FillObject<T extends object>(obj : T) : T
+    {
+        
+        for(let c in obj)
+        {
+            let d = TP.GetDesingType(obj.constructor, c);
+
+            if(!d)
+                continue;
+
+            if(d.name === "Number")
+                (obj as any)[c] = -1;
+            else  if(d.name === "String")
+                (obj as any)[c] = c;
+            else  if(d.name === "Boolean")
+                (obj as any)[c] = false;
+            else  if(d.name === "Date")
+                (obj as any)[c] = new Date();
+        }
 
         return obj;
     }

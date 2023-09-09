@@ -27,7 +27,7 @@ export default class CompanyService  extends AbstractCompanyService
     }
 
     public override IsCompatible(obj: any): obj is Company {
-        return Type.HasKeys<Company>(obj, "Name");
+        return Type.HasKeys<Company>(obj, "Name", "Description", "Document");
     }
     public override async GetByIdAsync(id: number): Promise<Company | undefined> {       
         return await this._context.Companies
@@ -61,13 +61,20 @@ export default class CompanyService  extends AbstractCompanyService
     public override async GetByNameAsync(name: string): Promise<Company | undefined> {        
         return await this._context.Companies.Where({Field: "Name", Value : name}).FirstOrDefaultAsync();
     }
-    
+
     public override ValidateObject(obj : Company) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${Company.name} type`);
 
         if(!obj.Name)
-            throw new InvalidEntityException(`The name of ${Company.name} is required`);         
-    }
+            throw new InvalidEntityException(`The name of ${Company.name} is required`); 
+        
+        if(!obj.Description)
+            throw new InvalidEntityException(`The description of ${Company.name} is required`);
+    
+        if(!obj.Document)
+            throw new InvalidEntityException(`The document of ${Company.name} is required`);
+    } 
+   
 }

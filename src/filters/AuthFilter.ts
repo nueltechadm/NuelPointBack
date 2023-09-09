@@ -6,7 +6,7 @@ export function IsLogged(context : IHTTPRequestContext) : void
 {   
 
     if(process.env.ENVIROMENT == 'DEBUG' && context.Request.url.indexOf("/login/") != 0){
-        context.Request.APIAUTH = new Authorization("dev", "debug");      
+        context.Request.APIAUTH = new Authorization("development", "development");      
         console.debug(`No auth in DEBUG mode: ${context.Request.url}`);
         return context.Next();
     }

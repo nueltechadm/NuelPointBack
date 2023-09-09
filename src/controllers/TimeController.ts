@@ -78,6 +78,13 @@ export default class TimeController extends AbstractController {
         this.OK(await this._service.DeleteAsync(del));
     }
 
+    @GET("getJson")
+    @SetDatabaseFromToken()
+    public async GetJson()
+    {
+        this.OK(Type.CreateTemplateFrom<Time>(Time));
+    }
+
 
 }
 

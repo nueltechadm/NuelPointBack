@@ -80,6 +80,13 @@ export default class UserController extends AbstractController
         this.OK(await this._service.DeleteAsync(del));
     }
 
+    @GET("getJson")
+    @SetDatabaseFromToken()
+    public async GetJson()
+    {
+        this.OK(Type.CreateTemplateFrom<User>(User));
+    }
+
     private RemovePassWordAndMetadata(user? : User) : User | undefined
     {
         if(!user)
@@ -90,6 +97,8 @@ export default class UserController extends AbstractController
 
         return Type.RemoveORMMetadata(user);
     }
+
+    
 }
 
 

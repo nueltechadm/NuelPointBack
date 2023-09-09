@@ -110,6 +110,13 @@ export class AccessController extends AbstractController {
 
         return Type.RemoveORMMetadata(access);
     }
+
+    @GET("getJson")
+    @SetDatabaseFromToken()
+    public async GetJson()
+    {
+        this.OK(Type.CreateTemplateFrom<Access>(Access));
+    }
 }
 
 

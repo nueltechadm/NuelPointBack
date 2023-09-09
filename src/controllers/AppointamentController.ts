@@ -150,5 +150,12 @@ export default class AppointamentController extends AbstractController
 
         this.OK(Type.RemoveORMMetadata(appointament));
     }  
+
+    @GET("getJson")
+    @SetDatabaseFromToken()
+    public async GetJson()
+    {
+        this.OK(Type.CreateTemplateFrom<Appointment>(Appointment));
+    }
    
 }

@@ -8,6 +8,9 @@ import Type from "../utils/Type";
 import AbstractController from "./AbstractController";
 import Authorization from "../utils/Authorization";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
+import Address from "../core/entities/Address";
+import Contact from "../core/entities/Contact";
+import User from "../core/entities/User";
 
 
 @UseBefore(IsLogged)
@@ -60,6 +63,7 @@ export default class CompanyController extends AbstractController {
     @POST("insert")    
     @SetDatabaseFromToken()
     public async InsertAsync(@FromBody() company: Company) {
+        
         this.OK(await this._service.AddAsync(company));
     }
 
@@ -92,6 +96,12 @@ export default class CompanyController extends AbstractController {
         this.OK(await this._service.DeleteAsync(del));
     }
 
+    @GET("getJson")
+    @SetDatabaseFromToken()
+    public async GetJson()
+    {
+        this.OK(Type.CreateTemplateFrom<Company>(Company));
+    }
     
 
 
