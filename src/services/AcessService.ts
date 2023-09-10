@@ -9,8 +9,7 @@ import { AbstractAccessService } from "../core/abstractions/AbstractAccessServic
 
 
 export default class AcessService extends AbstractAccessService {
-  
-   
+       
     @Inject()
     private _context: Context;
 
@@ -26,6 +25,13 @@ export default class AcessService extends AbstractAccessService {
     public override IsCompatible(obj: any): obj is Access {
         return Type.HasKeys<Access>(obj, "Username", "User");
     }
+
+    public override async ExistsAsync(id: number): Promise<boolean> {
+        
+        return (await this._context.Access.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+    }
+  
+    
     public override async CountAsync(): Promise<number> {
 
         return await this._context.Access.CountAsync();

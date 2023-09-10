@@ -18,6 +18,11 @@ export default class Type
         return true;
     }
 
+    public static IsObject(obj : any) : obj is object
+    {
+        return obj != undefined && typeof obj == "object";
+    }
+
     public static RemoveORMMetadata<T extends object>(obj? : T ) : T | undefined
     {
         if(obj == undefined || obj == null)
@@ -100,4 +105,48 @@ export default class Type
 
         return obj;
     }
+
+
+    public static RemoveCircularReferences<T extends object, K extends keyof T>(removeThis: T, fromThis? : T[K]) : T
+    {
+        let source : any = fromThis ?? removeThis;        
+
+        for(let c in source)
+        {
+            if(!source[c])
+                continue;
+
+            if(["string", "boolean", "number"].includes(typeof source[c]))
+                continue;
+
+            let isArray = source[c].constructor == Array;
+
+            if(isArray && source[c].lenght > 0)
+            {
+                if(source[c].filter((s : any) => s == removeThis))
+                    source[c] = source[c].filter((s : any) => s != removeThis);  
+                
+                for(let i of source[c]){
+
+                    Type.RemoveCircularReferences(removeThis, i);
+                    Type.RemoveCircularReferences(i);
+                }
+
+                continue;
+            }
+
+            if(source[c] == removeThis)
+                source[c] = undefined;
+            else{
+
+                Type.RemoveCircularReferences(removeThis, source[c]);
+                Type.RemoveCircularReferences(source[c]);
+            }
+            
+        }
+
+        return source as T;
+    }      
+
+       
 }

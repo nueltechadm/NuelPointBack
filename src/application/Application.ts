@@ -23,8 +23,6 @@ import AbstractJorneyService from '../core/abstractions/AbstractJorneyService';
 import JourneyService from '../services/JourneyService';
 import TimeService  from "../services/TimeService";
 
-import AbstractPeriodService from '../core/abstractions/AbstractPeriodService';
-import PeriodService from '../services/PeriodService';
 import AbstractTimeService from '../core/abstractions/AbstractTimeService';
 import AcessService from '../services/AcessService';
 import { AbstractAccessService } from '../core/abstractions/AbstractAccessService';
@@ -33,6 +31,9 @@ import AppointmentService from '../services/AppointmentService';
 import { ControlContext } from '../data/ControlContext';
 import { DatabaseService } from '../services/DatabaseService';
 import AbstractDatabaseService from '../services/abstractions/AbstractDatabaseService';
+import InvalidEntityException from '../exceptions/InvalidEntityException';
+import EntityNotFoundException from '../exceptions/EntityNotFoundException';
+import { ApplicationExceptionHandler } from 'web_api_base/dist/interfaces/IApplication';
 
 
 export default class App extends Application
@@ -44,16 +45,7 @@ export default class App extends Application
 
         this.UseControllers();     
        
-        this.ApplicationThreadExeptionHandler = (request, response, exception) => 
-        {
-            console.error(exception);
-            response.status(500);
-
-            if(appConfig.EnviromentVariables["ENVIROMENT"] == "DEBUG")
-                response.json(exception);
-            else
-                response.json({Message: "Error while processing the request"});
-        }      
+        this.ApplicationThreadExeptionHandler = this.ApplicationThreadExeptionEvent;
 
         appConfig.AddScoped(Context);
         appConfig.AddScoped(ControlContext);        
@@ -66,8 +58,7 @@ export default class App extends Application
         appConfig.AddScoped(AbstractCheckpointService, CheckpointService);
         appConfig.AddScoped(AbstractFileService, FileService);
         appConfig.AddScoped(AbstractCompanyService, CompanyService);
-        appConfig.AddScoped(AbstractJorneyService, JourneyService);
-        appConfig.AddScoped(AbstractPeriodService, PeriodService);
+        appConfig.AddScoped(AbstractJorneyService, JourneyService);        
         appConfig.AddScoped(AbstractTimeService, TimeService);
         appConfig.AddScoped(AbstractAccessService, AcessService);
         appConfig.AddScoped(AbstractAppointmentService, AppointmentService);
@@ -76,9 +67,34 @@ export default class App extends Application
         (async()=>{
 
             await DependecyService.Resolve<ControlContext>(ControlContext)?.UpdateDatabaseAsync();
-
         })();
        
     }
+
+    protected ApplicationThreadExeptionEvent : ApplicationExceptionHandler =  (request, response, exception) => 
+    {
+        if(exception instanceof InvalidEntityException)
+        {
+            response.status(400);
+            response.json({Message : exception.Message});
+            return;
+        }
+
+        if(exception instanceof EntityNotFoundException)
+        {
+            response.status(404);
+            response.json({Message : exception.Message});
+            return;
+        }
+
+        console.error(exception);
+        response.status(500);
+
+        if(this.ApplicationConfiguration.EnviromentVariables["ENVIROMENT"] == "DEBUG")
+            response.json(exception);
+        else
+            response.json({Message: "Error while processing the request"});
+    }      
     
 }
+

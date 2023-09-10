@@ -30,6 +30,10 @@ export default class TimeService extends AbstractTimeService {
 
         return await this._context.Times.CountAsync();
     }
+    public override async ExistsAsync(id: number): Promise<boolean> {
+        
+        return (await this._context.Times.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+    }
     public override async GetByIdAsync(id: number): Promise<Time | undefined> {
         return await this._context.Times.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }

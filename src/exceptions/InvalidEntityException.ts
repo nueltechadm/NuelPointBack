@@ -1,6 +1,7 @@
+import { Exception } from "web_api_base";
 
 
-export default class InvalidEntityException extends Error
+export default class InvalidEntityException extends Exception
 {
     constructor(msg : string)
     {

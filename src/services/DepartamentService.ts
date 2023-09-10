@@ -46,6 +46,12 @@ export default class DepartamentService  extends AbstractDepartamentService
 
         return this._context.Departaments.AddAsync(obj);
     }
+
+    public override async ExistsAsync(id: number): Promise<boolean> {
+        
+        return (await this._context.Departaments.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+    }
+
     public override async UpdateAsync(obj: Departament): Promise<Departament> {
 
         this.ValidateObject(obj);

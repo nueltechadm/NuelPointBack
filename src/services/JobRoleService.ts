@@ -26,6 +26,11 @@ export default class JobRoleService  extends AbstractJobRoleService
         return Type.HasKeys<JobRole>(obj, "Description", "Company");  
     }
 
+    public override async ExistsAsync(id: number): Promise<boolean> {
+        
+        return (await this._context.JobRoles.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+    }
+
     public override async CountAsync(): Promise<number> {
         
         return await this._context.JobRoles.CountAsync();

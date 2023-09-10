@@ -31,6 +31,10 @@ export default class JourneyService  extends AbstractJorneyService
     public override async GetByIdAsync(id: number): Promise<Journey | undefined> {       
         return await this._context.Journeys.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }      
+    public override async ExistsAsync(id: number): Promise<boolean> {
+        
+        return (await this._context.Journeys.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+    }
     public override async AddAsync(obj: Journey): Promise<Journey> {
 
         this.ValidateObject(obj);

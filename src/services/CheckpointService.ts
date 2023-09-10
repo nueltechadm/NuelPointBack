@@ -30,6 +30,11 @@ export default class CheckpointService  extends AbstractCheckpointService
         return await this._context.Checkpoints.CountAsync();
     }
 
+    public override async ExistsAsync(id: number): Promise<boolean> {
+        
+        return (await this._context.Checkpoints.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+    }
+
     public override async GetFolderAndFileName(checkpoint: Checkpoint): Promise<{ Folder: string; File: string; }> {
        
         if(!this.IsCompatible(checkpoint))

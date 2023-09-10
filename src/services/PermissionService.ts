@@ -28,6 +28,10 @@ export default class PermissionService  extends AbstractPermissionService
         
         return await this._context.Permissions.CountAsync();
     }
+    public override async ExistsAsync(id: number): Promise<boolean> {
+        
+        return (await this._context.Permissions.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+    }
     public override async GetByIdAsync(id: number): Promise<Permission | undefined> {       
         return await this._context.Permissions.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }

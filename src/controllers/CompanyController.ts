@@ -8,9 +8,7 @@ import Type from "../utils/Type";
 import AbstractController from "./AbstractController";
 import Authorization from "../utils/Authorization";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
-import Address from "../core/entities/Address";
-import Contact from "../core/entities/Contact";
-import User from "../core/entities/User";
+
 
 
 @UseBefore(IsLogged)
@@ -30,11 +28,9 @@ export default class CompanyController extends AbstractController {
 
     @GET("list")    
     @SetDatabaseFromToken()
-    public async GetAllAsync(): Promise<void> {
+    public async GetAllAsync(): Promise<void> {                
 
-        let companies = await this._service.GetAllAsync();        
-
-        this.OK(Type.RemoveORMMetadata(companies));
+        this.OK(await this._service.GetAllAsync());
     }
 
     @GET("getByName")    
@@ -46,40 +42,48 @@ export default class CompanyController extends AbstractController {
         if(!company)
             return this.NotFound(`Company not found`);
         else
-            return this.OK(Type.RemoveORMMetadata(company));        
+            return this.OK(company);        
     }
 
     @GET("getById")    
     @SetDatabaseFromToken()
     public async GetByIdAsync(@FromQuery() id: number) {
+
         let company = await this._service.GetByIdAsync(id);
 
         if (!company)
             return this.NotFound({ Message: "Company not found" });
 
-        this.OK(Type.RemoveORMMetadata(company));
+        this.OK(company);
     }
 
     @POST("insert")    
     @SetDatabaseFromToken()
     public async InsertAsync(@FromBody() company: Company) {
         
+        company.Id = -1;
+
+        this._service.ValidateObject(company);        
+
+        let exists = await this._service.GetByNameAsync(company.Name);
+
+        if(exists)
+            return this.BadRequest(`Already exists a company with name : "${company.Name}"`);
+
         this.OK(await this._service.AddAsync(company));
     }
 
     @PUT("update")    
     @SetDatabaseFromToken()
     public async UpdateAsync(@FromBody() company: Company) {
-        try {
+        
+        if(!company || !company.Id)
+            return this.BadRequest({ Message: "Id is required" });
 
-            this.OK(await this._service.UpdateAsync(company));
-        }
-        catch (ex) {
-            if (ex instanceof InvalidEntityException || ex instanceof EntityNotFoundException)
-                return this.BadRequest({ Message: ex.message });
+        let fromDB = await this._service.GetByIdAsync(company.Id);
 
-            return this.Error("Error while processing the request");
-        }
+        if (!fromDB)
+            return this.NotFound({ Message: "Company not found" });
     }
 
     @DELETE("delete")    

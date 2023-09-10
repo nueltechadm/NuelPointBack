@@ -51,6 +51,11 @@ export default class CompanyService  extends AbstractCompanyService
 
         return this._context.Companies.UpdateAsync(obj);
     }
+    public override async ExistsAsync(id: number): Promise<boolean> {
+        
+        return (await this._context.Companies.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+    }
+
     public override async DeleteAsync(obj: Company): Promise<Company> {
         return this._context.Companies.DeleteAsync(obj);
     }
