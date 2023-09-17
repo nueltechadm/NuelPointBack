@@ -40,7 +40,12 @@ export default class UserController extends AbstractController
     @SetDatabaseFromToken() 
     public async GetByIdAsync(@FromQuery()id : number) : Promise<void>
     { 
-       this.OK(this.RemovePassWordAndMetadata(await this._service.GetByIdAsync(id)));
+       let user = await this._service.GetByIdAsync(id);
+
+       if(!user)
+            this.NotFound();
+        else
+            this.OK(this.RemovePassWordAndMetadata(user));
     }          
     
     @POST("insert")

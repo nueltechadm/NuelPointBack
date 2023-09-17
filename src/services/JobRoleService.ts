@@ -19,7 +19,7 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
 
     public override async SetClientDatabaseAsync(client: string): Promise<void> {       
-        this._context.SetDatabaseAsync(client);
+        await this._context.SetDatabaseAsync(client);
     }
 
     public override IsCompatible(obj: any): obj is JobRole {        
@@ -82,7 +82,7 @@ export default class JobRoleService  extends AbstractJobRoleService
             throw new InvalidEntityException(`The description of ${JobRole.name} is required`);
 
         if(!obj.Company)
-            throw new InvalidEntityException(`The folder of ${JobRole.name} is required`);
+            throw new InvalidEntityException(`The company of ${JobRole.name} is required`);
       
     }
 }

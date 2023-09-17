@@ -20,7 +20,7 @@ export default class TimeService extends AbstractTimeService {
     }
 
     public override async SetClientDatabaseAsync(client: string): Promise<void> {       
-        this._context.SetDatabaseAsync(client);
+        await this._context.SetDatabaseAsync(client);
     }
 
     public override IsCompatible(obj: any): obj is Time {

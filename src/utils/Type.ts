@@ -30,6 +30,9 @@ export default class Type
 
         let removeRecursive = (k : any) => 
         {
+            if(!k)
+                return;
+
             if(["String", "Number"].indexOf(k.constructor.name) > -1)
                 return;
 

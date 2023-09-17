@@ -25,7 +25,7 @@ export default class DepartamentService  extends AbstractDepartamentService
     }
 
     public override async SetClientDatabaseAsync(client: string): Promise<void> {       
-        this._context.SetDatabaseAsync(client);
+        await this._context.SetDatabaseAsync(client);
     }
 
     public override async CountAsync(): Promise<number> {

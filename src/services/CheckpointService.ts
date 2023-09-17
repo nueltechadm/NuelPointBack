@@ -23,7 +23,7 @@ export default class CheckpointService  extends AbstractCheckpointService
     }
 
     public override async SetClientDatabaseAsync(client: string): Promise<void> {       
-        this._context.SetDatabaseAsync(client);
+        await this._context.SetDatabaseAsync(client);
     }
 
     public async CountAsync(): Promise<number> {        

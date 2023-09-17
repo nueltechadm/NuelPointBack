@@ -1,11 +1,11 @@
-import {ControllerBase, IHTTPRequestContext} from 'web_api_base';
+import {Application, ControllerBase, IHTTPRequestContext} from 'web_api_base';
 import {Decode, DecodeResult} from '../utils/JWT';
 import Authorization from '../utils/Authorization';
 
 export function IsLogged(context : IHTTPRequestContext) : void
 {   
 
-    if(process.env.ENVIROMENT == 'DEBUG' && context.Request.url.indexOf("/login/") != 0){
+    if(Application.Configurations.DEBUG && context.Request.url.indexOf("/login/") != 0){
         context.Request.APIAUTH = new Authorization("development", "development");      
         console.debug(`No auth in DEBUG mode: ${context.Request.url}`);
         return context.Next();
@@ -24,7 +24,7 @@ export function IsLogged(context : IHTTPRequestContext) : void
 
     if(decodeResult.Result == DecodeResult.EXPIRED)
     {
-        context.Response.status(403);
+        context.Response.status(401);
         context.Response.json({Message : "Token has expired"});
         return;
     }

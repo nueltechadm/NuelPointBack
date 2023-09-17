@@ -43,14 +43,17 @@ export default class App extends Application
     {       
         this.UseCors();
 
-        this.UseControllers();     
+        await this.UseControllersAsync();    
+        
+        if(Application.Configurations.DEBUG)
+            this.CreateDocumentation();
        
         this.ApplicationThreadExeptionHandler = this.ApplicationThreadExeptionEvent;
 
         appConfig.AddScoped(Context);
         appConfig.AddScoped(ControlContext);        
 
-        process.env["ROOT"] = appConfig.EnviromentVariables["ROOT"];
+        process.env["ROOT"] = appConfig.RootPath;
         
         appConfig.AddScoped(AbstractUserService, UserService);
         appConfig.AddScoped(AbstractPermissionService, PermissionService);
@@ -65,7 +68,6 @@ export default class App extends Application
         appConfig.AddScoped(AbstractDatabaseService, DatabaseService);       
 
         (async()=>{
-
             await DependecyService.Resolve<ControlContext>(ControlContext)?.UpdateDatabaseAsync();
         })();
        

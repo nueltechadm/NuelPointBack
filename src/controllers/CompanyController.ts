@@ -1,4 +1,4 @@
-import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RunBefore } from "web_api_base";
+import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RunBefore, ProducesResponse } from "web_api_base";
 import { IsLogged } from '../filters/AuthFilter';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
@@ -28,6 +28,8 @@ export default class CompanyController extends AbstractController {
 
     @GET("list")    
     @SetDatabaseFromToken()
+    @ProducesResponse({Status : 200, Description: "Se der bom",  JSON : JSON.stringify([Type.CreateTemplateFrom<Company>(Company)])})
+    @ProducesResponse({Status : 400, Description: "Se der ruim", JSON : JSON.stringify({Message: "Erro"})})
     public async GetAllAsync(): Promise<void> {                
 
         this.OK(await this._service.GetAllAsync());

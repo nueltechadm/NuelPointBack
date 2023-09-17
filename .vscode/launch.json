@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],            
             "runtimeExecutable": "node", 
-            "runtimeArgs": ["${workspaceFolder}//dist/Index.js"]
+            "runtimeArgs": ["${workspaceFolder}//dist/Index.js", "--debug", "--dark"]
         }, 
 
         {
