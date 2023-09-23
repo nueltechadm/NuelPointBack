@@ -18,7 +18,7 @@ export default class Appointment {
     public Time: Time;
 
     @Column()
-    @DataType(DBTypes.DATETIME)
+    @DataType(DBTypes.DATE)
     public Date : Date; 
 
     @Column()

@@ -5,10 +5,12 @@ export default class Authorization {
 
     public User: string;
     public Link: string;
+    public UserId : number;
 
-    constructor(user: string, link: string) {
+    constructor(user: string, link: string, id: number) {
         this.User = user;
-        this.Link = link    
+        this.Link = link;
+        this.UserId = id;
     }
 
     public GetClientDatabase() : string
@@ -38,7 +40,8 @@ export default class Authorization {
 
             let auth = new Authorization
             (payload.User.toString(),
-             payload.Link.toString()); 
+             payload.Link.toString(), 
+             parseInt(payload.UserId)); 
              return auth;
  
          } catch {

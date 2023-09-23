@@ -15,4 +15,6 @@ export default abstract class AbstractDatabaseService {
 
     public abstract CreateDefaultUserAsync(dabataseName: string): Promise<void>;
 
+    public abstract UpdateDatabaseSchemaAsync(db : Database): Promise<void>;
+
 }

@@ -28,28 +28,52 @@ export default class PermissionService  extends AbstractPermissionService
         
         return await this._context.Permissions.CountAsync();
     }
+
     public override async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Permissions.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
+
+
     public override async GetByIdAsync(id: number): Promise<Permission | undefined> {       
         return await this._context.Permissions.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }
+
+
     public override async GetByNameAsync(name: PermissionName): Promise<Permission | undefined> {
         return await this._context.Permissions.WhereField("Name").IsEqualTo(name).OrderBy("Description").FirstOrDefaultAsync();
     }
+
+
     public override async GetByDescriptionAsync(description: string): Promise<Permission[]> {
         return await this._context.Permissions.WhereField("Description").Constains(description).OrderBy("Description").ToListAsync();
-    }    
+    }  
+    
+    public override async GetByAndLoadAsync<K extends keyof Permission>(key: K, value: Permission[K], load: K[]): Promise<Permission[]> 
+    {
+       this._context.Permissions.Where({Field : key, Value : value});
+
+       for(let l of load)
+            this._context.Permissions.Join(l);
+        
+       return await this._context.Permissions.ToListAsync();
+    } 
+    
     public override async AddAsync(obj: Permission): Promise<Permission> {
         return this._context.Permissions.AddAsync(obj);
     }
+
+
     public override async UpdateAsync(obj: Permission): Promise<Permission> {
         return this._context.Permissions.UpdateAsync(obj);
     }
+
+
     public override async DeleteAsync(obj: Permission): Promise<Permission> {
         return this._context.Permissions.DeleteAsync(obj);
     }
+
+
     public override async GetAllAsync(): Promise<Permission[]> {
         return await this._context.Permissions.OrderBy("Description").ToListAsync();
     }  

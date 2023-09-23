@@ -19,7 +19,7 @@ export default class AcessService extends AbstractAccessService {
     }
 
     public override async SetClientDatabaseAsync(client: string): Promise<void> {       
-        this._context.SetDatabaseAsync(client);
+        await this._context.SetDatabaseAsync(client);
     }
 
     public override IsCompatible(obj: any): obj is Access {
@@ -36,6 +36,19 @@ export default class AcessService extends AbstractAccessService {
 
         return await this._context.Access.CountAsync();
     }
+    
+
+    public override async GetByAndLoadAsync<K extends keyof Access>(key: K, value: Access[K], load: K[]): Promise<Access[]> 
+    {
+       this._context.Access.Where({Field : key, Value : value});
+
+       for(let l of load)
+            this._context.Access.Join(l);
+        
+       return await this._context.Access.ToListAsync();
+    } 
+
+    
     public override async GetByIdAsync(id: number): Promise<Access | undefined> {
         return await this._context.Access
         .WhereField("Id")
@@ -52,15 +65,18 @@ export default class AcessService extends AbstractAccessService {
 
         return this._context.Access.AddAsync(obj);
     }
+
     public override async UpdateAsync(obj: Access): Promise<Access> {
 
         this.ValidateObject(obj);
 
         return this._context.Access.UpdateAsync(obj);
     }
+
     public override async DeleteAsync(obj: Access): Promise<Access> {
         return this._context.Access.DeleteAsync(obj);
     }
+    
     public override async GetAllAsync(): Promise<Access[]> {
         return await this._context.Access.OrderBy("Company").ToListAsync();
     }

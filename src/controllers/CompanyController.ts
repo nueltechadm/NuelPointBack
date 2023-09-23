@@ -28,8 +28,7 @@ export default class CompanyController extends AbstractController {
 
     @GET("list")    
     @SetDatabaseFromToken()
-    @ProducesResponse({Status : 200, Description: "Se der bom",  JSON : JSON.stringify([Type.CreateTemplateFrom<Company>(Company)])})
-    @ProducesResponse({Status : 400, Description: "Se der ruim", JSON : JSON.stringify({Message: "Erro"})})
+    @CompanyController.ProducesType(200, "List of all comapanies in client database" , Company, true)    
     public async GetAllAsync(): Promise<void> {                
 
         this.OK(await this._service.GetAllAsync());
@@ -61,6 +60,7 @@ export default class CompanyController extends AbstractController {
 
     @POST("insert")    
     @SetDatabaseFromToken()
+    @CompanyController.ReceiveType(Company)
     public async InsertAsync(@FromBody() company: Company) {
         
         company.Id = -1;

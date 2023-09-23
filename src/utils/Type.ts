@@ -65,6 +65,13 @@ export default class Type
         return obj;
     }
 
+    public static CreateInstance<T extends object>(ctor : new (...args: any[]) => T) : T
+    {
+        let base = Reflect.construct(ctor, []) as T;      
+
+        return Type.FillObject(base);
+    }
+
     public static CreateTemplateFrom<T extends object>(ctor : new (...args: any[]) => T) : T
     {
         let base = Reflect.construct(ctor, []) as T;

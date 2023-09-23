@@ -12,4 +12,4 @@ export default abstract class AbstractUserService extends AbstractService<User>
     abstract GetByUserNameAndPasswordAsync(username : string, password : string) : Promise<Access | undefined>;
     abstract GetByEmailAsync(email : string) : Promise<User | undefined>;
    
-}
+}                               

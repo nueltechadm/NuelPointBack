@@ -6,10 +6,13 @@ import Access from '../core/entities/Access';
 import User from '../core/entities/User';
 import AbstractDatabaseService from './abstractions/AbstractDatabaseService';
 import { MD5 } from '../utils/Cryptography';
+import Company from '../core/entities/Company';
+import DatabaseException from '../exceptions/DatabaseException';
 
 
 
 export class DatabaseService extends AbstractDatabaseService{
+   
    
     @Inject()
     private _context: Context;
@@ -44,6 +47,30 @@ export class DatabaseService extends AbstractDatabaseService{
         return (await this._controlContext.Databases.ToListAsync()).filter(s => s.Name == dabataseName && s.Status == DababaseStatus.CREATED).length > 0;
     }
 
+    public override async UpdateDatabaseSchemaAsync(db: Database): Promise<void> 
+    {
+        if(db.Status == DababaseStatus.CREATED || db.Status == DababaseStatus.UPDATED)
+        {
+            db.Status = DababaseStatus.UPDATING;
+
+            await this._controlContext.Databases.UpdateAsync(db);
+
+            try{
+
+                await this._context.UpdateDatabaseAsync();
+                db.Status = DababaseStatus.UPDATED;                
+
+            }catch(err)
+            {
+                db.Status = DababaseStatus.UPDATEFAIL;
+                db.Warning = (err as any).message;
+            }
+            
+            db.LasUpdate = new Date();
+            await this._controlContext.Databases.UpdateAsync(db);
+        }
+    }
+
     public override async CreateDabaseAsync(dabataseName: string): Promise<void> {
         let db = await this._controlContext.Databases.Where({ Field: 'Name', Value: dabataseName }).FirstOrDefaultAsync();
 
@@ -68,6 +95,8 @@ export class DatabaseService extends AbstractDatabaseService{
         }
     }    
 
+
+
     public override async CreateDefaultUserAsync(dabataseName : string) : Promise<void>
     {
         let user = Reflect.construct(User, []) as User;
@@ -77,7 +106,7 @@ export class DatabaseService extends AbstractDatabaseService{
         user.Access = new Access(user, dabataseName, MD5(`${dabataseName}123`));
 
         user.IsSuperUser = true;
-
+        
         await this._context.SetDatabaseAsync(dabataseName);
 
         await this._context.Users.AddAsync(user);

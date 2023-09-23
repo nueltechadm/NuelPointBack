@@ -92,7 +92,7 @@ export default class App extends Application
         console.error(exception);
         response.status(500);
 
-        if(this.ApplicationConfiguration.EnviromentVariables["ENVIROMENT"] == "DEBUG")
+        if(Application.Configurations.DEBUG)
             response.json(exception);
         else
             response.json({Message: "Error while processing the request"});

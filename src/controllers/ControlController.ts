@@ -64,4 +64,36 @@ export default class ControlController extends ControllerBase {
             
     }
 
+
+    @GET("update")
+    public async UpdateDatabaseAsync(@FromQuery() name: string) {
+
+        if(!name)
+            return this.BadRequest({Message : "The parameter \"name\" is required"});
+
+        let db = await this._service.GetDabaseAsync(name);
+
+        if (!db)           
+            return this.NotFound();  
+        
+        if(db.Status == DababaseStatus.UPDATING)
+            return this.OK({Message : `The database ${name} is already updating`});
+    
+        if(db.Status == DababaseStatus.CREATED || db.Status == DababaseStatus.UPDATED)
+        {            
+            (async()=>
+            {
+                await this._service.UpdateDatabaseSchemaAsync(db);
+
+            })();
+
+            return this.OK({Message : `The database ${name} is updating`});
+        }
+        else
+        {
+            return this.BadRequest({Message : `Can not update a database with status : ${db.Status.toString()}`});
+        } 
+            
+    }
+
 }

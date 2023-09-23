@@ -29,6 +29,7 @@ export default class CompanyService  extends AbstractCompanyService
     public override IsCompatible(obj: any): obj is Company {
         return Type.HasKeys<Company>(obj, "Name", "Description", "Document");
     }
+
     public override async GetByIdAsync(id: number): Promise<Company | undefined> {       
         return await this._context.Companies
         .WhereField("Id")
@@ -39,18 +40,32 @@ export default class CompanyService  extends AbstractCompanyService
         .LoadRelationOn("Users")
         .FirstOrDefaultAsync();
     }      
+
     public override async AddAsync(obj: Company): Promise<Company> {
 
         this.ValidateObject(obj);
 
         return this._context.Companies.AddAsync(obj);
     }
+
+
     public override async UpdateAsync(obj: Company): Promise<Company> {
 
         this.ValidateObject(obj);
 
         return this._context.Companies.UpdateAsync(obj);
     }
+
+    public override async GetByAndLoadAsync<K extends keyof Company>(key: K, value: Company[K], load: K[]): Promise<Company[]> 
+    {
+       this._context.Companies.Where({Field : key, Value : value});
+
+       for(let l of load)
+            this._context.Companies.Join(l);
+        
+       return await this._context.Companies.ToListAsync();
+    } 
+
     public override async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Companies.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
@@ -59,6 +74,8 @@ export default class CompanyService  extends AbstractCompanyService
     public override async DeleteAsync(obj: Company): Promise<Company> {
         return this._context.Companies.DeleteAsync(obj);
     }
+
+
     public override async GetAllAsync(): Promise<Company[]> {
         return await this._context.Companies.OrderBy("Description").ToListAsync();
     }    

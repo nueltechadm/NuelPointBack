@@ -13,6 +13,7 @@ import Address from '../core/entities/Address';
 import Contact from '../core/entities/Contact';
 import Appointment from '../core/entities/Appointment';
 import DatabaseException from '../exceptions/DatabaseException';
+import DayOfWeek from '../core/entities/DayOfWeek';
 
 
 export default class Context extends PGDBContext
@@ -29,6 +30,7 @@ export default class Context extends PGDBContext
     public Departaments : PGDBSet<Departament>; 
     public Times : PGDBSet<Time>; 
     public Journeys : PGDBSet<Journey>; 
+    public DaysOfWeek : PGDBSet<DayOfWeek>; 
     public Addresses : PGDBSet<Address>; 
     public Contacts : PGDBSet<Contact>; 
 
@@ -47,6 +49,7 @@ export default class Context extends PGDBContext
         this.Companies = new PGDBSet(Company, this);
         this.Times = new PGDBSet(Time, this);
         this.Journeys = new PGDBSet(Journey, this);
+        this.DaysOfWeek = new PGDBSet(DayOfWeek, this);
         this.Addresses = new PGDBSet(Address, this);
         this.Appointments = new PGDBSet(Appointment, this);
         this.Contacts = new PGDBSet(Contact, this);

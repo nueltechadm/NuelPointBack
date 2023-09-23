@@ -1,16 +1,16 @@
 import User from "../core/entities/User";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import Context from "../data/Context";
-import {Inject} from'web_api_base'
 import {MD5} from '../utils/Cryptography';
 import ObjectNotFoundExcpetion from "../exceptions/ObjectNotFoundExcpetion";
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Access from "../core/entities/Access";
+import { Inject } from "web_api_base";
+
 
 export default class UserService  extends AbstractUserService
-{
-   
+{      
     
     @Inject()
     private _context : Context;
@@ -77,7 +77,18 @@ export default class UserService  extends AbstractUserService
      
     }
 
-    public override async GetByEmailAsync(email: string): Promise<User | undefined> {
+    public override async GetByAndLoadAsync<K extends keyof User>(key: K, value: User[K], load: K[]): Promise<User[]> 
+    {
+       this._context.Users.Where({Field : key, Value : value});
+
+       for(let l of load)
+            this._context.Users.Join(l);
+        
+       return await this._context.Users.ToListAsync();
+    } 
+
+    public override async GetByEmailAsync(email: string): Promise<User | undefined> 
+    {       
 
         return await this._context.Users.Where(
                                             {
@@ -100,10 +111,10 @@ export default class UserService  extends AbstractUserService
 
         await this.SyncPermissionsAsync(obj.Access);
 
-        if(!obj.Company)
+        if(!obj.Company && !obj.IsSuperUser)
             throw new InvalidEntityException("The company of the user is required");
 
-        if(!obj.JobRole)
+        if(!obj.JobRole && !obj.IsSuperUser)
             throw new InvalidEntityException("The jobrole of the user is required");        
 
         obj.Access!.Password = MD5(obj.Access!.Password);
@@ -118,15 +129,17 @@ export default class UserService  extends AbstractUserService
         if(!curr)
             throw new ObjectNotFoundExcpetion(`This user do not exists on database`);
 
-        if(curr.Access!.Password != obj.Access!.Password)
+        if(obj.Access && curr.Access!.Password != obj.Access!.Password)
+        {
             obj.Access!.Password = MD5(obj.Access!.Password);
         
-        await this.SyncPermissionsAsync(obj.Access!);
+            await this.SyncPermissionsAsync(obj.Access!);
+        }
 
-        if(!obj.Company)
+        if(!obj.Company && !obj.IsSuperUser)
             throw new InvalidEntityException("The company of the user is required");
 
-        if(!obj.JobRole)
+        if(!obj.JobRole && !obj.IsSuperUser)
             throw new InvalidEntityException("The jobrole of the user is required");         
 
         return await this._context.Users.UpdateAsync(obj)!;
@@ -173,3 +186,6 @@ export default class UserService  extends AbstractUserService
     }
 
 }
+
+
+

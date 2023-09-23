@@ -1,5 +1,5 @@
 
-import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, UseAfter, RunBefore } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
 import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
 import JobRole from "../core/entities/JobRole";
 import {IsLogged} from '../filters/AuthFilter';
@@ -68,17 +68,7 @@ export default class JobRoleController extends AbstractController
     @SetDatabaseFromToken()
     public async UpdateAsync(@FromBody()jobRole : JobRole) 
     {  
-        try{
-
-            this.OK(await this._service.UpdateAsync(jobRole));
-        }
-        catch(ex)
-        {
-            if(ex instanceof InvalidEntityException || ex instanceof EntityNotFoundException)
-                return this.BadRequest({Message : ex.message});
-            
-            return this.Error("Error while processing the request");
-        }
+        this.OK(await this._service.UpdateAsync(jobRole));        
     }
 
     @DELETE("delete")     
@@ -105,10 +95,6 @@ export default class JobRoleController extends AbstractController
 
     
 }
-
-
-
-
 
 
 

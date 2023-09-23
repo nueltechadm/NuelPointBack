@@ -52,6 +52,16 @@ export default class DepartamentService  extends AbstractDepartamentService
         return (await this._context.Departaments.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
+    public override async GetByAndLoadAsync<K extends keyof Departament>(key: K, value: Departament[K], load: K[]): Promise<Departament[]> 
+    {
+       this._context.Departaments.Where({Field : key, Value : value});
+
+       for(let l of load)
+            this._context.Departaments.Join(l);
+        
+       return await this._context.Departaments.ToListAsync();
+    } 
+
     public override async UpdateAsync(obj: Departament): Promise<Departament> {
 
         this.ValidateObject(obj);

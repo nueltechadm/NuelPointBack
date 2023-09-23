@@ -1,12 +1,11 @@
-import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RunBefore } from "web_api_base";
-import Formidable from "formidable";
+import { POST, PUT, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
 import {IsLogged} from '../filters/AuthFilter';
 import AbstractCheckpointService from "../core/abstractions/AbstractCheckpointService";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractFileService from "../services/abstractions/AbstractFileService";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import { CheckpointDTO } from "../dto/CheckpointDTO";
+
 import Appointment  from "../core/entities/Appointment";
 import { AbstractAppointmentService } from "../core/abstractions/AbstractAppointmentService";
 import Type from "../utils/Type";
@@ -16,6 +15,7 @@ import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
 import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
 import AbstractTimeService from "../core/abstractions/AbstractTimeService";
 import Checkpoint from "../core/entities/Checkpoint";
+import AppointmentDTO from "../dto/AppointmentDTO";
 
 
 @UseBefore(IsLogged)
@@ -63,36 +63,39 @@ export default class AppointamentController extends AbstractController
         await this._checkpointService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
         await this._appointamentService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
         await this._userService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
+        await this._timeService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
     }
     
     @POST("insert")    
     @SetDatabaseFromToken()
-    public async InsertAsync(@FromBody()dto : {x : number, y : number, picture : string}) 
+    @AppointamentController.ProducesType(200, "The just created Appointment object", Appointment)
+    @AppointamentController.ProducesMessage(400, "A message telling what is missing", {Message : "The user with ID 1 not exists"})
+    public async InsertAsync(@FromBody()dto : AppointmentDTO) 
     {  
         
-        let user = await this._userService.GetByIdAsync(this.Request.APIAUTH.User);
+        let user = await this._userService.GetByIdAsync(this.Request.APIAUTH.UserId);
 
         if(!user)
-            return this.BadRequest(`The user with Id #${this.Request.APIAUTH.User} not exists`);       
+            return this.BadRequest({Message : `The user with ID #${this.Request.APIAUTH.UserId} not exists`});       
 
         let time = await this._timeService.GetByDayOfWeekAsync(user.Id, new Date().getDay());
 
         if(!time)
-            return this.BadRequest(`No one time is registered`);
+            return this.BadRequest({Message : `No one time is registered`});
 
         let currentDayOfUser = await this._appointamentService.GetCurrentDayByUser(user);
 
         if(!currentDayOfUser)
             currentDayOfUser = new Appointment(time, user);
 
-        currentDayOfUser.Checkpoints.push(new Checkpoint(user, dto.x, dto.y, dto.picture, user.Company!, time));
+        currentDayOfUser.Checkpoints.push(new Checkpoint(user, dto.X, dto.Y, dto.Picture, user.Company!, time));
 
         if(currentDayOfUser.Id <= 0)
             await this._appointamentService.AddAsync(currentDayOfUser);
         else
             await this._appointamentService.UpdateAsync(currentDayOfUser);
 
-        this.Created({Message : "Checkpoint created"});
+        this.OK(currentDayOfUser);
               
     }
 

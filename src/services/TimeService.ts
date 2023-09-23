@@ -8,9 +8,8 @@ import User from "../core/entities/User";
 
 
 
-export default class TimeService extends AbstractTimeService {  
+export default class TimeService extends AbstractTimeService {
    
-
     @Inject()
     private _context: Context;
 
@@ -26,39 +25,57 @@ export default class TimeService extends AbstractTimeService {
     public override IsCompatible(obj: any): obj is Time {
         return Type.HasKeys<Time>(obj, "Description", "Time1", "Time2", "Time3", "Time4");
     }
-    public override async CountAsync(): Promise<number> {
 
+
+    public override async CountAsync(): Promise<number> {
         return await this._context.Times.CountAsync();
     }
-    public override async ExistsAsync(id: number): Promise<boolean> {
-        
+
+
+    public override async ExistsAsync(id: number): Promise<boolean> {        
         return (await this._context.Times.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
+
+    public override async GetByAndLoadAsync<K extends keyof Time>(key: K, value: Time[K], load: K[]): Promise<Time[]> 
+    {
+       this._context.Times.Where({Field : key, Value : value});
+
+       for(let l of load)
+            this._context.Times.Join(l);
+        
+       return await this._context.Times.ToListAsync();
+    } 
+
     public override async GetByIdAsync(id: number): Promise<Time | undefined> {
         return await this._context.Times.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
-    }
+    }     
+
     public override async AddAsync(obj: Time): Promise<Time> {
 
         this.ValidateObject(obj);
-
         return this._context.Times.AddAsync(obj);
     }
+
     public override async UpdateAsync(obj: Time): Promise<Time> {
 
         this.ValidateObject(obj);
-
         return this._context.Times.UpdateAsync(obj);
     }
+
+
     public override async DeleteAsync(obj: Time): Promise<Time> {
         return this._context.Times.DeleteAsync(obj);
     }
+
+
     public override async GetAllAsync(): Promise<Time[]> {
         return await this._context.Times.OrderBy("Description").ToListAsync();
     }
 
+
     public override async GetByDayOfWeekAsync(userId: number, day: number): Promise<Time | undefined> {
         
-        let u = await this._context.Users.WhereField("Id").IsEqualTo(userId).FirstOrDefaultAsync();
+        let u = await this._context.Users.WhereField("Id").IsEqualTo(userId).LoadRelationOn("Journey").FirstOrDefaultAsync();
 
         let d = u?.Journey?.DaysOfWeek.filter(s => s.Day == day);
 

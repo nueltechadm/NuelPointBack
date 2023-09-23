@@ -93,9 +93,23 @@ export default class CheckpointService  extends AbstractCheckpointService
         
         return this._context.Checkpoints.UpdateAsync(obj);
     }
+
+    public override async GetByAndLoadAsync<K extends keyof Checkpoint>(key: K, value: Checkpoint[K], load: K[]): Promise<Checkpoint[]> 
+    {
+       this._context.Checkpoints.Where({Field : key, Value : value});
+
+       for(let l of load)
+            this._context.Checkpoints.Join(l);
+        
+       return await this._context.Checkpoints.ToListAsync();
+    } 
+
+
     public override async DeleteAsync(obj: Checkpoint): Promise<Checkpoint> {
         return this._context.Checkpoints.DeleteAsync(obj);
     }
+
+
     public override async GetAllAsync(): Promise<Checkpoint[]> {
         return await this._context.Checkpoints.OrderDescendingBy("Date").ToListAsync();
     }  

@@ -48,18 +48,32 @@ export default class AppointmentService extends AbstractAppointmentService {
 
         return this._context.Appointments.AddAsync(obj);
     }
+
     public override async UpdateAsync(obj: Appointment): Promise<Appointment> {
 
         this.ValidateObject(obj);
-
         return this._context.Appointments.UpdateAsync(obj);
     }
+
     public override async DeleteAsync(obj: Appointment): Promise<Appointment> {
         return this._context.Appointments.DeleteAsync(obj);
     }
+
+
     public override async GetAllAsync(): Promise<Appointment[]> {
         return await this._context.Appointments.OrderDescendingBy("Date").ToListAsync();
     }
+
+    public override async GetByAndLoadAsync<K extends keyof Appointment>(key: K, value: Appointment[K], load: K[]): Promise<Appointment[]> 
+    {
+       this._context.Appointments.Where({Field : key, Value : value});
+
+       for(let l of load)
+            this._context.Appointments.Join(l);
+        
+       return await this._context.Appointments.ToListAsync();
+    } 
+
 
     public override async GetCurrentDayByUser(user: User): Promise<Appointment | undefined> {
         

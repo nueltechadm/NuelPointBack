@@ -35,6 +35,7 @@ export default class JobRoleService  extends AbstractJobRoleService
         
         return await this._context.JobRoles.CountAsync();
     }
+
     public override async GetByIdAsync(id: number): Promise<JobRole | undefined> {       
         return await this._context.JobRoles.WhereField("Id").IsEqualTo(id).LoadRelationOn("Company").FirstOrDefaultAsync();
     }
@@ -48,6 +49,17 @@ export default class JobRoleService  extends AbstractJobRoleService
 
         return this._context.JobRoles.AddAsync(obj);
     }
+
+    public override async GetByAndLoadAsync<K extends keyof JobRole>(key: K, value: JobRole[K], load: K[]): Promise<JobRole[]> 
+    {
+       this._context.JobRoles.Where({Field : key, Value : value});
+
+       for(let l of load)
+            this._context.JobRoles.Join(l);
+        
+       return await this._context.JobRoles.ToListAsync();
+    } 
+
     public override async UpdateAsync(obj: JobRole): Promise<JobRole> {
 
         this.ValidateObject(obj);
@@ -57,6 +69,8 @@ export default class JobRoleService  extends AbstractJobRoleService
 
         return this._context.JobRoles.UpdateAsync(obj);
     }
+
+
     public override async DeleteAsync(obj: JobRole): Promise<JobRole> {
         
         if(!obj.Id || obj == undefined)
@@ -69,6 +83,8 @@ export default class JobRoleService  extends AbstractJobRoleService
 
         return this._context.JobRoles.DeleteAsync(curr);
     }
+
+
     public override async GetAllAsync(): Promise<JobRole[]> {
         return await this._context.JobRoles.OrderBy("Description").ToListAsync();
     }  
