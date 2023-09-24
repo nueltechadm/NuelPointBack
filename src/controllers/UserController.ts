@@ -1,5 +1,5 @@
 
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ProducesResponse } from "web_api_base";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import User from "../core/entities/User";
 import {IsLogged} from '../filters/AuthFilter';
@@ -53,30 +53,36 @@ export default class UserController extends AbstractController
 
     @GET("list")
     @SetDatabaseFromToken()
+    @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
     public async GetAllAsync() : Promise<void>
     {       
        let users =  await this._userService.GetAllAsync();
 
-       users.forEach(s => this.RemovePassWordAndMetadata(s));
+       users.forEach(s => this.RemovePassword(s));
 
        this.OK(users);
     }    
     
     @GET("getById")   
     @SetDatabaseFromToken() 
-    public async GetByIdAsync(@FromQuery()id : number) : Promise<void>
+    @UserController.ProducesType(200,  "A completed loaded user", User)
+    @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"}) 
+    public async GetByIdAsync(@FromQuery()id : number) : Promise<any>
     { 
+        if(!id || typeof id != "number")
+            return this.BadRequest({Message : "Invalid userId"});
+
        let users = await this._userService.GetByAndLoadAsync("Id", id, ["Access", "Contacts", "JobRole", "Journey"]);
 
        if(users.length == 0)
             this.NotFound();
         else
-            this.OK(this.RemovePassWordAndMetadata(users[0]));
+            this.OK(this.RemovePassword(users[0]));
     }          
     
     @POST("insert")
     @SetDatabaseFromToken()
-    @UserController.ProducesType(200, "The just create user", User) 
+    @UserController.ProducesType(200, "The just created user", User) 
     public async InsertAsync(@FromBody()user : User) : Promise<void>
     {  
         this.OK(await this._userService.AddAsync(user));
@@ -92,9 +98,9 @@ export default class UserController extends AbstractController
         if(!userId || typeof userId != "number")
             return this.BadRequest({Message : "Invalid userId"});
 
-        let user = await this._userService.GetByIdAsync(userId);
+        let users= await this._userService.GetByAndLoadAsync("Id", userId, ["Journey"]);
 
-        if(!user)
+        if(users.length == 0)
             return this.NotFound({Message : `User with ID ${userId} not exists`});
 
         if(journey.Id <= 0)
@@ -109,9 +115,9 @@ export default class UserController extends AbstractController
             journey = journeys[0];
         }
 
-        user.Journey = journey;
+        users[0].Journey = journey;
 
-        await this._userService.UpdateAsync(user);
+        await this._userService.UpdateAsync(users[0]);
 
         this.OK(journey);
     }
@@ -127,9 +133,9 @@ export default class UserController extends AbstractController
         if(!userId || typeof userId != "number")
             return this.BadRequest({Message : "Invalid userId"});
 
-        let user = await this._userService.GetByIdAsync(userId);
+        let users = await this._userService.GetByAndLoadAsync("Id", userId, ["Company"]);
 
-        if(!user)
+        if(users.length == 0)
             return this.NotFound({Message : `User with ID ${userId} not exists`});
 
         if(company.Id <= 0)
@@ -144,9 +150,9 @@ export default class UserController extends AbstractController
             company = companies[0];
         }
 
-        user.Company = company;
+        users[0].Company = company;
 
-        await this._userService.UpdateAsync(user);
+        await this._userService.UpdateAsync(users[0]);
 
         this.OK(company);
     }
@@ -191,6 +197,9 @@ export default class UserController extends AbstractController
     
     @PUT("update")  
     @SetDatabaseFromToken() 
+    @UserController.ProducesType(200, "The just updated user", User)   
+    @UserController.ProducesMessage(400, "A message telling what is missing", {Message : "The ID must be greater than 0"})
+    @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "User not found"})  
     public async UpdateAsync(@FromBody()user : User) 
     {        
         if(user.Id == undefined || user.Id <= 0)
@@ -206,6 +215,9 @@ export default class UserController extends AbstractController
 
     @DELETE("delete")   
     @SetDatabaseFromToken() 
+    @UserController.ProducesType(200, "The just deleted user", User)   
+    @UserController.ProducesMessage(400, "A message telling what is missing", {Message : "The ID must be greater than 0"})
+    @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "User not found"}) 
     public async DeleteAsync(@FromQuery()id : number) 
     {  
         if(!id)
@@ -226,7 +238,7 @@ export default class UserController extends AbstractController
         this.OK(Type.CreateTemplateFrom<User>(User));
     }
 
-    private RemovePassWordAndMetadata(user? : User) : User | undefined
+    private RemovePassword(user? : User) : User | undefined
     {
         if(!user)
             return undefined;
@@ -234,7 +246,7 @@ export default class UserController extends AbstractController
         if(user.Access)
             delete (user.Access as any).Password;        
 
-        return Type.RemoveORMMetadata(user);
+        return user;
     }
 
     

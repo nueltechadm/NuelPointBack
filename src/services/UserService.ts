@@ -48,7 +48,9 @@ export default class UserService  extends AbstractUserService
                                         })                                        
                                         .Join("Access")
                                         .Join("Company")                                        
-                                        .Join("Contacts")                                        
+                                        .Join("Contacts")   
+                                        .Join("JobRole")
+                                        .Join("Journey")                                     
                                         .FirstOrDefaultAsync();
         
     }

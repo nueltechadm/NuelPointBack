@@ -15,7 +15,7 @@
     "formidable": "^2.1.1",
     "jsonwebtoken": "^9.0.0",
     "myorm_pg": "^2.5.2",
-    "web_api_base": "^3.6.7"
+    "web_api_base": "^3.6.8"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
