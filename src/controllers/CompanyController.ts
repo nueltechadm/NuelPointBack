@@ -36,18 +36,22 @@ export default class CompanyController extends AbstractController {
 
     @GET("getByName")    
     @SetDatabaseFromToken()
+    @CompanyController.ProducesType(200, "Company filtered by name" , Company)   
+    @CompanyController.ProducesMessage(404, "Not found the company", {Message : "Company not found"})
     public async GetByNameAsync(@FromQuery("name") name : string) {
 
         let company = await this._service.GetByNameAsync(name);   
         
         if(!company)
-            return this.NotFound(`Company not found`);
+            return this.NotFound({Message : "Company not found"});
         else
             return this.OK(company);        
     }
 
     @GET("getById")    
     @SetDatabaseFromToken()
+    @CompanyController.ProducesType(200, "Company filtered by name" , Company)   
+    @CompanyController.ProducesMessage(404, "Not found the company", {Message : "Company not found"})
     public async GetByIdAsync(@FromQuery() id: number) {
 
         let company = await this._service.GetByIdAsync(id);
@@ -61,6 +65,9 @@ export default class CompanyController extends AbstractController {
     @POST("insert")    
     @SetDatabaseFromToken()
     @CompanyController.ReceiveType(Company)
+    @CompanyController.ProducesType(200, "Just created company" , Company)  
+    @CompanyController.ProducesMessage(400, "Invalid object", {Message : "Message describing the error"})
+    @CompanyController.ProducesMessage(400, "Company already exists", {Message : "Already exists a company with name <company.name>"})
     public async InsertAsync(@FromBody() company: Company) {
         
         company.Id = -1;
@@ -70,7 +77,7 @@ export default class CompanyController extends AbstractController {
         let exists = await this._service.GetByNameAsync(company.Name);
 
         if(exists)
-            return this.BadRequest(`Already exists a company with name : "${company.Name}"`);
+            return this.BadRequest({Message : `Already exists a company with name : "${company.Name}"`});
 
         this.OK(await this._service.AddAsync(company));
     }
@@ -82,7 +89,7 @@ export default class CompanyController extends AbstractController {
         if(!company || !company.Id)
             return this.BadRequest({ Message: "Id is required" });
 
-        let fromDB = await this._service.GetByIdAsync(company.Id);
+        let fromDB = await this._service.GetByAndLoadAsync("Id", company.Id, ["Departaments", "Contacts"]);
 
         if (!fromDB)
             return this.NotFound({ Message: "Company not found" });
