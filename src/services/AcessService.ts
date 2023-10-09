@@ -73,6 +73,13 @@ export default class AcessService extends AbstractAccessService {
         return this._context.Access.UpdateAsync(obj);
     }
 
+    public override async UpdateObjectAndRelationsAsync<U extends keyof Access>(obj: Access, relations: U[]): Promise<Access> {
+
+        this.ValidateObject(obj);
+
+        return await this._context.Access.UpdateObjectAndRelationsAsync(obj, relations);
+    }
+
     public override async DeleteAsync(obj: Access): Promise<Access> {
         return this._context.Access.DeleteAsync(obj);
     }

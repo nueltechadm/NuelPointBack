@@ -50,7 +50,14 @@ export default class JourneyService  extends AbstractJorneyService
 
         this.ValidateObject(obj);
         
-        return this._context.Journeys.UpdateAsync(obj);
+        return await this._context.Journeys.UpdateAsync(obj);
+    }
+
+    public override async UpdateObjectAndRelationsAsync<U extends keyof Journey>(obj: Journey, relations: U[]): Promise<Journey> {
+
+        this.ValidateObject(obj);
+
+        return await this._context.Journeys.UpdateObjectAndRelationsAsync(obj, relations);
     }
 
     public override async GetByAndLoadAsync<K extends keyof Journey>(key: K, value: Journey[K], load: K[]): Promise<Journey[]> 

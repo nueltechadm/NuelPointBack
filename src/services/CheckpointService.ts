@@ -91,8 +91,16 @@ export default class CheckpointService  extends AbstractCheckpointService
 
         this.ValidateObject(obj);
         
-        return this._context.Checkpoints.UpdateAsync(obj);
+        return await this._context.Checkpoints.UpdateAsync(obj);
     }
+
+    public override async UpdateObjectAndRelationsAsync<U extends keyof Checkpoint>(obj: Checkpoint, relations: U[]): Promise<Checkpoint> {
+
+        this.ValidateObject(obj);
+
+        return await this._context.Checkpoints.UpdateObjectAndRelationsAsync(obj, relations);
+    }
+
 
     public override async GetByAndLoadAsync<K extends keyof Checkpoint>(key: K, value: Checkpoint[K], load: K[]): Promise<Checkpoint[]> 
     {

@@ -65,7 +65,17 @@ export default class PermissionService  extends AbstractPermissionService
 
 
     public override async UpdateAsync(obj: Permission): Promise<Permission> {
-        return this._context.Permissions.UpdateAsync(obj);
+
+        this.ValidateObject(obj);
+
+        return await this._context.Permissions.UpdateAsync(obj);
+    }
+
+    public override async UpdateObjectAndRelationsAsync<U extends keyof Permission>(obj: Permission, relations: U[]): Promise<Permission> {
+
+        this.ValidateObject(obj);
+
+        return await this._context.Permissions.UpdateObjectAndRelationsAsync(obj, relations);
     }
 
 

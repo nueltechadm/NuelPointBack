@@ -62,12 +62,16 @@ export default class JobRoleService  extends AbstractJobRoleService
 
     public override async UpdateAsync(obj: JobRole): Promise<JobRole> {
 
+        this.ValidateObject(obj);       
+
+        return await this._context.JobRoles.UpdateAsync(obj);
+    }
+
+    public override async UpdateObjectAndRelationsAsync<U extends keyof JobRole>(obj: JobRole, relations: U[]): Promise<JobRole> {
+
         this.ValidateObject(obj);
 
-        if(!obj.Id)
-            throw new InvalidEntityException(`ID must be greater than 0`);
-
-        return this._context.JobRoles.UpdateAsync(obj);
+        return await this._context.JobRoles.UpdateObjectAndRelationsAsync(obj, relations);
     }
 
 
@@ -92,7 +96,7 @@ export default class JobRoleService  extends AbstractJobRoleService
     public override ValidateObject(obj: JobRole) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`The object is not of ${JobRole.name} type`);
+            throw new InvalidEntityException(`The object is not of ${JobRole.name} type`);        
 
         if(!obj.Description)
             throw new InvalidEntityException(`The description of ${JobRole.name} is required`);

@@ -66,8 +66,16 @@ export default class DepartamentService  extends AbstractDepartamentService
 
         this.ValidateObject(obj);
 
-        return this._context.Departaments.UpdateAsync(obj);
+        return await this._context.Departaments.UpdateAsync(obj);
     }
+
+    public override async UpdateObjectAndRelationsAsync<U extends keyof Departament>(obj: Departament, relations: U[]): Promise<Departament> {
+
+        this.ValidateObject(obj);
+
+        return await this._context.Departaments.UpdateObjectAndRelationsAsync(obj, relations);
+    }
+
     public override async DeleteAsync(obj: Departament): Promise<Departament> {
         
         if(!obj.Id || obj == undefined)

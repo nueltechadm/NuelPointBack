@@ -59,7 +59,14 @@ export default class TimeService extends AbstractTimeService {
     public override async UpdateAsync(obj: Time): Promise<Time> {
 
         this.ValidateObject(obj);
-        return this._context.Times.UpdateAsync(obj);
+        return await this._context.Times.UpdateAsync(obj);
+    }
+
+    public override async UpdateObjectAndRelationsAsync<U extends keyof Time>(obj: Time, relations: U[]): Promise<Time> {
+
+        this.ValidateObject(obj);
+
+        return await this._context.Times.UpdateObjectAndRelationsAsync(obj, relations);
     }
 
 

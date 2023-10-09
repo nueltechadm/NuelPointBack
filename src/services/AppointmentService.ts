@@ -52,7 +52,14 @@ export default class AppointmentService extends AbstractAppointmentService {
     public override async UpdateAsync(obj: Appointment): Promise<Appointment> {
 
         this.ValidateObject(obj);
-        return this._context.Appointments.UpdateAsync(obj);
+        return await this._context.Appointments.UpdateAsync(obj);
+    }
+
+    public override async UpdateObjectAndRelationsAsync<U extends keyof Appointment>(obj: Appointment, relations: U[]): Promise<Appointment> {
+
+        this.ValidateObject(obj);
+
+        return await this._context.Appointments.UpdateObjectAndRelationsAsync(obj, relations);
     }
 
     public override async DeleteAsync(obj: Appointment): Promise<Appointment> {

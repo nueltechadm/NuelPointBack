@@ -89,10 +89,12 @@ export default class CompanyController extends AbstractController {
         if(!company || !company.Id)
             return this.BadRequest({ Message: "Id is required" });
 
-        let fromDB = await this._service.GetByAndLoadAsync("Id", company.Id, ["Departaments", "Contacts"]);
+        let fromDB = await this._service.GetByIdAsync(company.Id);
 
         if (!fromDB)
             return this.NotFound({ Message: "Company not found" });
+
+        await this._service.UpdateObjectAndRelationsAsync(company, ["Departaments", "Contacts"]);
     }
 
     @DELETE("delete")    

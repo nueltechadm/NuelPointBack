@@ -126,6 +126,8 @@ export default class UserService  extends AbstractUserService
 
     public override async UpdateAsync(obj: User): Promise<User> {
 
+        this.ValidateObject(obj);
+
         let curr = await this.GetByIdAsync(obj.Id);
 
         if(!curr)
@@ -136,16 +138,30 @@ export default class UserService  extends AbstractUserService
             obj.Access!.Password = MD5(obj.Access!.Password);
         
             await this.SyncPermissionsAsync(obj.Access!);
-        }
-
-        if(!obj.Company && !obj.IsSuperUser)
-            throw new InvalidEntityException("The company of the user is required");
-
-        if(!obj.JobRole && !obj.IsSuperUser)
-            throw new InvalidEntityException("The jobrole of the user is required");         
+        }            
 
         return await this._context.Users.UpdateAsync(obj)!;
     }
+
+    public override async UpdateObjectAndRelationsAsync<U extends keyof User>(obj: User, relations: U[]): Promise<User> {
+
+        this.ValidateObject(obj);
+
+        let curr = await this.GetByIdAsync(obj.Id);
+
+        if(!curr)
+            throw new ObjectNotFoundExcpetion(`This user do not exists on database`);
+
+        if(obj.Access && curr.Access!.Password != obj.Access!.Password)
+        {
+            obj.Access!.Password = MD5(obj.Access!.Password);
+        
+            await this.SyncPermissionsAsync(obj.Access!);
+        }            
+
+        return await this._context.Users.UpdateObjectAndRelationsAsync(obj, relations);
+    }
+
 
     public override async DeleteAsync(obj: User): Promise<User> {
 
@@ -167,6 +183,12 @@ export default class UserService  extends AbstractUserService
 
         if(!obj.Name)
           throw new InvalidEntityException(`The name of user is required`);
+
+        if(!obj.Company && !obj.IsSuperUser)
+          throw new InvalidEntityException("The company of the user is required");
+
+       if(!obj.JobRole && !obj.IsSuperUser)
+          throw new InvalidEntityException("The jobrole of the user is required");    
     }
 
     private async GetAccessByIdAsync(id : number) : Promise<Access | undefined>

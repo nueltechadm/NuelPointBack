@@ -6,6 +6,7 @@ export default abstract class AbstractService<T>
     abstract ExistsAsync(id : number) : Promise<boolean>;
     abstract AddAsync(obj : T) : Promise<T>;
     abstract UpdateAsync(obj : T) : Promise<T>;
+    abstract UpdateObjectAndRelationsAsync<U extends keyof T>(obj : T, relations : U[]) : Promise<T>;
     abstract DeleteAsync(obj : T) : Promise<T>;
     abstract GetAllAsync() : Promise<T[]>;
     abstract GetByIdAsync(id : number) : Promise<T | undefined>;
