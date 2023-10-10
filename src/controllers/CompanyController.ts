@@ -84,6 +84,10 @@ export default class CompanyController extends AbstractController {
 
     @PUT("update")    
     @SetDatabaseFromToken()
+    @CompanyController.ReceiveType(Company)
+    @CompanyController.ProducesType(200, "Just created company" , Company)  
+    @CompanyController.ProducesMessage(400, "Invalid object", {Message : "Message describing the error"})
+    @CompanyController.ProducesMessage(404, "Company not found ", {Message : "Company not found"})
     public async UpdateAsync(@FromBody() company: Company) {
         
         if(!company || !company.Id)
@@ -98,7 +102,10 @@ export default class CompanyController extends AbstractController {
     }
 
     @DELETE("delete")    
-    @SetDatabaseFromToken()
+    @SetDatabaseFromToken()    
+    @CompanyController.ProducesType(200, "Just deleted company" , Company)  
+    @CompanyController.ProducesMessage(400, "Invalid object", {Message : "Message describing the error"})
+    @CompanyController.ProducesMessage(404, "Company not found ", {Message : "Company not found"})    
     public async DeleteAsync(@FromQuery() id: number) {
         if (!id)
             return this.BadRequest({ Message: "The ID must be greater than 0" });
