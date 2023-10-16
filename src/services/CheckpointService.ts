@@ -8,7 +8,6 @@ import Path from 'path';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Company from "../core/entities/Company";
 import User from "../core/entities/User";
-import { AbstractAppointmentService } from "../core/abstractions/AbstractAppointmentService";
 
 export default class CheckpointService  extends AbstractCheckpointService
 {   

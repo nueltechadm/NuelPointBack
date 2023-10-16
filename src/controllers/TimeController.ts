@@ -28,8 +28,8 @@ export default class TimeController extends AbstractController {
     @SetDatabaseFromToken()
     public async GetAllAsync(): Promise<void> {
 
-        let times = await this._service.GetAllAsync();
-        this.OK(Type.RemoveORMMetadata(times));
+        let times = await this._service.GetAllAsync();        
+        this.OK(times);
     }
 
     @GET("getById")
@@ -40,7 +40,7 @@ export default class TimeController extends AbstractController {
         if (!time)
             return this.NotFound({ Message: "Time not found" });
 
-        this.OK(Type.RemoveORMMetadata(time));
+        this.OK(time);
     }
 
     @POST("insert")

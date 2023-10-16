@@ -1,7 +1,7 @@
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RunBefore, ProducesResponse } from "web_api_base";
 import { IsLogged } from '../filters/AuthFilter';
 import Type from "../utils/Type";
-import { AbstractAccessService } from "../core/abstractions/AbstractAccessService";
+import  AbstractAccessService  from "../core/abstractions/AbstractAccessService";
 import Access from "../core/entities/Access";
 import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
 import AbstractController from "./AbstractController";

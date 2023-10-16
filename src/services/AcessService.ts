@@ -3,7 +3,7 @@ import { Inject } from 'web_api_base';
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Access from "../core/entities/Access";
-import { AbstractAccessService } from "../core/abstractions/AbstractAccessService";
+import AbstractAccessService from "../core/abstractions/AbstractAccessService";
 
 
 

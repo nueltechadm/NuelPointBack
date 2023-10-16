@@ -32,6 +32,7 @@ export default class JourneyController extends AbstractController {
     @GET("getById")
     @SetDatabaseFromToken()
     public async GetByIdAsync(@FromQuery() id: number) {
+        
         let job = await this._service.GetByIdAsync(id);
 
         if (!job)

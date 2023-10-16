@@ -3,7 +3,7 @@ import AbstractService from "./AbstractService";
 
 
 
-export abstract class AbstractAccessService extends AbstractService<Access>
+export default abstract class AbstractAccessService extends AbstractService<Access>
 {
     abstract GetByIdAsync(id: number): Promise<Access | undefined>;
     

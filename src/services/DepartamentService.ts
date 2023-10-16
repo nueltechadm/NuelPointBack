@@ -39,10 +39,7 @@ export default class DepartamentService  extends AbstractDepartamentService
     
     public override async AddAsync(obj: Departament): Promise<Departament> {
 
-        this.ValidateObject(obj);
-
-        if(!obj.Company)
-            throw new InvalidEntityException(`The company of ${Departament.name} is required`); 
+        this.ValidateObject(obj);      
 
         return this._context.Departaments.AddAsync(obj);
     }

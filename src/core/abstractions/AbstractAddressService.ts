@@ -4,7 +4,7 @@ import AbstractService from "./AbstractService";
 
 
 
-export abstract class AbstractAddressService extends AbstractService<Address>
+export default abstract class AbstractAddressService extends AbstractService<Address>
 {
     abstract GetByIdAsync(id: number): Promise<Address | undefined>;
 }

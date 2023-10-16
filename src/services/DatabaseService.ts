@@ -1,17 +1,14 @@
 import { Inject } from 'web_api_base';
 import Context from '../data/Context';
-import { ControlContext } from '../data/ControlContext';
+import  ControlContext  from '../data/ControlContext';
 import Database, { DababaseStatus } from '../core/entities/Database';
 import Access from '../core/entities/Access';
 import User from '../core/entities/User';
 import AbstractDatabaseService from './abstractions/AbstractDatabaseService';
 import { MD5 } from '../utils/Cryptography';
-import Company from '../core/entities/Company';
-import DatabaseException from '../exceptions/DatabaseException';
 
 
-
-export class DatabaseService extends AbstractDatabaseService{
+export default class DatabaseService extends AbstractDatabaseService{
    
    
     @Inject()

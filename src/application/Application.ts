@@ -1,3 +1,5 @@
+import 'ts_linq_base';
+
 import { Application, IApplicationConfiguration, DependecyService } from 'web_api_base';
 import Context from '../data/Context';
 
@@ -21,18 +23,24 @@ import CompanyService from '../services/CompanyService';
 
 import AbstractJorneyService from '../core/abstractions/AbstractJorneyService';
 import JourneyService from '../services/JourneyService';
-import TimeService  from "../services/TimeService";
 
 import AbstractTimeService from '../core/abstractions/AbstractTimeService';
+import TimeService  from "../services/TimeService";
+
+import AbstractDepartamentService from '../core/abstractions/AbstractDepartamentService';
+import DepartamentService  from "../services/DepartamentService";
+
 import AcessService from '../services/AcessService';
-import { AbstractAccessService } from '../core/abstractions/AbstractAccessService';
-import { AbstractAppointmentService } from '../core/abstractions/AbstractAppointmentService';
+import  AbstractAccessService  from '../core/abstractions/AbstractAccessService';
+import  AbstractAppointmentService  from '../core/abstractions/AbstractAppointmentService';
 import AppointmentService from '../services/AppointmentService';
-import { ControlContext } from '../data/ControlContext';
-import { DatabaseService } from '../services/DatabaseService';
+import  ControlContext  from '../data/ControlContext';
+import  DatabaseService  from '../services/DatabaseService';
 import AbstractDatabaseService from '../services/abstractions/AbstractDatabaseService';
 import InvalidEntityException from '../exceptions/InvalidEntityException';
 import EntityNotFoundException from '../exceptions/EntityNotFoundException';
+
+
 import { ApplicationExceptionHandler } from 'web_api_base/dist/interfaces/IApplication';
 
 
@@ -40,11 +48,11 @@ export default class App extends Application
 {
 
     public override async ConfigureAsync(appConfig: IApplicationConfiguration): Promise<void>
-    {       
+    {             
         this.UseCors();
 
-        await this.UseControllersAsync();    
-        
+        await this.UseControllersAsync();        
+
         if(Application.Configurations.DEBUG)
             this.CreateDocumentation();
        
@@ -56,6 +64,7 @@ export default class App extends Application
         process.env["ROOT"] = appConfig.RootPath;
         
         appConfig.AddScoped(AbstractUserService, UserService);
+        appConfig.AddScoped(AbstractDepartamentService, DepartamentService);
         appConfig.AddScoped(AbstractPermissionService, PermissionService);
         appConfig.AddScoped(AbstractJobRoleService, JobRoleService);       
         appConfig.AddScoped(AbstractCheckpointService, CheckpointService);

@@ -7,7 +7,7 @@ import AbstractUserService from "../core/abstractions/AbstractUserService";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 
 import Appointment  from "../core/entities/Appointment";
-import { AbstractAppointmentService } from "../core/abstractions/AbstractAppointmentService";
+import  AbstractAppointmentService  from "../core/abstractions/AbstractAppointmentService";
 import Type from "../utils/Type";
 import AbstractController from "./AbstractController";
 import Authorization from "../utils/Authorization";

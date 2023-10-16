@@ -3,7 +3,7 @@ import { Inject } from 'web_api_base';
 import Appointment from "../core/entities/Appointment";
 import { Operation } from "myorm_pg";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import { AbstractAppointmentService } from "../core/abstractions/AbstractAppointmentService";
+import AbstractAppointmentService  from "../core/abstractions/AbstractAppointmentService";
 import User from "../core/entities/User";
 
 

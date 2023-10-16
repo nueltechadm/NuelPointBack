@@ -1,13 +1,15 @@
-import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
+import AbstractCompanyService, { FilterParamas } from "../core/abstractions/AbstractCompanyService";
 import Context from "../data/Context";
 import {Inject} from'web_api_base'
 import Company from "../core/entities/Company";
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
+import Departament from "../core/entities/Departament";
+import { Operation } from "myorm_pg";
 
 export default class CompanyService  extends AbstractCompanyService
 {
-      
+    
     
     @Inject()
     private _context : Context;
@@ -39,7 +41,37 @@ export default class CompanyService  extends AbstractCompanyService
         .LoadRelationOn("Contacts")
         .LoadRelationOn("Users")
         .FirstOrDefaultAsync();
-    }      
+    }   
+
+    public override async FilterAsync(params: FilterParamas): Promise<Company[]> {
+        
+        let offset = params.Page - 1 * params.Quantity; 
+
+        if(params.Name)
+            this._context.Companies.Where({Field: "Name", Kind : Operation.CONSTAINS, Value: params.Name});
+        if(params.Description)
+            this._context.Companies.Where({Field: "Description", Kind : Operation.CONSTAINS, Value: params.Description});
+        if(params.Document)
+            this._context.Companies.Where({Field: "Document", Kind : Operation.CONSTAINS, Value: params.Document});
+        if(params.Active)
+            this._context.Companies.Where({Field: "Active", Kind : Operation.CONSTAINS, Value: params.Active});
+
+        return await this._context.Companies.Limit(params.Quantity).Offset(offset).ToListAsync();        
+    }
+   
+    
+    public override async AddDepartamentToAllAsync(departament: Departament): Promise<void> {
+        
+        let companies = await this._context.Companies.LoadRelationOn("Departaments").ToListAsync();     
+        
+        for(let c of companies)
+        {
+            c.Departaments.Add(departament);
+            await this._context.Companies.UpdateAsync(c);
+        }
+
+    }
+      
 
     public override async AddAsync(obj: Company): Promise<Company> {
 

@@ -1,13 +1,14 @@
-import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RunBefore, ProducesResponse } from "web_api_base";
+import { ControllerBase, POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RequestJson } from "web_api_base";
 import { IsLogged } from '../filters/AuthFilter';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
-import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
+import AbstractCompanyService, { FilterParamas } from "../core/abstractions/AbstractCompanyService";
 import Company from "../core/entities/Company";
 import Type from "../utils/Type";
 import AbstractController from "./AbstractController";
 import Authorization from "../utils/Authorization";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
+import { CompanyFilterDTO } from "../dto/CompanyFilterDTO";
 
 
 
@@ -32,6 +33,20 @@ export default class CompanyController extends AbstractController {
     public async GetAllAsync(): Promise<void> {                
 
         this.OK(await this._service.GetAllAsync());
+    }
+
+
+    @POST("filter")    
+    @SetDatabaseFromToken()
+    @RequestJson(JSON.stringify(FilterParamas.GetTemplate(), null, 2))
+    @CompanyController.ProducesType(200, "List of all comapanies retrived by filters" , CompanyFilterDTO)    
+    public async FilterAsync(@FromBody()params : FilterParamas) {
+
+        let companies = await this._service.FilterAsync(params);
+
+        let result = new CompanyFilterDTO(companies, params.Quantity, await this._service.CountAsync(), params.Page);
+
+        return this.OK(result);
     }
 
     @GET("getByName")    
@@ -99,6 +114,8 @@ export default class CompanyController extends AbstractController {
             return this.NotFound({ Message: "Company not found" });
 
         await this._service.UpdateObjectAndRelationsAsync(company, ["Departaments", "Contacts"]);
+
+        this.OK(company);
     }
 
     @DELETE("delete")    
