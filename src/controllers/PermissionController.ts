@@ -1,5 +1,5 @@
 
-import { RunBefore, GET, Inject, UseBefore, Validate } from "web_api_base";
+import { RunBefore, GET, Inject, UseBefore, Validate, ActionResult } from "web_api_base";
 import AbstractPermissionService from "../core/abstractions/AbstractPermissionService";
 import {IsLogged} from '../filters/AuthFilter';
 import AbstractController from "./AbstractController";
@@ -15,28 +15,34 @@ export default class PermissionController extends AbstractController
     @Inject()
     private _service : AbstractPermissionService;
 
+    
     constructor(service : AbstractPermissionService)
     {
         super();                    
         this._service = service;
     }        
 
+
     public override async SetClientDatabaseAsync(): Promise<void> {
         await this._service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
     }
 
+
+
     @GET("list")
     @RunBefore(IsLogged)     
-    public async GetAllAsync() : Promise<void>
+    public async GetAllAsync() : Promise<ActionResult>
     {
-       this.OK(await this._service.GetAllAsync());
+       return this.OK(await this._service.GetAllAsync());
     } 
+
+
 
     @GET("getJson")
     @SetDatabaseFromToken()
-    public async GetJson()
+    public GetJson() : ActionResult
     {
-        this.OK(Type.CreateTemplateFrom<Permission>(Permission));
+        return this.OK(Type.CreateTemplateFrom<Permission>(Permission));
     }
    
 }

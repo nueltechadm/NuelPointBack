@@ -1,4 +1,4 @@
-import { POST, PUT, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
+import { POST, PUT, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
 import {IsLogged} from '../filters/AuthFilter';
 import AbstractCheckpointService from "../core/abstractions/AbstractCheckpointService";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
@@ -16,6 +16,8 @@ import AbstractCompanyService from "../core/abstractions/AbstractCompanyService"
 import AbstractTimeService from "../core/abstractions/AbstractTimeService";
 import Checkpoint from "../core/entities/Checkpoint";
 import AppointmentDTO from "../dto/AppointmentDTO";
+
+
 
 
 @UseBefore(IsLogged)
@@ -57,7 +59,10 @@ export default class AppointamentController extends AbstractController
         this._timeService = timeService;
         this._fileService = fileService;
         this._appointamentService = appointamentService;
-    }    
+    }   
+    
+    
+
         
     public override async SetClientDatabaseAsync(): Promise<void> {
         await this._checkpointService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
@@ -65,12 +70,14 @@ export default class AppointamentController extends AbstractController
         await this._userService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
         await this._timeService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
     }
+
+
     
     @POST("insert")    
     @SetDatabaseFromToken()
     @AppointamentController.ProducesType(200, "The just created Appointment object", Appointment)
     @AppointamentController.ProducesMessage(400, "A message telling what is missing", {Message : "The user with ID 1 not exists"})
-    public async InsertAsync(@FromBody()dto : AppointmentDTO) 
+    public async InsertAsync(@FromBody()dto : AppointmentDTO) : Promise<ActionResult> 
     {  
         
         let user = await this._userService.GetByIdAsync(this.Request.APIAUTH.UserId);
@@ -95,29 +102,27 @@ export default class AppointamentController extends AbstractController
         else
             await this._appointamentService.UpdateAsync(currentDayOfUser);
 
-        this.OK(currentDayOfUser);
+        return this.OK(currentDayOfUser);
               
     }
 
+
+
+
     @PUT("update")    
     @SetDatabaseFromToken()
-    public async UpdateAsync(@FromBody() appointament: Appointment) {
-
-        try {
-
-            this.OK(await this._appointamentService.UpdateAsync(appointament));
-        }
-        catch (ex) {
-            if (ex instanceof InvalidEntityException || ex instanceof EntityNotFoundException)
-                return this.BadRequest({ Message: ex.message });
-
-            return this.Error("Error while processing the request");
-        }
+    public async UpdateAsync(@FromBody() appointament: Appointment) : Promise<ActionResult> 
+    {
+        return this.OK(await this._appointamentService.UpdateAsync(appointament));
     }
+
+
+
     
     @GET("search")    
     @SetDatabaseFromToken()
-    public async GetByIdAsync(@FromQuery() userId: number, @FromQuery() start : Date, @FromQuery() end : Date) {
+    public async GetByIdAsync(@FromQuery() userId: number, @FromQuery() start : Date, @FromQuery() end : Date) : Promise<ActionResult>
+    {
 
         let user = await this._userService.GetByIdAsync(userId);
 
@@ -126,13 +131,16 @@ export default class AppointamentController extends AbstractController
 
         let appointaments = await this._appointamentService.GetByUserAndDates(user, start, end);        
 
-        this.OK(Type.RemoveORMMetadata(appointaments));
+        return this.OK(Type.RemoveORMMetadata(appointaments));
     }  
+
+
 
 
     @GET("getDay")    
     @SetDatabaseFromToken()
-    public async GetCurrentDayByUserAsync(@FromQuery() userId : number) {
+    public async GetCurrentDayByUserAsync(@FromQuery() userId : number) : Promise<ActionResult>
+    {
 
         let user = await this._userService.GetByIdAsync(userId);
 
@@ -141,24 +149,16 @@ export default class AppointamentController extends AbstractController
 
         let appointament = await this._appointamentService.GetCurrentDayByUser(user);        
 
-        this.OK(Type.RemoveORMMetadata(appointament));
+        return this.OK(appointament);
     }  
 
-
-    @GET("getAllDay")    
-    @SetDatabaseFromToken()
-    public async GetCurrentDayAsync(@FromQuery() company? : number) {        
-
-        let appointament = await this._appointamentService.GetAllAsync();        
-
-        this.OK(Type.RemoveORMMetadata(appointament));
-    }  
+    
 
     @GET("getJson")
     @SetDatabaseFromToken()
-    public async GetJson()
+    public GetJson() : ActionResult
     {
-        this.OK(Type.CreateTemplateFrom<Appointment>(Appointment));
+       return this.OK(Type.CreateTemplateFrom<Appointment>(Appointment));
     }
    
 }

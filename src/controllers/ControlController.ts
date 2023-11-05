@@ -1,4 +1,4 @@
-import { Inject, GET, ControllerBase, FromQuery, UseBefore } from "web_api_base";
+import { Inject, GET, ControllerBase, FromQuery, UseBefore, ActionResult } from "web_api_base";
 import { DababaseStatus } from "../core/entities/Database";
 import AbstractDatabaseService from "../services/abstractions/AbstractDatabaseService";
 import   DatabasesAuthFilter from "../filters/DatabasesAuthFilter";
@@ -8,13 +8,17 @@ export default class ControlController extends ControllerBase {
     @Inject()
     private _service: AbstractDatabaseService;
 
+
     constructor(service: AbstractDatabaseService) {
         super();
         this._service = service;
     }
 
+    
+
     @GET("init")
-    public async CreateDatabaseAsync(@FromQuery() name: string) {
+    public async CreateDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
+    {
 
         if(!name)
             return this.BadRequest({Message : "The parameter \"name\" is required"});
@@ -22,7 +26,7 @@ export default class ControlController extends ControllerBase {
         let exist = await this._service.CheckIfDatabaseExists(name);
 
         if(exist)
-            this.OK({ Message: "Database already exists" });
+            return this.OK({ Message: "Database already exists" });
 
         (async () => {
 
@@ -46,11 +50,15 @@ export default class ControlController extends ControllerBase {
                 
         })();
 
-        this.OK({ Message: "Command sent to queue" });
+        return this.OK({ Message: "Command sent to queue" });
     }
 
+
+
+
     @GET("check")
-    public async CheckDatabaseAsync(@FromQuery() name: string) {
+    public async CheckDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
+    {
 
         if(!name)
             return this.BadRequest({Message : "The parameter \"name\" is required"});
@@ -58,15 +66,18 @@ export default class ControlController extends ControllerBase {
         let db = await this._service.GetDabaseAsync(name);
 
         if (db)
-            this.OK(db);       
+            return this.OK(db);       
         else 
-            this.NotFound();       
+            return this.NotFound();       
             
     }
 
 
+
+
     @GET("update")
-    public async UpdateDatabaseAsync(@FromQuery() name: string) {
+    public async UpdateDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
+    {
 
         if(!name)
             return this.BadRequest({Message : "The parameter \"name\" is required"});

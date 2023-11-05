@@ -1,5 +1,5 @@
 
-import { ControllerBase, Route, Action } from "web_api_base";
+import { ControllerBase, Route, Action, ActionResult } from "web_api_base";
 
 
 @Route()
@@ -12,9 +12,9 @@ export default class StatusController extends ControllerBase
     }
     
     @Action()
-    public Ping() : void
+    public Ping() : ActionResult
     {       
-        this.OK({status : "pong"});
+        return this.OK({status : "pong"});
     }
     
 }

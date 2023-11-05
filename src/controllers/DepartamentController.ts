@@ -1,4 +1,4 @@
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
 import { IsLogged } from '../filters/AuthFilter';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
@@ -32,51 +32,71 @@ export default class DepartamentController extends AbstractController {
         await this._companyService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
     }
 
+
+
+
     @GET("list")     
     @SetDatabaseFromToken()
-    public async GetAllAsync(): Promise<void> {        
+    public async GetAllAsync(): Promise<ActionResult> 
+    {        
 
-        let departaments = await this._departamentService.GetAllAsync();       
-        this.OK(Type.RemoveORMMetadata(departaments));
+        let departaments = await this._departamentService.GetAllAsync();  
+             
+        return this.OK(departaments);
     }
+
+
 
     @GET("getById")
     @SetDatabaseFromToken()
-    public async GetByIdAsync(@FromQuery() id: number) {
-        
+    public async GetByIdAsync(@FromQuery() id: number) : Promise<ActionResult>
+    {        
         let departament = await this._departamentService.GetByIdAsync(id);
 
         if (!departament)
             return this.NotFound({ Message: "departament not found" });
 
-        this.OK(Type.RemoveORMMetadata(departament));
+        return this.OK(Type.RemoveORMMetadata(departament));
     }
+
+
 
     @POST("insert")
     @SetDatabaseFromToken()
-    public async InsertAsync(@FromBody() departament: Departament) {
-        this.OK(await this._departamentService.AddAsync(departament));
+    public async InsertAsync(@FromBody() departament: Departament) : Promise<ActionResult>
+    {
+        return this.OK(await this._departamentService.AddAsync(departament));
     }
+
+
 
     @POST("add-to-all")
     @SetDatabaseFromToken()
-    public async AddToAllAsync(@FromBody() departament: Departament) {
+    public async AddToAllAsync(@FromBody() departament: Departament) : Promise<ActionResult>
+    {
         
         if(departament.Id <= 0)
-            return this.NotFound("Departament not exists in database");        
+            return this.NotFound("Departament not exists in database");   
+        
+        return this.NotFound();
 
     }
+
+
 
     @PUT("update")
     @SetDatabaseFromToken()
-    public async UpdateAsync(@FromBody() departament: Departament) {
-        
-        this.OK(await this._departamentService.UpdateAsync(departament));
+    public async UpdateAsync(@FromBody() departament: Departament) : Promise<ActionResult>
+    {        
+        return this.OK(await this._departamentService.UpdateAsync(departament));
     }
+
+
 
     @DELETE("delete")
     @SetDatabaseFromToken()
-    public async DeleteAsync(@FromQuery() id: number) {
+    public async DeleteAsync(@FromQuery() id: number) : Promise<ActionResult>
+    {
         if (!id)
             return this.BadRequest({ Message: "The ID must be greater than 0" });
 
@@ -85,14 +105,16 @@ export default class DepartamentController extends AbstractController {
         if (!del)
             return this.NotFound({ Message: "departament not found" });
 
-        this.OK(await this._departamentService.DeleteAsync(del));
+        return this.OK(await this._departamentService.DeleteAsync(del));
     }
+
+
 
     @GET("getJson")
     @SetDatabaseFromToken()
-    public async GetJson()
+    public GetJson() : ActionResult
     {
-        this.OK(Type.CreateTemplateFrom<Departament>(Departament));
+        return this.OK(Type.CreateTemplateFrom<Departament>(Departament));
     }
 
 

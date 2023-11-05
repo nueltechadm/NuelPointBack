@@ -18,7 +18,7 @@ export default function SetDatabaseFromToken() {
 
         propertyDescriptor.value = async function (...args: any[]) {            
             await (this as AbstractController).SetClientDatabaseAsync();
-            await originalMethod.apply(this, args);
+            return await originalMethod.apply(this, args);
         };
 
     };

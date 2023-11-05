@@ -1,5 +1,5 @@
 
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ProducesResponse } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ProducesResponse, ActionResult } from "web_api_base";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import User from "../core/entities/User";
 import {IsLogged} from '../filters/AuthFilter';
@@ -43,6 +43,8 @@ export default class UserController extends AbstractController
         this._companyService = companyService;
         this._jobRoleService = jobRoleService;
     }    
+
+
     
     public override async SetClientDatabaseAsync(): Promise<void> {
         await this._userService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
@@ -51,23 +53,30 @@ export default class UserController extends AbstractController
         await this._journeyService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
     }
 
+
+    
+
     @GET("list")
     @SetDatabaseFromToken()
     @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
-    public async GetAllAsync() : Promise<void>
+    public async GetAllAsync() : Promise<ActionResult>
     {       
        let users =  await this._userService.GetAllAsync();
 
        users.forEach(s => this.RemovePassword(s));
 
-       this.OK(users);
+       return this.OK(users);
     }    
+
+
+
+
     
     @GET("getById")   
     @SetDatabaseFromToken() 
     @UserController.ProducesType(200,  "A completed loaded user", User)
     @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"}) 
-    public async GetByIdAsync(@FromQuery()id : number) : Promise<any>
+    public async GetByIdAsync(@FromQuery()id : number) : Promise<ActionResult>
     { 
         if(!id || typeof id != "number")
             return this.BadRequest({Message : "Invalid userId"});
@@ -75,25 +84,31 @@ export default class UserController extends AbstractController
        let users = await this._userService.GetByAndLoadAsync("Id", id, ["Access", "Contacts", "JobRole", "Journey"]);
 
        if(users.length == 0)
-            this.NotFound();
+            return this.NotFound();
         else
-            this.OK(this.RemovePassword(users[0]));
-    }          
+            return this.OK(this.RemovePassword(users[0]));
+    }       
+    
+    
+
     
     @POST("insert")
     @SetDatabaseFromToken()
     @UserController.ProducesType(200, "The just created user", User) 
-    public async InsertAsync(@FromBody()user : User) : Promise<void>
+    public async InsertAsync(@FromBody()user : User) : Promise<ActionResult>
     {  
-        this.OK(await this._userService.AddAsync(user));
+       return this.OK(await this._userService.AddAsync(user));
     }
 
+
+
+    
     @PUT("journey")  
     @SetDatabaseFromToken()   
     @UserController.ProducesType(200, "The user´s journey", Journey)  
     @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"})
     @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "The user with ID 1 not exists"})
-    public async UpdateJourney(@FromQuery()userId : number, @FromBody()journey : Journey) 
+    public async UpdateJourney(@FromQuery()userId : number, @FromBody()journey : Journey) : Promise<ActionResult>
     {
         if(!userId || typeof userId != "number")
             return this.BadRequest({Message : "Invalid userId"});
@@ -119,8 +134,11 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(users[0]);
 
-        this.OK(journey);
+        return this.OK(journey);
     }
+
+
+
 
     
     @PUT("company")  
@@ -128,7 +146,7 @@ export default class UserController extends AbstractController
     @UserController.ProducesType(200, "The user´s company", Company) 
     @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"})
     @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "The user with ID 1 not exists"})
-    public async UpdateCompany(@FromQuery()userId : number, @FromBody()company : Company) 
+    public async UpdateCompany(@FromQuery()userId : number, @FromBody()company : Company) : Promise<ActionResult>
     {
         if(!userId || typeof userId != "number")
             return this.BadRequest({Message : "Invalid userId"});
@@ -154,8 +172,10 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(users[0]);
 
-        this.OK(company);
+        return this.OK(company);
     }
+
+
 
 
     @PUT("jobrole")  
@@ -163,7 +183,7 @@ export default class UserController extends AbstractController
     @UserController.ProducesType(200, "The user´s jobrole", JobRole)  
     @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"})
     @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "The user with ID 1 not exists"})   
-    public async UpdateJobRole(@FromQuery()userId : number, @FromBody()jobRole : JobRole) 
+    public async UpdateJobRole(@FromQuery()userId : number, @FromBody()jobRole : JobRole) : Promise<ActionResult>
     {
         if(!userId || typeof userId != "number")
             return this.BadRequest({Message : "Invalid userId"});
@@ -191,16 +211,18 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(user);
 
-        this.OK(jobRole);
+        return this.OK(jobRole);
     }
     
+    
+
     
     @PUT("update")  
     @SetDatabaseFromToken() 
     @UserController.ProducesType(200, "The just updated user", User)   
     @UserController.ProducesMessage(400, "A message telling what is missing", {Message : "The ID must be greater than 0"})
     @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "User not found"})  
-    public async UpdateAsync(@FromBody()user : User) 
+    public async UpdateAsync(@FromBody()user : User) : Promise<ActionResult>
     {        
         if(user.Id == undefined || user.Id <= 0)
             return this.BadRequest({ Message : "The ID must be greater than 0"});
@@ -210,15 +232,17 @@ export default class UserController extends AbstractController
         if(!update)
             return this.NotFound({Message : "User not found"});
 
-        this.OK(await this._userService.UpdateAsync(user));
+        return this.OK(await this._userService.UpdateAsync(user));
     }
+
+
 
     @DELETE("delete")   
     @SetDatabaseFromToken() 
     @UserController.ProducesType(200, "The just deleted user", User)   
     @UserController.ProducesMessage(400, "A message telling what is missing", {Message : "The ID must be greater than 0"})
     @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "User not found"}) 
-    public async DeleteAsync(@FromQuery()id : number) 
+    public async DeleteAsync(@FromQuery()id : number) : Promise<ActionResult>
     {  
         if(!id)
             return this.BadRequest({ Message : "The ID must be greater than 0"});
@@ -228,14 +252,16 @@ export default class UserController extends AbstractController
         if(!del)
             return this.NotFound({Message : "User not found"});
 
-        this.OK(await this._userService.DeleteAsync(del));
+        return this.OK(await this._userService.DeleteAsync(del));
     }
 
+
+    
     @GET("getJson")
     @SetDatabaseFromToken()
-    public async GetJson()
+    public async GetJson() : Promise<ActionResult>
     {
-        this.OK(Type.CreateTemplateFrom<User>(User));
+        return Promise.resolve(this.OK(Type.CreateTemplateFrom<User>(User)));
     }
 
     private RemovePassword(user? : User) : User | undefined

@@ -1,10 +1,10 @@
-import { ControllerBase, ProducesResponse, RequestJson } from "web_api_base";
+import { ControllerBase, OKResult, ProducesResponse, RequestJson } from "web_api_base";
 import Type from "../utils/Type";
 
 export default abstract class AbstractController extends ControllerBase {
     abstract SetClientDatabaseAsync(): Promise<void>; 
     
-    public override OK<T>(result?: T | undefined): T | undefined 
+    public override OK<T>(result?: T): OKResult<T> 
     {
         if(result)
         {            

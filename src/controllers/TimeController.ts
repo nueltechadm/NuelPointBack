@@ -1,4 +1,4 @@
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
 import { IsLogged } from '../filters/AuthFilter';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
@@ -15,58 +15,61 @@ export default class TimeController extends AbstractController {
     @Inject()
     private _service: AbstractTimeService;
 
+
+
     constructor(service: AbstractTimeService) {
         super();
         this._service = service;
     }
 
+
+
+
     public override async SetClientDatabaseAsync(): Promise<void> {
         await this._service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
     }
 
+
+
     @GET("list")     
     @SetDatabaseFromToken()
-    public async GetAllAsync(): Promise<void> {
+    public async GetAllAsync(): Promise<ActionResult> {
 
-        let times = await this._service.GetAllAsync();        
-        this.OK(times);
+        let times = await this._service.GetAllAsync();  
+              
+        return this.OK(times);
     }
 
     @GET("getById")
     @SetDatabaseFromToken()
-    public async GetByIdAsync(@FromQuery() id: number) {
+    public async GetByIdAsync(@FromQuery() id: number) : Promise<ActionResult>
+    {
         let time = await this._service.GetByIdAsync(id);
 
         if (!time)
             return this.NotFound({ Message: "Time not found" });
 
-        this.OK(time);
+        return this.OK(time);
     }
 
     @POST("insert")
     @SetDatabaseFromToken()
-    public async InsertAsync(@FromBody() time: Time) {
-        this.OK(await this._service.AddAsync(time));
+    public async InsertAsync(@FromBody() time: Time) : Promise<ActionResult>
+    {
+        return this.OK(await this._service.AddAsync(time));
     }
 
     @PUT("update")
     @SetDatabaseFromToken()
-    public async UpdateAsync(@FromBody() time: Time) {
-        try {
-
-            this.OK(await this._service.UpdateAsync(time));
-        }
-        catch (ex) {
-            if (ex instanceof InvalidEntityException || ex instanceof EntityNotFoundException)
-                return this.BadRequest({ Message: ex.message });
-
-            return this.Error("Error while processing the request");
-        }
+    public async UpdateAsync(@FromBody() time: Time) : Promise<ActionResult>
+    {
+        return this.OK(await this._service.UpdateAsync(time));        
     }
 
     @DELETE("delete")
     @SetDatabaseFromToken()
-    public async DeleteAsync(@FromQuery() id: number) {
+    public async DeleteAsync(@FromQuery() id: number) : Promise<ActionResult>
+    {
         if (!id)
             return this.BadRequest({ Message: "The ID must be greater than 0" });
 
@@ -75,14 +78,14 @@ export default class TimeController extends AbstractController {
         if (!del)
             return this.NotFound({ Message: "Time not found" });
 
-        this.OK(await this._service.DeleteAsync(del));
+        return this.OK(await this._service.DeleteAsync(del));
     }
 
     @GET("getJson")
     @SetDatabaseFromToken()
-    public async GetJson()
+    public GetJson(): Promise<ActionResult>
     {
-        this.OK(Type.CreateTemplateFrom<Time>(Time));
+        return Promise.resolve(this.OK(Type.CreateTemplateFrom<Time>(Time)));
     }
 
 

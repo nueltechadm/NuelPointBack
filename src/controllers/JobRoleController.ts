@@ -1,5 +1,5 @@
 
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
 import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
 import JobRole from "../core/entities/JobRole";
 import {IsLogged} from '../filters/AuthFilter';
@@ -27,53 +27,60 @@ export default class JobRoleController extends AbstractController
         await this._service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());        
     }
 
+
+
     @GET("list")    
     @SetDatabaseFromToken()
-    public async GetAllAsync() : Promise<void>
+    public async GetAllAsync() : Promise<ActionResult>
     {
        let jobs = await this._service.GetAllAsync();
 
-       for(let j of jobs)
-       {
-            delete (j as any)._orm_metadata_;
+       for(let j of jobs)      
             delete (j as any).Employers;
-       }
 
-       this.OK(jobs);
+       return this.OK(jobs);
     }    
+
+
     
     @GET("getById")  
     @SetDatabaseFromToken()
-    public async GetByIdAsync(@FromQuery()id : number) 
+    public async GetByIdAsync(@FromQuery()id : number) : Promise<ActionResult>
     { 
        let job = await this._service.GetByIdAsync(id);
 
        if(!job)
-            return this.NotFound({Message : "Job role not found"});
-        
-        delete (job as any)._orm_metadata_;
+            return this.NotFound({Message : "Job role not found"});        
+       
         delete (job as any).Employers;
 
-       this.OK(job);
+       return this.OK(job);
     }          
+
+
     
     @POST("insert")     
     @SetDatabaseFromToken()
-    public async InsertAsync(@FromBody()jobRole : JobRole) 
+    public async InsertAsync(@FromBody()jobRole : JobRole) : Promise<ActionResult>
     {  
-        this.OK(await this._service.AddAsync(jobRole));
+        return this.Created(await this._service.AddAsync(jobRole));
     }
+
+
     
     @PUT("update")       
     @SetDatabaseFromToken()
-    public async UpdateAsync(@FromBody()jobRole : JobRole) 
+    public async UpdateAsync(@FromBody()jobRole : JobRole) : Promise<ActionResult>
     {  
-        this.OK(await this._service.UpdateAsync(jobRole));        
+        return this.OK(await this._service.UpdateAsync(jobRole));        
     }
+
+
+
 
     @DELETE("delete")     
     @SetDatabaseFromToken()    
-    public async DeleteAsync(@FromQuery()id : number) 
+    public async DeleteAsync(@FromQuery()id : number) : Promise<ActionResult>
     {  
         if(!id)
             return this.BadRequest({ Message : "The ID must be greater than 0"});
@@ -83,14 +90,16 @@ export default class JobRoleController extends AbstractController
         if(!del)
             return this.NotFound({Message : "Job role not found"});
 
-        this.OK(await this._service.DeleteAsync(del));
+        return this.OK(await this._service.DeleteAsync(del));
     }
+
+
 
     @GET("getJson")
     @SetDatabaseFromToken()
-    public async GetJson()
+    public GetJson() : ActionResult
     {
-        this.OK(Type.CreateTemplateFrom<JobRole>(JobRole));
+        return this.OK(Type.CreateTemplateFrom<JobRole>(JobRole));
     }
 
     

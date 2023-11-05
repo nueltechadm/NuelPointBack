@@ -1,5 +1,5 @@
 
-import { POST, Inject, FromBody, RunBefore, GET } from "web_api_base";
+import { POST, Inject, FromBody, RunBefore, GET, ActionResult } from "web_api_base";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import {Generate} from '../utils/JWT';
 import { IsLogged } from "../filters/AuthFilter";
@@ -19,19 +19,22 @@ export default class LoginController extends AbstractController
     @Inject()
     private _databaseService : AbstractDatabaseService;
 
+
     constructor(userService : AbstractUserService, databaseService: AbstractDatabaseService)
     {
         super();                    
         this._userService = userService;
         this._databaseService = databaseService;
     }    
+
     
     public override async SetClientDatabaseAsync(): Promise<void> {
         await this._userService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
     }    
 
+
     @POST("login")   
-    public async LoginAsync(@FromBody()user : LoginDTO)
+    public async LoginAsync(@FromBody()user : LoginDTO) : Promise<ActionResult>
     {   
         let db = await this._databaseService.GetDabaseAsync(user.Link);
 
@@ -55,16 +58,17 @@ export default class LoginController extends AbstractController
 
         let token = Generate(new Authorization(access.Username, user.Link, access.User.Id), 1);
 
-        this.OK({User : Type.RemoveORMMetadata(access), Token : token});
+        return this.OK({User : Type.RemoveORMMetadata(access), Token : token});
         
     } 
+
 
     
     @GET("validateToken")  
     @RunBefore(IsLogged)  
-    public async ValidateTokenAsync() 
+    public async ValidateTokenAsync() : Promise<ActionResult>
     {        
-        this.OK({Message : "Token válido"});
+        return Promise.resolve(this.OK({Message : "Token válido"}));
     } 
     
    
