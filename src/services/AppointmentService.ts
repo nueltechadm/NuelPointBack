@@ -1,19 +1,19 @@
-import Context from "../data/Context";
 import { Inject } from 'web_api_base';
 import Appointment from "../core/entities/Appointment";
 import { Operation } from "myorm_pg";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import AbstractAppointmentService  from "../core/abstractions/AbstractAppointmentService";
 import User from "../core/entities/User";
+import AbstractDBContext from "../data/abstract/AbstractDBContext";
 
 
 export default class AppointmentService extends AbstractAppointmentService {
           
 
     @Inject()
-    private _context: Context;
+    private _context: AbstractDBContext;
 
-    constructor(context: Context) {
+    constructor(context: AbstractDBContext) {
         super();
         this._context = context;
     }

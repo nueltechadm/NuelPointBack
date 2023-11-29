@@ -14,12 +14,11 @@ import Contact from '../core/entities/Contact';
 import Appointment from '../core/entities/Appointment';
 import DatabaseException from '../exceptions/DatabaseException';
 import DayOfWeek from '../core/entities/DayOfWeek';
+import AbstractDBContext, { IDBContext } from './abstract/AbstractDBContext';
 
 
-export default class Context extends PGDBContext
-{
-
-    
+export default class DBContext extends PGDBContext implements IDBContext
+{    
     public Users : PGDBSet<User>; 
     public Access : PGDBSet<Access>; 
     public Permissions : PGDBSet<Permission>; 

@@ -1,23 +1,23 @@
 import { Inject } from 'web_api_base';
-import Context from '../data/Context';
-import  ControlContext  from '../data/ControlContext';
 import Database, { DababaseStatus } from '../core/entities/Database';
 import Access from '../core/entities/Access';
 import User from '../core/entities/User';
 import AbstractDatabaseService from './abstractions/AbstractDatabaseService';
 import { MD5 } from '../utils/Cryptography';
+import AbstractControlContext from '../data/abstract/AbstractControlContext';
+import AbstractDBContext from '../data/abstract/AbstractDBContext';
 
 
 export default class DatabaseService extends AbstractDatabaseService{
    
    
     @Inject()
-    private _context: Context;
+    private _context: AbstractDBContext;
 
     @Inject()
-    private _controlContext: ControlContext;
+    private _controlContext: AbstractControlContext;
 
-    constructor(context: Context, controlContext: ControlContext) {
+    constructor(context: AbstractDBContext, controlContext: AbstractControlContext) {
 
         super();
         this._context = context;
@@ -73,7 +73,7 @@ export default class DatabaseService extends AbstractDatabaseService{
 
         if (!db || db.Status == DababaseStatus.DELETED) {
 
-            await this._context["_manager"].CreateDataBase(dabataseName);            
+            await (this._context as any)["_manager"].CreateDataBase(dabataseName);            
 
             await this._context.SetDatabaseAsync(dabataseName);
 

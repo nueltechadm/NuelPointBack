@@ -1,18 +1,18 @@
 import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
-import Context from "../data/Context";
 import {Inject} from'web_api_base'
 import JobRole from "../core/entities/JobRole";
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
+import AbstractDBContext from "../data/abstract/AbstractDBContext";
 
 export default class JobRoleService  extends AbstractJobRoleService
 {
     
     @Inject()
-    private _context : Context;
+    private _context : AbstractDBContext;
 
-    constructor(context : Context)
+    constructor(context : AbstractDBContext)
     {
         super();
         this._context = context;

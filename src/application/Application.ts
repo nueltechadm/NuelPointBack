@@ -1,7 +1,7 @@
 import 'ts_linq_base';
 
 import { Application, IApplicationConfiguration, DependecyService } from 'web_api_base';
-import Context from '../data/Context';
+import DBContext from '../data/DBContext';
 
 import AbstractUserService from '../core/abstractions/AbstractUserService';
 import UserService from '../services/UserService';
@@ -42,6 +42,8 @@ import EntityNotFoundException from '../exceptions/EntityNotFoundException';
 
 
 import { ApplicationExceptionHandler } from 'web_api_base/dist/interfaces/IApplication';
+import AbstractDBContext from '../data/abstract/AbstractDBContext';
+import AbstractControlContext from '../data/abstract/AbstractControlContext';
 
 
 export default class App extends Application
@@ -58,8 +60,8 @@ export default class App extends Application
        
         this.ApplicationThreadExeptionHandler = this.ApplicationThreadExeptionEvent;
 
-        appConfig.AddScoped(Context);
-        appConfig.AddScoped(ControlContext);        
+        appConfig.AddScoped(AbstractDBContext, DBContext);
+        appConfig.AddScoped(AbstractControlContext, ControlContext);        
 
         process.env["ROOT"] = appConfig.RootPath;
         

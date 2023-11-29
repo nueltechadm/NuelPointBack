@@ -1,17 +1,17 @@
 import AbstractPermissionService from "../core/abstractions/AbstractPermissionService";
-import Context from "../data/Context";
 import {Inject} from'web_api_base'
 import Permission, {PermissionName} from "../core/entities/Permission";
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
+import AbstractDBContext from "../data/abstract/AbstractDBContext";
 
 export default class PermissionService  extends AbstractPermissionService
 {
     
     @Inject()
-    private _context : Context;
+    private _context : AbstractDBContext;
 
-    constructor(context : Context)
+    constructor(context : AbstractDBContext)
     {
         super();
         this._context = context;

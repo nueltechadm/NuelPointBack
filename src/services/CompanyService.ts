@@ -1,20 +1,20 @@
 import AbstractCompanyService, { FilterParamas } from "../core/abstractions/AbstractCompanyService";
-import Context from "../data/Context";
 import {Inject} from'web_api_base'
 import Company from "../core/entities/Company";
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Departament from "../core/entities/Departament";
 import { Operation } from "myorm_pg";
+import AbstractDBContext from "../data/abstract/AbstractDBContext";
 
 export default class CompanyService  extends AbstractCompanyService
 {
     
     
     @Inject()
-    private _context : Context;
+    private _context : AbstractDBContext;
 
-    constructor(context : Context)
+    constructor(context : AbstractDBContext)
     {
         super();
         this._context = context;

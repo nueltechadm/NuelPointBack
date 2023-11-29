@@ -1,21 +1,21 @@
 import User from "../core/entities/User";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
-import Context from "../data/Context";
 import {MD5} from '../utils/Cryptography';
 import ObjectNotFoundExcpetion from "../exceptions/ObjectNotFoundExcpetion";
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Access from "../core/entities/Access";
 import { Inject } from "web_api_base";
+import AbstractDBContext from "../data/abstract/AbstractDBContext";
 
 
 export default class UserService  extends AbstractUserService
 {      
     
     @Inject()
-    private _context : Context;
+    private _context : AbstractDBContext;
 
-    constructor(context : Context)
+    constructor(context : AbstractDBContext)
     {
         super();
         this._context = context;

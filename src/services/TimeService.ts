@@ -1,19 +1,18 @@
-import Context from "../data/Context";
 import { Inject } from 'web_api_base';
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Time from "../core/entities/Time";
 import AbstractTimeService from "../core/abstractions/AbstractTimeService";
-import User from "../core/entities/User";
+import AbstractDBContext from '../data/abstract/AbstractDBContext';
 
 
 
 export default class TimeService extends AbstractTimeService {
    
     @Inject()
-    private _context: Context;
+    private _context: AbstractDBContext;
 
-    constructor(context: Context) {
+    constructor(context: AbstractDBContext) {
         super();
         this._context = context;
     }

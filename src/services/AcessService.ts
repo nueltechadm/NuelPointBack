@@ -1,9 +1,9 @@
-import Context from "../data/Context";
 import { Inject } from 'web_api_base';
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Access from "../core/entities/Access";
 import AbstractAccessService from "../core/abstractions/AbstractAccessService";
+import AbstractDBContext from "../data/abstract/AbstractDBContext";
 
 
 
@@ -11,9 +11,9 @@ import AbstractAccessService from "../core/abstractions/AbstractAccessService";
 export default class AcessService extends AbstractAccessService {
        
     @Inject()
-    private _context: Context;
+    private _context: AbstractDBContext;
 
-    constructor(context: Context) {
+    constructor(context: AbstractDBContext) {
         super();
         this._context = context;
     }
