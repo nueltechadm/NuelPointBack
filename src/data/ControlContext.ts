@@ -1,9 +1,7 @@
-import { PGDBContext, PGDBSet, PGDBManager } from 'myorm_pg';
-
+import { PGDBSet, PGDBManager, PGDBContext } from 'myorm_pg';
 import Database from '../core/entities/Database';
-import { IControlContext } from './abstract/AbstractControlContext';
 
-export default class ControlContext extends PGDBContext implements IControlContext {
+export default class ControlContext extends PGDBContext {
 
     public Databases: PGDBSet<Database>;
 

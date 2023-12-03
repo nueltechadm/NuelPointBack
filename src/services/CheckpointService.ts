@@ -2,7 +2,7 @@ import {Inject} from'web_api_base'
 import AbstractCheckpointService from "../core/abstractions/AbstractCheckpointService";
 import Checkpoint from "../core/entities/Checkpoint";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
-import { Operation } from "myorm_pg";
+import { Operation } from "myorm_core";
 import Path from 'path';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Company from "../core/entities/Company";
@@ -26,12 +26,12 @@ export default class CheckpointService  extends AbstractCheckpointService
     }
 
     public async CountAsync(): Promise<number> {        
-        return await this._context.Checkpoints.CountAsync();
+        return await this._context.Collection(Checkpoint).CountAsync();
     }
 
     public override async ExistsAsync(id: number): Promise<boolean> {
         
-        return (await this._context.Checkpoints.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+        return (await this._context.Collection(Checkpoint).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
     public override async GetFolderAndFileName(checkpoint: Checkpoint): Promise<{ Folder: string; File: string; }> {
@@ -74,7 +74,7 @@ export default class CheckpointService  extends AbstractCheckpointService
     }
    
     public override async GetByIdAsync(id: number): Promise<Checkpoint | undefined> {       
-        return await this._context.Checkpoints.WhereField("Id").IsEqualTo(id).LoadRelationOn("User").FirstOrDefaultAsync();
+        return await this._context.Collection(Checkpoint).WhereField("Id").IsEqualTo(id).LoadRelationOn("User").FirstOrDefaultAsync();
     }
     
     public override async AddAsync(obj: Checkpoint): Promise<Checkpoint> {        
@@ -84,51 +84,51 @@ export default class CheckpointService  extends AbstractCheckpointService
         if(!obj.User.Company)
             throw new InvalidEntityException(`The user of this checkpoint has no company`);
 
-        return this._context.Checkpoints.AddAsync(obj);
+        return this._context.Collection(Checkpoint).AddAsync(obj);
     }
     public override async UpdateAsync(obj: Checkpoint): Promise<Checkpoint> {
 
         this.ValidateObject(obj);
         
-        return await this._context.Checkpoints.UpdateAsync(obj);
+        return await this._context.Collection(Checkpoint).UpdateAsync(obj);
     }
 
     public override async UpdateObjectAndRelationsAsync<U extends keyof Checkpoint>(obj: Checkpoint, relations: U[]): Promise<Checkpoint> {
 
         this.ValidateObject(obj);
 
-        return await this._context.Checkpoints.UpdateObjectAndRelationsAsync(obj, relations);
+        return await this._context.Collection(Checkpoint).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
 
     public override async GetByAndLoadAsync<K extends keyof Checkpoint>(key: K, value: Checkpoint[K], load: K[]): Promise<Checkpoint[]> 
     {
-       this._context.Checkpoints.Where({Field : key, Value : value});
+       this._context.Collection(Checkpoint).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Checkpoints.Join(l);
+            this._context.Collection(Checkpoint).Join(l);
         
-       return await this._context.Checkpoints.ToListAsync();
+       return await this._context.Collection(Checkpoint).ToListAsync();
     } 
 
 
     public override async DeleteAsync(obj: Checkpoint): Promise<Checkpoint> {
-        return this._context.Checkpoints.DeleteAsync(obj);
+        return this._context.Collection(Checkpoint).DeleteAsync(obj);
     }
 
 
     public override async GetAllAsync(): Promise<Checkpoint[]> {
-        return await this._context.Checkpoints.OrderDescendingBy("Date").ToListAsync();
+        return await this._context.Collection(Checkpoint).OrderDescendingBy("Date").ToListAsync();
     }  
 
     public override async GetByRangeAndEmployer(userId: number, begin: Date, end?: Date | undefined): Promise<Checkpoint[]> {
 
-        let user = await this._context.Users.WhereField("Id").IsEqualTo(userId).FirstOrDefaultAsync();
+        let user = await this._context.Collection(User).WhereField("Id").IsEqualTo(userId).FirstOrDefaultAsync();
 
         if(!user)
             throw new EntityNotFoundException(`Has no one employer with id: #${userId} in the database`);
 
-       return await this._context.Checkpoints
+       return await this._context.Collection(Checkpoint)
        .Where({
             Field : "User", 
             Value : user!})

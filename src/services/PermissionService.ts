@@ -26,41 +26,41 @@ export default class PermissionService  extends AbstractPermissionService
     }
     public override async CountAsync(): Promise<number> {
         
-        return await this._context.Permissions.CountAsync();
+        return await this._context.Collection(Permission).CountAsync();
     }
 
     public override async ExistsAsync(id: number): Promise<boolean> {
         
-        return (await this._context.Permissions.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+        return (await this._context.Collection(Permission).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
 
     public override async GetByIdAsync(id: number): Promise<Permission | undefined> {       
-        return await this._context.Permissions.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
+        return await this._context.Collection(Permission).WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }
 
 
     public override async GetByNameAsync(name: PermissionName): Promise<Permission | undefined> {
-        return await this._context.Permissions.WhereField("Name").IsEqualTo(name).OrderBy("Description").FirstOrDefaultAsync();
+        return await this._context.Collection(Permission).WhereField("Name").IsEqualTo(name).OrderBy("Description").FirstOrDefaultAsync();
     }
 
 
     public override async GetByDescriptionAsync(description: string): Promise<Permission[]> {
-        return await this._context.Permissions.WhereField("Description").Constains(description).OrderBy("Description").ToListAsync();
+        return await this._context.Collection(Permission).WhereField("Description").Constains(description).OrderBy("Description").ToListAsync();
     }  
     
     public override async GetByAndLoadAsync<K extends keyof Permission>(key: K, value: Permission[K], load: K[]): Promise<Permission[]> 
     {
-       this._context.Permissions.Where({Field : key, Value : value});
+       this._context.Collection(Permission).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Permissions.Join(l);
+            this._context.Collection(Permission).Join(l);
         
-       return await this._context.Permissions.ToListAsync();
+       return await this._context.Collection(Permission).ToListAsync();
     } 
     
     public override async AddAsync(obj: Permission): Promise<Permission> {
-        return this._context.Permissions.AddAsync(obj);
+        return this._context.Collection(Permission).AddAsync(obj);
     }
 
 
@@ -68,24 +68,24 @@ export default class PermissionService  extends AbstractPermissionService
 
         this.ValidateObject(obj);
 
-        return await this._context.Permissions.UpdateAsync(obj);
+        return await this._context.Collection(Permission).UpdateAsync(obj);
     }
 
     public override async UpdateObjectAndRelationsAsync<U extends keyof Permission>(obj: Permission, relations: U[]): Promise<Permission> {
 
         this.ValidateObject(obj);
 
-        return await this._context.Permissions.UpdateObjectAndRelationsAsync(obj, relations);
+        return await this._context.Collection(Permission).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
 
     public override async DeleteAsync(obj: Permission): Promise<Permission> {
-        return this._context.Permissions.DeleteAsync(obj);
+        return this._context.Collection(Permission).DeleteAsync(obj);
     }
 
 
     public override async GetAllAsync(): Promise<Permission[]> {
-        return await this._context.Permissions.OrderBy("Description").ToListAsync();
+        return await this._context.Collection(Permission).OrderBy("Description").ToListAsync();
     }  
 
     public override ValidateObject(obj : Permission) : void

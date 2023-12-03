@@ -7,6 +7,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Access from "../core/entities/Access";
 import { Inject } from "web_api_base";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import Permission from "../core/entities/Permission";
 
 
 export default class UserService  extends AbstractUserService
@@ -31,17 +32,17 @@ export default class UserService  extends AbstractUserService
 
     public override async ExistsAsync(id: number): Promise<boolean> {
         
-        return (await this._context.Users.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+        return (await this._context.Collection(User).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
     public override async CountAsync(): Promise<number> {
         
-        return await this._context.Users.CountAsync();
+        return await this._context.Collection(User).CountAsync();
     }
 
     public override async GetByIdAsync(id: number): Promise<User| undefined> {
         
-        return await this._context.Users.Where(
+        return await this._context.Collection(User).Where(
                                         {
                                             Field : "Id", 
                                             Value : id
@@ -56,7 +57,7 @@ export default class UserService  extends AbstractUserService
     }
     public override async GetByNameAsync(name: string): Promise<User[]> {
 
-        return await this._context.Users.WhereField("Name").Constains(name).Join("Company").ToListAsync() ?? [];
+        return await this._context.Collection(User).WhereField("Name").Constains(name).Join("Company").ToListAsync() ?? [];
     }
 
     public override async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<Access | undefined> {
@@ -81,18 +82,18 @@ export default class UserService  extends AbstractUserService
 
     public override async GetByAndLoadAsync<K extends keyof User>(key: K, value: User[K], load: K[]): Promise<User[]> 
     {
-       this._context.Users.Where({Field : key, Value : value});
+       this._context.Collection(User).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Users.Join(l);
+            this._context.Collection(User).Join(l);
         
-       return await this._context.Users.ToListAsync();
+       return await this._context.Collection(User).ToListAsync();
     } 
 
     public override async GetByEmailAsync(email: string): Promise<User | undefined> 
     {       
 
-        return await this._context.Users.Where(
+        return await this._context.Collection(User).Where(
                                             {
                                                 Field : "Email", 
                                                 Value : email
@@ -121,7 +122,7 @@ export default class UserService  extends AbstractUserService
 
         obj.Access!.Password = MD5(obj.Access!.Password);
 
-        return await this._context.Users.AddAsync(obj)!;        
+        return await this._context.Collection(User).AddAsync(obj)!;        
     }
 
     public override async UpdateAsync(obj: User): Promise<User> {
@@ -140,7 +141,7 @@ export default class UserService  extends AbstractUserService
             await this.SyncPermissionsAsync(obj.Access!);
         }            
 
-        return await this._context.Users.UpdateAsync(obj)!;
+        return await this._context.Collection(User).UpdateAsync(obj)!;
     }
 
     public override async UpdateObjectAndRelationsAsync<U extends keyof User>(obj: User, relations: U[]): Promise<User> {
@@ -159,18 +160,18 @@ export default class UserService  extends AbstractUserService
             await this.SyncPermissionsAsync(obj.Access!);
         }            
 
-        return await this._context.Users.UpdateObjectAndRelationsAsync(obj, relations);
+        return await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
 
     public override async DeleteAsync(obj: User): Promise<User> {
 
-       return await this._context.Users.DeleteAsync(obj)!;
+       return await this._context.Collection(User).DeleteAsync(obj)!;
     }
 
     public override async GetAllAsync(): Promise<User[]> {
 
-        return await this._context.Users.OrderBy("Name").ToListAsync()!;
+        return await this._context.Collection(User).OrderBy("Name").ToListAsync()!;
     }  
     
     public override ValidateObject(obj : User) : void
@@ -196,7 +197,7 @@ export default class UserService  extends AbstractUserService
         if(id < 1)
             return undefined;
 
-        return await this._context.Access.Where({ Field : "Id", Value : id}).FirstOrDefaultAsync();
+        return await this._context.Collection(Access).Where({ Field : "Id", Value : id}).FirstOrDefaultAsync();
     }
 
     private async SyncPermissionsAsync(obj : Access) : Promise<void>
@@ -205,7 +206,7 @@ export default class UserService  extends AbstractUserService
 
         if(permissionsIds)
         {
-            obj.Permissions = await this._context.Permissions.WhereField("Id").IsInsideIn(permissionsIds).ToListAsync();
+            obj.Permissions = await this._context.Collection(Permission).WhereField("Id").IsInsideIn(permissionsIds).ToListAsync();
         }
     }
 

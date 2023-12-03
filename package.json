@@ -14,7 +14,8 @@
     "crypto-js": "^4.1.1",
     "formidable": "^2.1.1",
     "jsonwebtoken": "^9.0.0",
-    "myorm_pg": "^4.0.1",
+    "myorm_core": "^1.0.2",
+    "myorm_pg": "^5.0.2",
     "ts_linq_base": "^1.0.4",
     "web_api_base": "^4.0.0"
   },

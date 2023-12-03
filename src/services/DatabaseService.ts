@@ -26,22 +26,22 @@ export default class DatabaseService extends AbstractDatabaseService{
 
     public override async GetAllDabasesAsync() : Promise<Database[]>
     {
-        return this._controlContext.Databases.ToListAsync();
+        return this._controlContext.Collection(Database).ToListAsync();
     }
 
     public override async UpdateDatabaseAsync(db: Database): Promise<void> {
         
-        await this._controlContext.Databases.UpdateAsync(db);
+        await this._controlContext.Collection(Database).UpdateAsync(db);
     }
 
     public override async GetDabaseAsync(dabataseName : string) : Promise<Database | undefined>
     {
-        return this._controlContext.Databases.WhereField("Name").IsEqualTo(dabataseName).FirstOrDefaultAsync();
+        return this._controlContext.Collection(Database).WhereField("Name").IsEqualTo(dabataseName).FirstOrDefaultAsync();
     }
 
     public override async CheckIfDatabaseExists(dabataseName : string) : Promise<boolean>
     {
-        return (await this._controlContext.Databases.ToListAsync()).filter(s => s.Name == dabataseName && s.Status == DababaseStatus.CREATED).length > 0;
+        return (await this._controlContext.Collection(Database).ToListAsync()).filter(s => s.Name == dabataseName && s.Status == DababaseStatus.CREATED).length > 0;
     }
 
     public override async UpdateDatabaseSchemaAsync(db: Database): Promise<void> 
@@ -50,7 +50,7 @@ export default class DatabaseService extends AbstractDatabaseService{
         {
             db.Status = DababaseStatus.UPDATING;
 
-            await this._controlContext.Databases.UpdateAsync(db);
+            await this._controlContext.Collection(Database).UpdateAsync(db);
 
             try{
 
@@ -64,12 +64,12 @@ export default class DatabaseService extends AbstractDatabaseService{
             }
             
             db.LasUpdate = new Date();
-            await this._controlContext.Databases.UpdateAsync(db);
+            await this._controlContext.Collection(Database).UpdateAsync(db);
         }
     }
 
     public override async CreateDabaseAsync(dabataseName: string): Promise<void> {
-        let db = await this._controlContext.Databases.Where({ Field: 'Name', Value: dabataseName }).FirstOrDefaultAsync();
+        let db = await this._controlContext.Collection(Database).Where({ Field: 'Name', Value: dabataseName }).FirstOrDefaultAsync();
 
         if (!db || db.Status == DababaseStatus.DELETED) {
 
@@ -79,13 +79,13 @@ export default class DatabaseService extends AbstractDatabaseService{
 
             let newDb = new Database(dabataseName);
 
-            await this._controlContext.Databases.AddAsync(newDb);
+            await this._controlContext.Collection(Database).AddAsync(newDb);
 
             await this._context.UpdateDatabaseAsync();
 
             newDb.Status = DababaseStatus.CREATED;
 
-            await this._controlContext.Databases.UpdateAsync(newDb);     
+            await this._controlContext.Collection(Database).UpdateAsync(newDb);     
             
             await this.CreateDefaultUserAsync(dabataseName);
 
@@ -106,7 +106,7 @@ export default class DatabaseService extends AbstractDatabaseService{
         
         await this._context.SetDatabaseAsync(dabataseName);
 
-        await this._context.Users.AddAsync(user);
+        await this._context.Collection(User).AddAsync(user);
     }
 
 }

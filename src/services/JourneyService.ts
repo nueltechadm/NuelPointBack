@@ -27,57 +27,57 @@ export default class JourneyService  extends AbstractJorneyService
 
     public override async CountAsync(): Promise<number> {
         
-        return await this._context.Journeys.CountAsync();
+        return await this._context.Collection(Journey).CountAsync();
     }
 
     public override async GetByIdAsync(id: number): Promise<Journey | undefined> {       
-        return await this._context.Journeys.WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
+        return await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }      
 
     public override async ExistsAsync(id: number): Promise<boolean> {
         
-        return (await this._context.Journeys.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+        return (await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
     public override async AddAsync(obj: Journey): Promise<Journey> {
 
         this.ValidateObject(obj);
 
-        return this._context.Journeys.AddAsync(obj);
+        return this._context.Collection(Journey).AddAsync(obj);
     }
 
     public override async UpdateAsync(obj: Journey): Promise<Journey> {
 
         this.ValidateObject(obj);
         
-        return await this._context.Journeys.UpdateAsync(obj);
+        return await this._context.Collection(Journey).UpdateAsync(obj);
     }
 
     public override async UpdateObjectAndRelationsAsync<U extends keyof Journey>(obj: Journey, relations: U[]): Promise<Journey> {
 
         this.ValidateObject(obj);
 
-        return await this._context.Journeys.UpdateObjectAndRelationsAsync(obj, relations);
+        return await this._context.Collection(Journey).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
     public override async GetByAndLoadAsync<K extends keyof Journey>(key: K, value: Journey[K], load: K[]): Promise<Journey[]> 
     {
-       this._context.Journeys.Where({Field : key, Value : value});
+       this._context.Collection(Journey).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Journeys.Join(l);
+            this._context.Collection(Journey).Join(l);
         
-       return await this._context.Journeys.ToListAsync();
+       return await this._context.Collection(Journey).ToListAsync();
     } 
 
     
     public override async DeleteAsync(obj: Journey): Promise<Journey> {
-        return this._context.Journeys.DeleteAsync(obj);
+        return this._context.Collection(Journey).DeleteAsync(obj);
     }
 
 
     public override async GetAllAsync(): Promise<Journey[]> {
-        return await this._context.Journeys.OrderBy("Description").ToListAsync();
+        return await this._context.Collection(Journey).OrderBy("Description").ToListAsync();
     }  
 
     public override ValidateObject(obj : Journey) : void

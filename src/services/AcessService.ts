@@ -28,29 +28,29 @@ export default class AcessService extends AbstractAccessService {
 
     public override async ExistsAsync(id: number): Promise<boolean> {
         
-        return (await this._context.Access.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+        return (await this._context.Collection(Access).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
   
     
     public override async CountAsync(): Promise<number> {
 
-        return await this._context.Access.CountAsync();
+        return await this._context.Collection(Access).CountAsync();
     }
     
 
     public override async GetByAndLoadAsync<K extends keyof Access>(key: K, value: Access[K], load: K[]): Promise<Access[]> 
     {
-       this._context.Access.Where({Field : key, Value : value});
+       this._context.Collection(Access).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Access.Join(l);
+            this._context.Collection(Access).Join(l);
         
-       return await this._context.Access.ToListAsync();
+       return await this._context.Collection(Access).ToListAsync();
     } 
 
     
     public override async GetByIdAsync(id: number): Promise<Access | undefined> {
-        return await this._context.Access
+        return await this._context.Collection(Access)
         .WhereField("Id")
         .IsEqualTo(id)
         .LoadRelationOn("Company")
@@ -63,29 +63,29 @@ export default class AcessService extends AbstractAccessService {
 
         this.ValidateObject(obj);
 
-        return this._context.Access.AddAsync(obj);
+        return this._context.Collection(Access).AddAsync(obj);
     }
 
     public override async UpdateAsync(obj: Access): Promise<Access> {
 
         this.ValidateObject(obj);
 
-        return this._context.Access.UpdateAsync(obj);
+        return this._context.Collection(Access).UpdateAsync(obj);
     }
 
     public override async UpdateObjectAndRelationsAsync<U extends keyof Access>(obj: Access, relations: U[]): Promise<Access> {
 
         this.ValidateObject(obj);
 
-        return await this._context.Access.UpdateObjectAndRelationsAsync(obj, relations);
+        return await this._context.Collection(Access).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
     public override async DeleteAsync(obj: Access): Promise<Access> {
-        return this._context.Access.DeleteAsync(obj);
+        return this._context.Collection(Access).DeleteAsync(obj);
     }
     
     public override async GetAllAsync(): Promise<Access[]> {
-        return await this._context.Access.OrderBy("Company").ToListAsync();
+        return await this._context.Collection(Access).OrderBy("Company").ToListAsync();
     }
 
     public override ValidateObject(obj: Access): void {

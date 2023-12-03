@@ -1,6 +1,6 @@
 import { Inject } from 'web_api_base';
 import Appointment from "../core/entities/Appointment";
-import { Operation } from "myorm_pg";
+import { Operation } from "myorm_core";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import AbstractAppointmentService  from "../core/abstractions/AbstractAppointmentService";
 import User from "../core/entities/User";
@@ -19,7 +19,7 @@ export default class AppointmentService extends AbstractAppointmentService {
     }
 
     public async CountAsync(): Promise<number> {
-        return await this._context.Checkpoints.CountAsync();
+        return await this._context.Collection(Appointment).CountAsync();
     }
 
     public override async SetClientDatabaseAsync(client: string): Promise<void> {       
@@ -32,11 +32,11 @@ export default class AppointmentService extends AbstractAppointmentService {
 
     public override async ExistsAsync(id: number): Promise<boolean> {
         
-        return (await this._context.Appointments.WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+        return (await this._context.Collection(Appointment).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
     public override async GetByIdAsync(id: number): Promise<Appointment | undefined> {
-        return await this._context.Appointments.WhereField("Id").IsEqualTo(id).LoadRelationOn("User").FirstOrDefaultAsync();
+        return await this._context.Collection(Appointment).WhereField("Id").IsEqualTo(id).LoadRelationOn("User").FirstOrDefaultAsync();
     }
 
     public override async AddAsync(obj: Appointment): Promise<Appointment> {
@@ -46,45 +46,45 @@ export default class AppointmentService extends AbstractAppointmentService {
         if (!obj.User.Company)
             throw new InvalidEntityException(`The user of this Appointment has no company`);
 
-        return this._context.Appointments.AddAsync(obj);
+        return this._context.Collection(Appointment).AddAsync(obj);
     }
 
     public override async UpdateAsync(obj: Appointment): Promise<Appointment> {
 
         this.ValidateObject(obj);
-        return await this._context.Appointments.UpdateAsync(obj);
+        return await this._context.Collection(Appointment).UpdateAsync(obj);
     }
 
     public override async UpdateObjectAndRelationsAsync<U extends keyof Appointment>(obj: Appointment, relations: U[]): Promise<Appointment> {
 
         this.ValidateObject(obj);
 
-        return await this._context.Appointments.UpdateObjectAndRelationsAsync(obj, relations);
+        return await this._context.Collection(Appointment).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
     public override async DeleteAsync(obj: Appointment): Promise<Appointment> {
-        return this._context.Appointments.DeleteAsync(obj);
+        return this._context.Collection(Appointment).DeleteAsync(obj);
     }
 
 
     public override async GetAllAsync(): Promise<Appointment[]> {
-        return await this._context.Appointments.OrderDescendingBy("Date").ToListAsync();
+        return await this._context.Collection(Appointment).OrderDescendingBy("Date").ToListAsync();
     }
 
     public override async GetByAndLoadAsync<K extends keyof Appointment>(key: K, value: Appointment[K], load: K[]): Promise<Appointment[]> 
     {
-       this._context.Appointments.Where({Field : key, Value : value});
+       this._context.Collection(Appointment).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Appointments.Join(l);
+            this._context.Collection(Appointment).Join(l);
         
-       return await this._context.Appointments.ToListAsync();
+       return await this._context.Collection(Appointment).ToListAsync();
     } 
 
 
     public override async GetCurrentDayByUser(user: User): Promise<Appointment | undefined> {
         
-        return await this._context.Appointments
+        return await this._context.Collection(Appointment)
             .Where({
                 Field: "User",
                 Value: user!
@@ -102,7 +102,7 @@ export default class AppointmentService extends AbstractAppointmentService {
     public override async GetByUserAndDates(user : User, start: Date, end: Date): Promise<Appointment[]> {
        
 
-        return await this._context.Appointments
+        return await this._context.Collection(Appointment)
             .Where({
                 Field: "User",
                 Value: user

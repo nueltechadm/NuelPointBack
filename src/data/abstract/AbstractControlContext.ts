@@ -1,12 +1,6 @@
-import { AbstractContext, AbstractSet } from 'myorm_pg';
-import Database from '../../core/entities/Database';
+import { AbstractContext } from 'myorm_core';
 
-export interface IControlContext 
+export default abstract class AbstractControlContext extends AbstractContext
 {
-    Databases: AbstractSet<Database>;
-}
-
-
-export default abstract class AbstractControlContext extends AbstractContext  implements IControlContext{
-    abstract Databases: AbstractSet<Database>;
+    
 }
