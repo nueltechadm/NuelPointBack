@@ -54,6 +54,7 @@ export default class DatabaseService extends AbstractDatabaseService{
 
             try{
 
+                await this._context.SetDatabaseAsync(db.Name);
                 await this._context.UpdateDatabaseAsync();
                 db.Status = DababaseStatus.UPDATED;                
 

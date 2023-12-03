@@ -85,17 +85,14 @@ export default class AppointamentController extends AbstractController
         if(!user)
             return this.BadRequest({Message : `The user with ID #${this.Request.APIAUTH.UserId} not exists`});       
 
-        let time = await this._timeService.GetByDayOfWeekAsync(user.Id, new Date().getDay());
-
-        if(!time)
-            return this.BadRequest({Message : `No one time is registered`});
+        let time = await this._timeService.GetByDayOfWeekAsync(user.Id, new Date().getDay());        
 
         let currentDayOfUser = await this._appointamentService.GetCurrentDayByUser(user);
 
         if(!currentDayOfUser)
-            currentDayOfUser = new Appointment(time, user);
+            currentDayOfUser = new Appointment(user, time);
 
-        currentDayOfUser.Checkpoints.push(new Checkpoint(user, dto.X, dto.Y, dto.Picture, user.Company!, time));
+        currentDayOfUser.Checkpoints.push(new Checkpoint(user, dto.X, dto.Y, dto.Picture, user.Company!, currentDayOfUser, time));
 
         if(currentDayOfUser.Id <= 0)
             await this._appointamentService.AddAsync(currentDayOfUser);
@@ -131,7 +128,7 @@ export default class AppointamentController extends AbstractController
 
         let appointaments = await this._appointamentService.GetByUserAndDates(user, start, end);        
 
-        return this.OK(Type.RemoveORMMetadata(appointaments));
+        return this.OK(Type.RemoveFieldsRecursive(appointaments));
     }  
 
 

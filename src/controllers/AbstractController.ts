@@ -15,13 +15,13 @@ export default abstract class AbstractController extends ControllerBase {
                     if(Type.IsObject(i))
                     {
                         Type.RemoveCircularReferences(i);   
-                        Type.RemoveORMMetadata(i);
+                        Type.RemoveFieldsRecursive(i, ["_orm_metadata_", "Password"]);
                     }
                 }
             }else if(Type.IsObject(result))
             {
                 Type.RemoveCircularReferences(result);   
-                Type.RemoveORMMetadata(result);                
+                Type.RemoveFieldsRecursive(result, ["_orm_metadata_", "Password"]);                
             }
         }
         

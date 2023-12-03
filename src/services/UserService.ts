@@ -179,10 +179,10 @@ export default class UserService  extends AbstractUserService
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${User.name} type`); 
 
-        if(!obj.Email)
+        if(!obj.Email && !obj.IsSuperUser)
           throw new InvalidEntityException(`The email of user is required`);
 
-        if(!obj.Name)
+        if(!obj.Name && !obj.IsSuperUser)
           throw new InvalidEntityException(`The name of user is required`);
 
         if(!obj.Company && !obj.IsSuperUser)

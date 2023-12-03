@@ -27,7 +27,7 @@ export default class AppointmentService extends AbstractAppointmentService {
     }
 
     public override IsCompatible(obj: any): obj is Appointment {
-        return ("User" in obj || "UserId" in obj) && "X" in obj && "Y" in obj;
+        return ("User" in obj || "UserId" in obj) && "Checkpoints" in obj;
     }
 
     public override async ExistsAsync(id: number): Promise<boolean> {

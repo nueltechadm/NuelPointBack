@@ -23,7 +23,7 @@ export default class Type
         return obj != undefined && typeof obj == "object";
     }
 
-    public static RemoveORMMetadata<T extends object>(obj? : T ) : T | undefined
+    public static RemoveFieldsRecursive<T extends object>(obj? : T, fields? : string[] ) : T | undefined
     {
         if(obj == undefined || obj == null)
             return obj;
@@ -33,6 +33,9 @@ export default class Type
             if(!k)
                 return;
 
+            if(typeof k === "function")
+                return
+
             if(["String", "Number"].indexOf(k.constructor.name) > -1)
                 return;
 
@@ -41,9 +44,11 @@ export default class Type
                 if(k[c] == undefined)
                     continue;
 
-                if(c == '_orm_metadata_')
-                {
-                    delete k._orm_metadata_;
+                if(fields?.Any(s => s === c))
+                { 
+                    if(fields?.Any())
+                        fields.forEach(f => delete k[f]);
+
                     continue;
                 }
 

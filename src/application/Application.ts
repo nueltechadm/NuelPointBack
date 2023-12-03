@@ -79,7 +79,7 @@ export default class App extends Application
         appConfig.AddScoped(AbstractDatabaseService, DatabaseService);       
 
         (async()=>{
-            await DependecyService.Resolve<ControlContext>(ControlContext)?.UpdateDatabaseAsync();
+            await DependecyService.Resolve<AbstractControlContext>(ControlContext)?.UpdateDatabaseAsync();
         })();
        
     }

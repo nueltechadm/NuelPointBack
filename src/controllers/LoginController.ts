@@ -58,7 +58,7 @@ export default class LoginController extends AbstractController
 
         let token = Generate(new Authorization(access.Username, user.Link, access.User.Id), 1);
 
-        return this.OK({User : Type.RemoveORMMetadata(access), Token : token});
+        return this.OK({User : Type.RemoveFieldsRecursive(access), Token : token});
         
     } 
 

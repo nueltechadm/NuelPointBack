@@ -146,33 +146,24 @@ export default class UserController extends AbstractController
     @UserController.ProducesType(200, "The user´s company", Company) 
     @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"})
     @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "The user with ID 1 not exists"})
-    public async UpdateCompany(@FromQuery()userId : number, @FromBody()company : Company) : Promise<ActionResult>
+    public async UpdateCompany(@FromQuery()userId : number, @FromQuery()companyId : number) : Promise<ActionResult>
     {
-        if(!userId || typeof userId != "number")
-            return this.BadRequest({Message : "Invalid userId"});
-
         let users = await this._userService.GetByAndLoadAsync("Id", userId, ["Company"]);
 
         if(users.length == 0)
             return this.NotFound({Message : `User with ID ${userId} not exists`});
 
-        if(company.Id <= 0)
-            this._companyService.ValidateObject(company);
-        else            
-        {
-            let companies = await this._companyService.GetByAndLoadAsync("Id", company.Id, []);
+        
+        let companies = await this._companyService.GetByAndLoadAsync("Id", companyId, []);
 
-            if(companies.length == 0)
-                return this.NotFound({Message : `Company with ID ${company.Id} not exists`});
-
-            company = companies[0];
-        }
-
-        users[0].Company = company;
+        if(!companies.Any())
+            return this.NotFound({Message : `Company with ID ${companyId} not exists`});     
+         
+        users[0].Company = companies.First();
 
         await this._userService.UpdateAsync(users[0]);
 
-        return this.OK(company);
+        return this.OK();
     }
 
 
@@ -183,10 +174,8 @@ export default class UserController extends AbstractController
     @UserController.ProducesType(200, "The user´s jobrole", JobRole)  
     @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"})
     @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "The user with ID 1 not exists"})   
-    public async UpdateJobRole(@FromQuery()userId : number, @FromBody()jobRole : JobRole) : Promise<ActionResult>
-    {
-        if(!userId || typeof userId != "number")
-            return this.BadRequest({Message : "Invalid userId"});
+    public async UpdateJobRole(@FromQuery()userId : number, @FromQuery()jobRoleId : number) : Promise<ActionResult>
+    {      
 
         let users = await this._userService.GetByAndLoadAsync("Id", userId, ["JobRole"]);
 
@@ -195,23 +184,16 @@ export default class UserController extends AbstractController
 
         let user = users[0];
 
-        if(jobRole.Id <= 0)
-            this._jobRoleService.ValidateObject(jobRole);
-        else            
-        {
-            let jobRoles = await this._jobRoleService.GetByAndLoadAsync("Id", jobRole.Id, []);
+        let jobRoles = await this._jobRoleService.GetByAndLoadAsync("Id", jobRoleId, []);
 
-            if(jobRoles.length == 0)
-                return this.NotFound({Message : `JobRole with ID ${jobRole.Id} not exists`});
+        if(!jobRoles.Any())
+            return this.NotFound({Message : `JobRole with ID ${jobRoleId} not exists`});        
 
-            jobRole = jobRoles[0];
-        }
-
-        user.JobRole = jobRole;
+        user.JobRole = jobRoles.First();
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK(jobRole);
+        return this.OK();
     }
     
     

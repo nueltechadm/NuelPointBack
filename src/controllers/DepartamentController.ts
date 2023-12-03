@@ -56,7 +56,7 @@ export default class DepartamentController extends AbstractController {
         if (!departament)
             return this.NotFound({ Message: "departament not found" });
 
-        return this.OK(Type.RemoveORMMetadata(departament));
+        return this.OK(Type.RemoveFieldsRecursive(departament));
     }
 
 

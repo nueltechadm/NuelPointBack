@@ -150,7 +150,7 @@ export class AccessController extends AbstractController {
 
         delete (access as any).Password;
 
-        return Type.RemoveORMMetadata(access);
+        return Type.RemoveFieldsRecursive(access);
     }
 
 }

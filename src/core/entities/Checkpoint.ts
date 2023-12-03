@@ -2,6 +2,7 @@ import {Table, Column, DataType, PrimaryKey, DBTypes, OneToOne, ManyToOne} from 
 import User from './User';
 import Company from './Company';
 import Time from './Time';
+import Appointment from './Appointment';
 
 
 @Table("checkpoint_tb")
@@ -36,14 +37,18 @@ export default class Checkpoint
     public Picture : string;
 
     @Column()
+    @ManyToOne(() => Appointment)
+    public Appointment : Appointment;
+
+    @Column()
     @ManyToOne(() => Company)
     public Company : Company;
 
     @Column()
     @ManyToOne(() => Time)
-    public Time : Time;
+    public Time? : Time;
     
-    constructor(user : User, x : number, y : number, picture : string, company : Company, time : Time)
+    constructor(user : User, x : number, y : number, picture : string, company : Company, appointament : Appointment, time? : Time)
     {
         this.Id = -1;
         this.Date = new Date();
@@ -52,6 +57,7 @@ export default class Checkpoint
         this.Y = y;
         this.Picture = picture;
         this.Company = company;
+        this.Appointment = appointament;
         this.Time = time;
         this.Observation = "";
         this.CheckpointType = CheckpointType.NORMAL;
