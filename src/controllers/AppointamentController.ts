@@ -1,10 +1,10 @@
 import { POST, PUT, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
+import 'formidable';
+import Path from 'path';
 import {IsLogged} from '../filters/AuthFilter';
 import AbstractCheckpointService from "../core/abstractions/AbstractCheckpointService";
-import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractFileService from "../services/abstractions/AbstractFileService";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
-import InvalidEntityException from "../exceptions/InvalidEntityException";
 
 import Appointment  from "../core/entities/Appointment";
 import  AbstractAppointmentService  from "../core/abstractions/AbstractAppointmentService";
@@ -16,6 +16,7 @@ import AbstractCompanyService from "../core/abstractions/AbstractCompanyService"
 import AbstractTimeService from "../core/abstractions/AbstractTimeService";
 import Checkpoint from "../core/entities/Checkpoint";
 import AppointmentDTO from "../dto/AppointmentDTO";
+import AbstractMultiPartRequestService, { PartType } from "../services/abstractions/AbstractMultiPartRequestService";
 
 
 
@@ -43,13 +44,19 @@ export default class AppointamentController extends AbstractController
     @Inject()
     private _fileService : AbstractFileService;
 
+
+
+    @Inject()
+    private _multiPartService : AbstractMultiPartRequestService;
+
     constructor(
         checkpoinService : AbstractCheckpointService, 
         fileService : AbstractFileService, 
         userService : AbstractUserService, 
         timeService : AbstractTimeService, 
         companyService : AbstractCompanyService,
-        appointamentService : AbstractAppointmentService
+        appointamentService : AbstractAppointmentService,
+        multiPartService : AbstractMultiPartRequestService
         )
     {
         super();                    
@@ -59,6 +66,7 @@ export default class AppointamentController extends AbstractController
         this._timeService = timeService;
         this._fileService = fileService;
         this._appointamentService = appointamentService;
+        this._multiPartService = multiPartService;
     }   
     
     
@@ -77,13 +85,42 @@ export default class AppointamentController extends AbstractController
     @SetDatabaseFromToken()
     @AppointamentController.ProducesType(200, "The just created Appointment object", Appointment)
     @AppointamentController.ProducesMessage(400, "A message telling what is missing", {Message : "The user with ID 1 not exists"})
-    public async InsertAsync(@FromBody()dto : AppointmentDTO) : Promise<ActionResult> 
+    public async InsertAsync() : Promise<ActionResult> 
     {  
         
         let user = await this._userService.GetByIdAsync(this.Request.APIAUTH.UserId);
 
         if(!user)
-            return this.BadRequest({Message : `The user with ID #${this.Request.APIAUTH.UserId} not exists`});       
+            return this.BadRequest({Message : `The user with ID #${this.Request.APIAUTH.UserId} not exists`}); 
+        
+        
+        let parts = await this._multiPartService.GetPartsFromRequestAsync(this.Request);
+        
+
+        if(
+            parts.Any() && 
+            parts.Any(s => s.Name == "Appointment" && s.Type == PartType.JSON) &&
+            parts.Any(s => s.Name == "picture" && s.Type == PartType.FILE)
+        )
+            return this.BadRequest({Message : `Appointament field and picture are required`});
+        
+            
+        let dto : AppointmentDTO = new  AppointmentDTO();
+        let filePart = parts.First(s => s.Type == PartType.FILE);
+        let image = Path.join(this._fileService.GetStorageDirectory(), filePart.Filename!);
+
+        await this._fileService.CopyAsync(filePart.Content, image);
+
+        await this._fileService.DeleteAsync(filePart.Content);
+        
+        try
+        { 
+            dto = parts.First(s => s.Name == "Appointament").Content.To<AppointmentDTO>();
+
+        }catch
+        { 
+            return this.BadRequest(`The appointament field is not of type ${AppointmentDTO.name}`);
+        }        
 
         let time = await this._timeService.GetByDayOfWeekAsync(user.Id, new Date().getDay());        
 
@@ -92,18 +129,17 @@ export default class AppointamentController extends AbstractController
         if(!currentDayOfUser)
             currentDayOfUser = new Appointment(user, time);
 
-        currentDayOfUser.Checkpoints.push(new Checkpoint(user, dto.X, dto.Y, dto.Picture, user.Company!, currentDayOfUser, time));
+        let checkpoint = new Checkpoint(user, dto.X, dto.Y, image, user.Company!, currentDayOfUser, time);
+
+        currentDayOfUser.Checkpoints.push(checkpoint);
 
         if(currentDayOfUser.Id <= 0)
             await this._appointamentService.AddAsync(currentDayOfUser);
         else
-            await this._appointamentService.UpdateAsync(currentDayOfUser);
-
-        return this.OK(currentDayOfUser);
-              
+            await this._appointamentService.UpdateAsync(currentDayOfUser);        
+        
+        return this.OK(checkpoint);
     }
-
-
 
 
     @PUT("update")    

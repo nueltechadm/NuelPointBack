@@ -1,4 +1,5 @@
 import 'ts_linq_base';
+import '../extensions';
 
 import { Application, IApplicationConfiguration, DependecyService } from 'web_api_base';
 import DBContext from '../data/DBContext';
@@ -44,6 +45,8 @@ import EntityNotFoundException from '../exceptions/EntityNotFoundException';
 import { ApplicationExceptionHandler } from 'web_api_base/dist/interfaces/IApplication';
 import AbstractDBContext from '../data/abstract/AbstractDBContext';
 import AbstractControlContext from '../data/abstract/AbstractControlContext';
+import AbstractMultiPartRequestService from '../services/abstractions/AbstractMultiPartRequestService';
+import FormidableMultiPartRequestService from '../services/FormidableMultiPartRequestService';
 
 
 export default class App extends Application
@@ -61,10 +64,12 @@ export default class App extends Application
         this.ApplicationThreadExeptionHandler = this.ApplicationThreadExeptionEvent;
 
         appConfig.AddScoped(AbstractDBContext, DBContext);
-        appConfig.AddScoped(AbstractControlContext, ControlContext);        
-
-        process.env["ROOT"] = appConfig.RootPath;
+        appConfig.AddScoped(AbstractControlContext, ControlContext);  
         
+        appConfig.AddScoped(AbstractMultiPartRequestService, FormidableMultiPartRequestService); 
+
+        process.env["ROOT"] = appConfig.RootPath; 
+
         appConfig.AddScoped(AbstractUserService, UserService);
         appConfig.AddScoped(AbstractDepartamentService, DepartamentService);
         appConfig.AddScoped(AbstractPermissionService, PermissionService);

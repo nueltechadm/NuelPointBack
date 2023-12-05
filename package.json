@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "crypto-js": "^4.1.1",
-    "formidable": "^2.1.1",
+    "formidable": "^2.1.2",
     "jsonwebtoken": "^9.0.0",
     "myorm_core": "^1.0.2",
     "myorm_pg": "^5.0.2",

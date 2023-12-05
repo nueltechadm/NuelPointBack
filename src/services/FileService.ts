@@ -3,20 +3,31 @@ import File from 'fs';
 import FileAsync from 'fs/promises';
 import Path from 'path';
 import FileServiceBase from "./abstractions/AbstractFileService";
-
+import { Application, ApplicationConfiguration, Exception } from 'web_api_base';
+import Checkpoint from '../core/entities/Checkpoint';
 
 
 export default class FileService extends FileServiceBase
 {
-    
+   
+    public override GetStorageDirectory(): string 
+    {
+       let dir = Path.join(Application.Configurations.RootPath, "disc");
 
-    public override CreateDirectory(path: string): Promise<void> {
+       if(!this.DirectoryExistsAsync(dir))
+            this.CreateDirectoryAsync(dir);
+
+        return dir;
+    }
+       
+
+    public override CreateDirectoryAsync(path: string): Promise<void> {
 
         return new Promise<void>(async (resolve, reject) => 
         {           
             try{
 
-               if(!await this.DirectoryExists(path))
+               if(!await this.DirectoryExistsAsync(path))
                     return resolve(File.mkdirSync(path));
                 
                 return resolve();
@@ -28,7 +39,7 @@ export default class FileService extends FileServiceBase
         });
     }
     
-    public override FileExists(file: string): Promise<boolean> {
+    public override FileExistsAsync(file: string): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => 
         {           
             try{
@@ -42,7 +53,7 @@ export default class FileService extends FileServiceBase
         });
     }
 
-    public override DirectoryExists(path: string): Promise<boolean> {
+    public override DirectoryExistsAsync(path: string): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => 
         {            
             try{
@@ -56,7 +67,7 @@ export default class FileService extends FileServiceBase
         });
     }
 
-    public override GetAllFiles(origin: string): Promise<string[]> {
+    public override GetAllFilesAsync(origin: string): Promise<string[]> {
         
         return new Promise<string[]>(async (resolve, reject) => 
         {
@@ -76,7 +87,7 @@ export default class FileService extends FileServiceBase
         });
     }
 
-    public override GetAllForders(origin: string): Promise<string[]> {
+    public override GetAllFordersAsync(origin: string): Promise<string[]> {
 
         return new Promise<string[]>(async (resolve, reject) => 
         {
@@ -115,9 +126,61 @@ export default class FileService extends FileServiceBase
             }
         });
         
+    }      
+
+    public override DeleteAsync(file: string): Promise<void> {
+     
+        return new Promise<void>(async (resolve, reject)=>
+        {
+            try{
+                await File.unlink(origin, (err) => 
+                {
+                    if(err) 
+                        throw err;
+
+                    resolve();
+                })
+
+            }catch(err)
+            {
+                reject(err);
+            }
+        });
+        
+    }      
+
+
+    public ComputeDirectory(checkpoint: Checkpoint): string {
+       
+        if(!checkpoint.User)
+            throw new Exception("User is required to compute the checkpoint directory");
+
+        if(!checkpoint.User.Company)
+            throw new Exception("User's company is required to compute the checkpoint directory");
+
+        let company = checkpoint.User.Company?.Id;
+        let user = checkpoint.User.Id;
+        let date = checkpoint.Date;
+        let dateStr = `_${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        let path = Path.join(this.GetStorageDirectory(), `_${company}`, `_${user}`, dateStr);
+
+        this.CreateDirectoryAsync(path);
+
+        return path;
+
     }
 
-   
+
+    public async ComputeNextFileNameAsync(checkpoint: Checkpoint): Promise<string> {
+
+        let path = this.ComputeDirectory(checkpoint);
+
+        let files = await this.GetAllFilesAsync(path);
+
+        let name = `_${files.Count() + 1}`;
+
+        return Path.join(path, name);
+    }
     
 }
 
