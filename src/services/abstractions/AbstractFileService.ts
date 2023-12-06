@@ -11,8 +11,8 @@ export default abstract class AbstractFileService
     public abstract FileExistsAsync(file: string): Promise<boolean>;
     public abstract DirectoryExistsAsync(path: string): Promise<boolean>;
     public abstract CreateDirectoryAsync(path: string): Promise<void>;
-    public abstract GetStorageDirectory() : string;  
-    public abstract ComputeDirectory(checkpoint : Checkpoint) : string;     
+    public abstract GetStorageDirectoryAsync() : Promise<string>;  
+    public abstract ComputeDirectoryAsync(checkpoint : Checkpoint) : Promise<string>;     
     public abstract ComputeNextFileNameAsync(checkpoint : Checkpoint) : Promise<string>;     
    
 }

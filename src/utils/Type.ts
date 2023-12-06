@@ -28,15 +28,18 @@ export default class Type
         if(obj == undefined || obj == null)
             return obj;
 
-        let removeRecursive = (k : any) => 
+        let removeRecursive = (k : any, o : any) => 
         {
             if(!k)
                 return;
 
             if(typeof k === "function")
+                return;
+
+            if(k.constructor == Array)
                 return
 
-            if(["String", "Number"].indexOf(k.constructor.name) > -1)
+            if(["String", "Number", "Date"].indexOf(k.constructor.name) > -1)
                 return;
 
             for(let c in k)
@@ -52,20 +55,23 @@ export default class Type
                     continue;
                 }
 
+                if(k[c] == o)
+                    continue;
+
                 if(["String", "Number"].indexOf(k[c].constructor.name) > -1)
                     continue;
 
                 if(k[c].constructor.name == "Array")
                 {
                     for(let i of k[c])
-                        removeRecursive(i);
+                        removeRecursive(i, k);
                 }
 
-                removeRecursive(k[c]);
+                removeRecursive(k[c], k);
             }           
         };
 
-        removeRecursive(obj);
+        removeRecursive(obj, obj);
 
         return obj;
     }
@@ -122,46 +128,50 @@ export default class Type
     }
 
 
-    public static RemoveCircularReferences<T extends object, K extends keyof T>(removeThis: T, fromThis? : T[K]) : T
-    {
-        let source : any = fromThis ?? removeThis;        
+    public static RemoveCircularReferences<T extends object, K extends keyof T>(origin: T, removeThis? : T[K]) : T
+    {        
+        let source = origin as any;
+
+        if(source == undefined || source.constructor == Array)
+            return source;  
 
         for(let c in source)
         {
+            if(c == "_orm_metadata_")
+                continue;
+
             if(!source[c])
                 continue;
 
-            if(["string", "boolean", "number"].includes(typeof source[c]))
+            if(["string", "boolean", "number", "function"].includes(typeof source[c]))
                 continue;
 
+            if(source[c] instanceof Date)
+                continue;
+                
             let isArray = source[c].constructor == Array;
 
-            if(isArray && source[c].lenght > 0)
+            if(isArray && source[c].Any())
             {
-                if(source[c].filter((s : any) => s == removeThis))
-                    source[c] = source[c].filter((s : any) => s != removeThis);  
-                
-                for(let i of source[c]){
-
-                    Type.RemoveCircularReferences(removeThis, i);
-                    Type.RemoveCircularReferences(i);
+                for(let i of source[c]){                    
+                    Type.RemoveCircularReferences(i, source);                    
                 }
 
                 continue;
             }
 
-            if(source[c] == removeThis)
-                source[c] = undefined;
-            else{
+            if(isArray)
+                continue;
 
-                Type.RemoveCircularReferences(removeThis, source[c]);
-                Type.RemoveCircularReferences(source[c]);
+            if(source[c] == removeThis ?? source)
+                source[c] = undefined;
+            else{ 
+                Type.RemoveCircularReferences(source[c], undefined);                
             }
             
         }
 
         return source as T;
-    }      
-
+    }  
        
 }

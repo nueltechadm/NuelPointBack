@@ -34,7 +34,7 @@ export default class Checkpoint
     public Y : number;
 
     @Column()
-    public Picture : string;
+    public Picture? : string;
 
     @Column()
     @ManyToOne(() => Appointment)
@@ -48,14 +48,14 @@ export default class Checkpoint
     @ManyToOne(() => Time)
     public Time? : Time;
     
-    constructor(user : User, x : number, y : number, picture : string, company : Company, appointament : Appointment, time? : Time)
+    constructor(user : User, x : number, y : number, company : Company, appointament : Appointment, time? : Time)
     {
         this.Id = -1;
         this.Date = new Date();
         this.User = user;
         this.X = x;
         this.Y = y;
-        this.Picture = picture;
+        this.Picture = undefined;
         this.Company = company;
         this.Appointment = appointament;
         this.Time = time;

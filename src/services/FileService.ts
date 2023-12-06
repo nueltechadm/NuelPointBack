@@ -9,17 +9,7 @@ import Checkpoint from '../core/entities/Checkpoint';
 
 export default class FileService extends FileServiceBase
 {
-   
-    public override GetStorageDirectory(): string 
-    {
-       let dir = Path.join(Application.Configurations.RootPath, "disc");
-
-       if(!this.DirectoryExistsAsync(dir))
-            this.CreateDirectoryAsync(dir);
-
-        return dir;
-    }
-       
+      
 
     public override CreateDirectoryAsync(path: string): Promise<void> {
 
@@ -28,7 +18,10 @@ export default class FileService extends FileServiceBase
             try{
 
                if(!await this.DirectoryExistsAsync(path))
-                    return resolve(File.mkdirSync(path));
+               {
+                    File.mkdirSync(path, {recursive: true});
+                    return resolve();
+               }                    
                 
                 return resolve();
 
@@ -133,7 +126,7 @@ export default class FileService extends FileServiceBase
         return new Promise<void>(async (resolve, reject)=>
         {
             try{
-                await File.unlink(origin, (err) => 
+                await File.unlink(file, (err) => 
                 {
                     if(err) 
                         throw err;
@@ -149,8 +142,21 @@ export default class FileService extends FileServiceBase
         
     }      
 
+    public override async GetStorageDirectoryAsync(): Promise<string> 
+    {
+       let dir = Application.Configurations.DEBUG ? 
+       Path.join(Application.Configurations.RootPath, "dist", "storage") :
+       Path.join(Application.Configurations.RootPath, "storage");
 
-    public ComputeDirectory(checkpoint: Checkpoint): string {
+       if(!await this.DirectoryExistsAsync(dir))
+            await this.CreateDirectoryAsync(dir);
+
+        return dir;
+    }
+       
+
+
+    public async ComputeDirectoryAsync(checkpoint: Checkpoint): Promise<string> {
        
         if(!checkpoint.User)
             throw new Exception("User is required to compute the checkpoint directory");
@@ -161,10 +167,10 @@ export default class FileService extends FileServiceBase
         let company = checkpoint.User.Company?.Id;
         let user = checkpoint.User.Id;
         let date = checkpoint.Date;
-        let dateStr = `_${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-        let path = Path.join(this.GetStorageDirectory(), `_${company}`, `_${user}`, dateStr);
+        let dateStr = `_${date.getFullYear()}_${date.getMonth()}_${date.getDate()}`;
+        let path = Path.join(await this.GetStorageDirectoryAsync(), `_${company}`, `_${user}`, dateStr);
 
-        this.CreateDirectoryAsync(path);
+        await this.CreateDirectoryAsync(path);
 
         return path;
 
@@ -173,7 +179,7 @@ export default class FileService extends FileServiceBase
 
     public async ComputeNextFileNameAsync(checkpoint: Checkpoint): Promise<string> {
 
-        let path = this.ComputeDirectory(checkpoint);
+        let path = await this.ComputeDirectoryAsync(checkpoint);
 
         let files = await this.GetAllFilesAsync(path);
 

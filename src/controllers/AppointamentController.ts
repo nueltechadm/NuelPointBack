@@ -87,15 +87,12 @@ export default class AppointamentController extends AbstractController
     @AppointamentController.ProducesMessage(400, "A message telling what is missing", {Message : "The user with ID 1 not exists"})
     public async InsertAsync() : Promise<ActionResult> 
     {  
-        
         let user = await this._userService.GetByIdAsync(this.Request.APIAUTH.UserId);
 
         if(!user)
-            return this.BadRequest({Message : `The user with ID #${this.Request.APIAUTH.UserId} not exists`}); 
+            return this.BadRequest({Message : `The user with ID #${this.Request.APIAUTH.UserId} not exists`});         
         
-        
-        let parts = await this._multiPartService.GetPartsFromRequestAsync(this.Request);
-        
+        let parts = await this._multiPartService.GetPartsFromRequestAsync(this.Request);        
 
         if(
             parts.Any() && 
@@ -106,12 +103,7 @@ export default class AppointamentController extends AbstractController
         
             
         let dto : AppointmentDTO = new  AppointmentDTO();
-        let filePart = parts.First(s => s.Type == PartType.FILE);
-        let image = Path.join(this._fileService.GetStorageDirectory(), filePart.Filename!);
-
-        await this._fileService.CopyAsync(filePart.Content, image);
-
-        await this._fileService.DeleteAsync(filePart.Content);
+        let filePart = parts.First(s => s.Type == PartType.FILE);       
         
         try
         { 
@@ -129,7 +121,15 @@ export default class AppointamentController extends AbstractController
         if(!currentDayOfUser)
             currentDayOfUser = new Appointment(user, time);
 
-        let checkpoint = new Checkpoint(user, dto.X, dto.Y, image, user.Company!, currentDayOfUser, time);
+        let checkpoint = new Checkpoint(user, dto.X, dto.Y, user.Company!, currentDayOfUser, time);
+
+        let image = Path.join(await this._fileService.ComputeDirectoryAsync(checkpoint), filePart.Filename!);        
+
+        await this._fileService.CopyAsync(filePart.Content, image);
+
+        await this._fileService.DeleteAsync(filePart.Content);
+
+        checkpoint.Picture = image;
 
         currentDayOfUser.Checkpoints.push(checkpoint);
 
