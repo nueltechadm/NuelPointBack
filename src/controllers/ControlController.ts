@@ -90,7 +90,7 @@ export default class ControlController extends ControllerBase {
         if(db.Status == DababaseStatus.UPDATING)
             return this.OK({Message : `The database ${name} is already updating`});
     
-        if(db.Status == DababaseStatus.CREATED || db.Status == DababaseStatus.UPDATED)
+        if(db.Status == DababaseStatus.CREATED || db.Status == DababaseStatus.UPDATED || db.Status == DababaseStatus.UPDATEFAIL)
         {            
             (async()=>
             {

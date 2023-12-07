@@ -17,7 +17,7 @@
     "myorm_core": "^1.0.2",
     "myorm_pg": "^5.0.2",
     "ts_linq_base": "^1.0.4",
-    "web_api_base": "^4.0.0"
+    "web_api_base": "^4.0.2"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
