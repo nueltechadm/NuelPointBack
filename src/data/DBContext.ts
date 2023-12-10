@@ -37,7 +37,7 @@ export default class DBContext extends PGDBContext implements IDBChangeable
     constructor()
     {       
         
-        super(PGDBManager.Build("localhost", 5434, "database", "supervisor", "sup"));       
+        super(PGDBManager.BuildFromEnviroment());       
         
         this.Users = new PGDBSet(User, this);
         this.Access = new PGDBSet(Access, this);

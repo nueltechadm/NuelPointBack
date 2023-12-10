@@ -36,6 +36,7 @@ export default class CompanyService  extends AbstractCompanyService
         return await this._context.Collection(Company)
         .WhereField("Id")
         .IsEqualTo(id)
+        .LoadRelationOn("Departaments")
         .LoadRelationOn("Address")
         .LoadRelationOn("Accesses")
         .LoadRelationOn("Contacts")

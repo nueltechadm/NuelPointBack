@@ -7,7 +7,7 @@ export default class ControlContext extends PGDBContext {
 
     constructor() {
 
-        super(PGDBManager.Build("localhost", 5434, "control_db", "supervisor", "sup"));
+        super(PGDBManager.BuildFromEnviroment());
 
         this.Databases = new PGDBSet(Database, this);
     }
