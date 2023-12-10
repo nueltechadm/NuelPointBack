@@ -18,6 +18,16 @@ export default class Type
         return true;
     }
 
+    public static Delete<T extends object>(obj : T, key : keyof T) : T
+    {
+        if(!obj)
+            return obj;
+
+        delete obj[key];
+
+        return obj;
+    }
+
     public static IsObject(obj : any) : obj is object
     {
         return obj != undefined && typeof obj == "object";
@@ -83,25 +93,58 @@ export default class Type
         return Type.FillObject(base);
     }
 
-    public static CreateTemplateFrom<T extends object>(ctor : new (...args: any[]) => T) : T
+    public static CreateTemplateWithPrimitivesFields<T extends object>(ctor : new (...args: any[]) => T) : T
     {
-        let base = Reflect.construct(ctor, []) as T;
+        let o = Type.CreateTemplateFrom(ctor);
 
-        for(let map of TP.GetColumnNameAndType(ctor))
+        for(let c in o)
         {
-            let relation = Schema.GetRelationAttribute(ctor, map.Field);
-            let designType = TP.GetDesingType(ctor, map.Field);
-
-            if(relation && designType)
+            if((o as any)[c] && (o as any)[c].constructor == Array)
             {
-                if(designType != Array)                
-                    (base as any)[map.Field] = Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object);
-                else
-                    (base as any)[map.Field] = [Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object)];
+                o = Type.Delete(o, c as keyof(typeof o));
             }
         }
 
+        return o;
+    }
+
+    public static CreateTemplateFrom<T extends object>(ctor : new (...args: any[]) => T, recursive = false) : T
+    {
+        let base = Reflect.construct(ctor, []) as T;
+
+        if(recursive)
+            for(let map of TP.GetColumnNameAndType(ctor))
+            {
+                let relation = Schema.GetRelationAttribute(ctor, map.Field);
+                let designType = TP.GetDesingType(ctor, map.Field);
+
+                if(relation && designType)
+                {
+                    if(designType != Array)                
+                        (base as any)[map.Field] = Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object);
+                    else
+                        (base as any)[map.Field] = [Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object)];
+                }
+            }       
+
         return Type.FillObject(base);
+    }
+
+    public static RemoveAllRelationedObject<T extends object>(obj : T) : T
+    {
+        for(let c in obj)
+        {
+            let d = TP.GetDesingType((obj as any).constructor, c);
+
+            if(!d)
+                continue;
+
+            if(!["Number", "String", "Boolean", "Date"].Any(s => s == d?.name))
+                Reflect.set(obj, c, undefined);
+               
+        }
+
+        return obj;
     }
 
     public static FillObject<T extends object>(obj : T) : T
@@ -122,6 +165,8 @@ export default class Type
                 (obj as any)[c] = false;
             else  if(d.name === "Date")
                 (obj as any)[c] = new Date();
+            else  if(d.name === "Array")
+                (obj as any)[c] = [];
         }
 
         return obj;

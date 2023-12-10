@@ -80,7 +80,7 @@ export default class UserService  extends AbstractUserService
      
     }
 
-    public override async GetByAndLoadAsync<K extends keyof User>(key: K, value: User[K], load: K[]): Promise<User[]> 
+    public override async GetByAndLoadAsync<K extends keyof User>(key: K, value: User[K], load: (keyof User)[]): Promise<User[]> 
     {
        this._context.Collection(User).Where({Field : key, Value : value});
 

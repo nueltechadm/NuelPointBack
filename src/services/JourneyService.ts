@@ -60,7 +60,7 @@ export default class JourneyService  extends AbstractJorneyService
         return await this._context.Collection(Journey).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public override async GetByAndLoadAsync<K extends keyof Journey>(key: K, value: Journey[K], load: K[]): Promise<Journey[]> 
+    public override async GetByAndLoadAsync<K extends keyof Journey>(key: K, value: Journey[K], load: (keyof Journey)[]): Promise<Journey[]> 
     {
        this._context.Collection(Journey).Where({Field : key, Value : value});
 

@@ -50,7 +50,7 @@ export default class JobRoleService  extends AbstractJobRoleService
         return this._context.Collection(JobRole).AddAsync(obj);
     }
 
-    public override async GetByAndLoadAsync<K extends keyof JobRole>(key: K, value: JobRole[K], load: K[]): Promise<JobRole[]> 
+    public override async GetByAndLoadAsync<K extends keyof JobRole>(key: K, value: JobRole[K], load: (keyof JobRole)[]): Promise<JobRole[]> 
     {
        this._context.Collection(JobRole).Where({Field : key, Value : value});
 

@@ -36,7 +36,7 @@ export default class TimeService extends AbstractTimeService {
         return (await this._context.Collection(Time).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async GetByAndLoadAsync<K extends keyof Time>(key: K, value: Time[K], load: K[]): Promise<Time[]> 
+    public override async GetByAndLoadAsync<K extends keyof Time>(key: K, value: Time[K], load: (keyof Time)[]): Promise<Time[]> 
     {
        this._context.Collection(Time).Where({Field : key, Value : value});
 

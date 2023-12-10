@@ -101,7 +101,7 @@ export default class CheckpointService  extends AbstractCheckpointService
     }
 
 
-    public override async GetByAndLoadAsync<K extends keyof Checkpoint>(key: K, value: Checkpoint[K], load: K[]): Promise<Checkpoint[]> 
+    public override async GetByAndLoadAsync<K extends keyof Checkpoint>(key: K, value: Checkpoint[K], load: (keyof Checkpoint)[]): Promise<Checkpoint[]> 
     {
        this._context.Collection(Checkpoint).Where({Field : key, Value : value});
 

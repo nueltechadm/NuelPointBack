@@ -1,6 +1,6 @@
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RequestJson, ActionResult } from "web_api_base";
 import { IsLogged } from '../filters/AuthFilter';
-import AbstractCompanyService, { FilterParamas } from "../core/abstractions/AbstractCompanyService";
+import AbstractCompanyService, { CompanyPaginatedFilterRequest, CompanyPaginatedFilterResponse } from "../core/abstractions/AbstractCompanyService";
 import Company from "../core/entities/Company";
 import Type from "../utils/Type";
 import AbstractController from "./AbstractController";
@@ -31,8 +31,7 @@ export default class CompanyController extends AbstractController {
     @SetDatabaseFromToken()
     @CompanyController.ProducesType(200, "List of all comapanies in client database" , Company, true)    
     public async GetAllAsync(): Promise<ActionResult> 
-    {                
-
+    { 
         return this.OK(await this._service.GetAllAsync());
     }
 
@@ -41,15 +40,11 @@ export default class CompanyController extends AbstractController {
 
     @POST("filter")    
     @SetDatabaseFromToken()
-    @RequestJson(JSON.stringify(FilterParamas.GetTemplate(), null, 2))
-    @CompanyController.ProducesType(200, "List of all comapanies retrived by filters" , CompanyFilterDTO)    
-    public async FilterAsync(@FromBody()params : FilterParamas) : Promise<ActionResult>
-    {
-        let companies = await this._service.FilterAsync(params);
-
-        let result = new CompanyFilterDTO(companies, params.Quantity, await this._service.CountAsync(), params.Page);
-
-        return this.OK(result);
+    @CompanyController.ReceiveType(CompanyPaginatedFilterRequest)
+    @CompanyController.ProducesType(200, "List of all comapanies retrived by filters" , CompanyPaginatedFilterResponse)    
+    public async FilterAsync(@FromBody()params : CompanyPaginatedFilterRequest) : Promise<ActionResult>
+    {  
+        return this.OK(await this._service.FilterAsync(params));
     }
 
 
@@ -59,13 +54,8 @@ export default class CompanyController extends AbstractController {
     @CompanyController.ProducesType(200, "Company filtered by name" , Company)   
     @CompanyController.ProducesMessage(404, "Not found the company", {Message : "Company not found"})
     public async GetByNameAsync(@FromQuery("name") name : string) : Promise<ActionResult>
-    {
-        let company = await this._service.GetByNameAsync(name);   
-        
-        if(!company)
-            return this.NotFound({Message : "Company not found"});
-        else
-            return this.OK(company);        
+    {         
+        return this.OK(await this._service.GetByNameAsync(name));        
     }
 
 
@@ -86,13 +76,11 @@ export default class CompanyController extends AbstractController {
     }
 
 
-
     @POST("insert")    
     @SetDatabaseFromToken()
-    @CompanyController.ReceiveType(Company)
-    @CompanyController.ProducesType(200, "Just created company" , Company)  
-    @CompanyController.ProducesMessage(400, "Invalid object", {Message : "Message describing the error"})
-    @CompanyController.ProducesMessage(400, "Company already exists", {Message : "Already exists a company with name <company.name>"})
+    @RequestJson(CompanyController.CreateTemplateToInsertAndUpdate())
+    @CompanyController.ProducesMessage(200, 'Success message', {Message : "Company created"})
+    @CompanyController.ProducesMessage(400, 'Error message', {Message : 'Message describing the error'})    
     public async InsertAsync(@FromBody() company: Company) : Promise<ActionResult>
     {        
         company.Id = -1;
@@ -108,24 +96,26 @@ export default class CompanyController extends AbstractController {
     }
 
 
-
-
     @PUT("update")    
     @SetDatabaseFromToken()
-    @CompanyController.ReceiveType(Company)
-    @CompanyController.ProducesType(200, "Just created company" , Company)  
-    @CompanyController.ProducesMessage(400, "Invalid object", {Message : "Message describing the error"})
-    @CompanyController.ProducesMessage(404, "Company not found ", {Message : "Company not found"})
+    @RequestJson(CompanyController.CreateTemplateToInsertAndUpdate())
+    @CompanyController.ProducesMessage(200, 'Success message', {Message : "Company updated"})
+    @CompanyController.ProducesMessage(400, 'Error message', {Message : 'Message describing the error'})  
+    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})
     public async UpdateAsync(@FromBody() company: Company) : Promise<ActionResult> 
-    {
-        
+    {        
         if(!company || !company.Id)
             return this.BadRequest({ Message: "Id is required" });
 
         let fromDB = await this._service.GetByIdAsync(company.Id);
 
         if (!fromDB)
-            return this.NotFound({ Message: "Company not found" });
+            return this.NotFound({ Message: "Company not found" }); 
+        
+        let exists = await this._service.GetByNameAsync(company.Name);
+
+        if(exists.Any(s => s.Id != company.Id))
+            return this.BadRequest({Message : `Already exists a company with name : "${company.Name}"`});
 
         await this._service.UpdateObjectAndRelationsAsync(company, ["Departaments", "Contacts"]);
 
@@ -134,17 +124,12 @@ export default class CompanyController extends AbstractController {
 
 
 
-
     @DELETE("delete")    
     @SetDatabaseFromToken()    
-    @CompanyController.ProducesType(200, "Just deleted company" , Company)  
-    @CompanyController.ProducesMessage(400, "Invalid object", {Message : "Message describing the error"})
-    @CompanyController.ProducesMessage(404, "Company not found ", {Message : "Company not found"})    
+    @CompanyController.ProducesMessage(200, 'Success message', {Message : "Company deleted"})     
+    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})  
     public async DeleteAsync(@FromQuery() id: number) : Promise<ActionResult>
-    {
-        if (!id)
-            return this.BadRequest({ Message: "The ID must be greater than 0" });
-
+    {      
         let del = await this._service.GetByIdAsync(id);
 
         if (!del)
@@ -152,7 +137,6 @@ export default class CompanyController extends AbstractController {
 
         return this.OK(await this._service.DeleteAsync(del));
     }
-
 
     
 
@@ -162,7 +146,17 @@ export default class CompanyController extends AbstractController {
     {
         return this.OK(Type.CreateTemplateFrom<Company>(Company));
     }
-    
 
+        
+    protected static CreateTemplateToInsertAndUpdate() : string
+    {
+        let o = Type.CreateTemplateFrom(Company);
+        o = Type.Delete(o, 'Accesses');
+        o = Type.Delete(o, 'Users');
+        return JSON.stringify(o, null, 2);
+    }
 
 }
+
+
+

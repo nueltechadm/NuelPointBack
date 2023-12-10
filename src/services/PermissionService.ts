@@ -49,7 +49,7 @@ export default class PermissionService  extends AbstractPermissionService
         return await this._context.Collection(Permission).WhereField("Description").Constains(description).OrderBy("Description").ToListAsync();
     }  
     
-    public override async GetByAndLoadAsync<K extends keyof Permission>(key: K, value: Permission[K], load: K[]): Promise<Permission[]> 
+    public override async GetByAndLoadAsync<K extends keyof Permission>(key: K, value: Permission[K], load: (keyof Permission)[]): Promise<Permission[]> 
     {
        this._context.Collection(Permission).Where({Field : key, Value : value});
 

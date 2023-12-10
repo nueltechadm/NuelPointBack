@@ -49,7 +49,7 @@ export default class DepartamentService  extends AbstractDepartamentService
         return (await this._context.Collection(Departament).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async GetByAndLoadAsync<K extends keyof Departament>(key: K, value: Departament[K], load: K[]): Promise<Departament[]> 
+    public override async GetByAndLoadAsync<K extends keyof Departament>(key: K, value: Departament[K], load: (keyof Departament)[]): Promise<Departament[]> 
     {
        this._context.Collection(Departament).Where({Field : key, Value : value});
 

@@ -1,34 +1,39 @@
 import Company from "../entities/Company";
 import Departament from "../entities/Departament";
-import AbstractService from "./AbstractService";
+import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 export default abstract class AbstractCompanyService extends AbstractService<Company>
 {
     abstract GetByIdAsync(id : number) : Promise<Company | undefined>;    
-    abstract GetByNameAsync(name : string) : Promise<Company | undefined>;   
+    abstract GetByNameAsync(name : string) : Promise<Company[]>;   
     abstract AddDepartamentToAllAsync(departament : Departament) : Promise<void>;   
-    abstract FilterAsync(params : FilterParamas) : Promise<Company[]>
+    abstract FilterAsync(params : CompanyPaginatedFilterRequest) : Promise<CompanyPaginatedFilterResponse>
 
 }
 
-export class FilterParamas
+export /*sealed*/ class CompanyPaginatedFilterRequest extends PaginatedFilterRequest
 {
     Description? : string = undefined;
-    Name? : string = undefined;
-    Document? : string = undefined;
-    Active? : boolean = undefined;
-    Quantity : number = 10;
-    Page: number = 1;
+    Name : string = "";
+    Document : string = "";
+    Active : boolean = false;   
 
-    public static GetTemplate() : FilterParamas
+    constructor()
     {
-        let template = new FilterParamas();
-        template.Active = false;
-        template.Description = "Description";
-        template.Document = "Document";
-        template.Name = "Name";
-        template.Page = 1;
-        template.Quantity = 10;
-        return template;
+        super();
+    }
+    
+}
+
+
+export /*sealed*/ class CompanyPaginatedFilterResponse extends PaginatedFilterResult<Company>
+{
+    constructor(companies : Company[], quantity : number, total : number, page : number)
+    {
+        super();
+        this.Page = page;
+        this.Quantity = quantity;
+        this.Total = total;
+        this.Result = companies;
     }
 }

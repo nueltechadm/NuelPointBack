@@ -27,7 +27,7 @@ export default class AppointmentService extends AbstractAppointmentService {
     }
 
     public override IsCompatible(obj: any): obj is Appointment {
-        return ("User" in obj || "UserId" in obj) && "Checkpoints" in obj;
+        return  obj.constructor == Appointment && ("User" in obj || "UserId" in obj) && "Checkpoints" in obj;
     }
 
     public override async ExistsAsync(id: number): Promise<boolean> {
@@ -51,7 +51,9 @@ export default class AppointmentService extends AbstractAppointmentService {
 
     public override async UpdateAsync(obj: Appointment): Promise<Appointment> {
 
-        this.ValidateObject(obj);
+        if (!this.IsCompatible(obj))
+            throw new InvalidEntityException(`This object is not of ${Appointment.name} type`);
+
         return await this._context.Collection(Appointment).UpdateAsync(obj);
     }
 
@@ -71,7 +73,7 @@ export default class AppointmentService extends AbstractAppointmentService {
         return await this._context.Collection(Appointment).OrderDescendingBy("Date").ToListAsync();
     }
 
-    public override async GetByAndLoadAsync<K extends keyof Appointment>(key: K, value: Appointment[K], load: K[]): Promise<Appointment[]> 
+    public override async GetByAndLoadAsync<K extends keyof Appointment>(key: K, value: Appointment[K], load: (keyof Appointment)[]): Promise<Appointment[]> 
     {
        this._context.Collection(Appointment).Where({Field : key, Value : value});
 
