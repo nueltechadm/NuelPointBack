@@ -8,6 +8,7 @@ import Type from "../utils/Type";
 import AbstractController from "./AbstractController";
 import Authorization from "../utils/Authorization";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
+import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -31,15 +32,14 @@ export default class TimeController extends AbstractController {
 
 
 
-    @GET("list")     
+    @POST("list")     
     @SetDatabaseFromToken()
-    public async GetAllAsync(): Promise<ActionResult> {
-
-        let times = await this._service.GetAllAsync();  
-              
-        return this.OK(times);
+    public async GetAllAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    {             
+        return this.OK(await this._service.GetAllAsync(params));
     }
 
+    
     @GET("getById")
     @SetDatabaseFromToken()
     public async GetByIdAsync(@FromQuery() id: number) : Promise<ActionResult>

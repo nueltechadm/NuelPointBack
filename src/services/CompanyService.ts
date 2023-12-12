@@ -6,6 +6,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Departament from "../core/entities/Departament";
 import { AbstractSet, Operation } from "myorm_core";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
 
 export default class CompanyService  extends AbstractCompanyService
 {
@@ -43,19 +44,20 @@ export default class CompanyService  extends AbstractCompanyService
         .LoadRelationOn("Users")
         .FirstOrDefaultAsync();
     }   
+    
 
-    public override async FilterAsync(params: CompanyPaginatedFilterRequest): Promise<CompanyPaginatedFilterResponse> {        
-       
-        let offset = params.Page - 1 * params.Quantity; 
+    public override async GetAllAsync(request : CompanyPaginatedFilterRequest) : Promise<CompanyPaginatedFilterResponse>  
+    {
+        let offset = request.Page - 1 * request.Quantity; 
 
-        let total = await this.BuildQuery(params).CountAsync();
+        let total = await this.BuildQuery(request).CountAsync();
 
-        let companies = await this.BuildQuery(params).Limit(params.Quantity).Offset(offset).ToListAsync();  
+        let companies = await this.BuildQuery(request).Limit(request.Quantity).Offset(offset).ToListAsync();  
 
-        let result = new CompanyPaginatedFilterResponse(companies, companies.Count(), total, params.Page);
+        let result = new CompanyPaginatedFilterResponse(companies, companies.Count(), total, request.Page);
         
         return result;
-    }
+    }  
 
     protected BuildQuery(params : CompanyPaginatedFilterRequest) : AbstractSet<Company>
     {
@@ -127,9 +129,7 @@ export default class CompanyService  extends AbstractCompanyService
     }
 
 
-    public override async GetAllAsync(): Promise<Company[]> {
-        return await this._context.Collection(Company).OrderBy("Description").ToListAsync();
-    }    
+     
 
     public override async GetByNameAsync(name: string): Promise<Company[]> {        
         return await this._context.Collection(Company).Where({Field: "Name", Kind: Operation.CONSTAINS,  Value : name}).ToListAsync();

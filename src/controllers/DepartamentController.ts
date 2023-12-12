@@ -9,6 +9,7 @@ import AbstractController from "./AbstractController";
 import Authorization from "../utils/Authorization";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
 import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
+import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -35,14 +36,11 @@ export default class DepartamentController extends AbstractController {
 
 
 
-    @GET("list")     
+    @POST("list")     
     @SetDatabaseFromToken()
-    public async GetAllAsync(): Promise<ActionResult> 
-    {        
-
-        let departaments = await this._departamentService.GetAllAsync();  
-             
-        return this.OK(departaments);
+    public async GetAllAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    {             
+        return this.OK(await this._departamentService.GetAllAsync(params));
     }
 
 

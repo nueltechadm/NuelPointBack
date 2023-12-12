@@ -7,6 +7,7 @@ import AbstractCompanyService from "../core/abstractions/AbstractCompanyService"
 import AbstractController from "./AbstractController";
 import Authorization from "../utils/Authorization";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
+import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
 
 
 @UseBefore(IsLogged)
@@ -36,16 +37,16 @@ export class AccessController extends AbstractController {
 
 
 
-    @GET("list")    
+    @POST("list")    
     @SetDatabaseFromToken()
     @ProducesResponse({ Status : 200, Description: "List of accesses with no one related object", JSON: JSON.stringify(Type.CreateInstance(Access), null, 2)})
-    public async GetAllAsync(): Promise<ActionResult> {
+    public async GetAllAsync(@FromBody()paginatedRequest : PaginatedFilterRequest): Promise<ActionResult> {
 
-        let accesses = await this._accessService.GetAllAsync();
+        let paginatedResult = await this._accessService.GetAllAsync(paginatedRequest);
 
-        accesses.forEach(s => this.RemovePassWordAndMetadata(s));
+        paginatedResult.Result.forEach(s => this.RemovePassWordAndMetadata(s));
 
-        return this.OK(accesses);
+        return this.OK(paginatedResult);
     }
 
 
@@ -101,7 +102,7 @@ export class AccessController extends AbstractController {
     {
 
         if (access.Id == undefined || access.Id <= 0)
-            return this.BadRequest({ Message: "The ID must be greater than 0" });
+            return this.BadRequest({ Message: "The Id must be greater than 0" });
 
         let update = await this._accessService.GetByIdAsync(access.Id);
 

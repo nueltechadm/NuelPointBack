@@ -4,6 +4,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Access from "../core/entities/Access";
 import AbstractAccessService from "../core/abstractions/AbstractAccessService";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from '../core/abstractions/AbstractService';
 
 
 
@@ -84,8 +85,21 @@ export default class AcessService extends AbstractAccessService {
         return this._context.Collection(Access).DeleteAsync(obj);
     }
     
-    public override async GetAllAsync(): Promise<Access[]> {
-        return await this._context.Collection(Access).OrderBy("Company").ToListAsync();
+    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Access>> 
+    {
+        let offset = request.Page - 1 * request.Quantity; 
+
+        let total = await this._context.Collection(Access).CountAsync();
+
+        let accesses = await this._context.Collection(Access).OrderBy("Company").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        let result = new PaginatedFilterResult<Access>();
+        result.Page = request.Page;
+        result.Quantity = accesses.Count();
+        result.Total = total;
+        result.Result = accesses;
+
+        return result;
     }
 
     public override ValidateObject(obj: Access): void {

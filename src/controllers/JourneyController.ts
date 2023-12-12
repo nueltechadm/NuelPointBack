@@ -6,6 +6,7 @@ import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
 import Authorization from "../utils/Authorization";
 import AbstractJorneyService from "../core/abstractions/AbstractJorneyService";
 import Journey from "../core/entities/Journey";
+import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
 
 
 @UseBefore(IsLogged)
@@ -28,11 +29,11 @@ export default class JourneyController extends AbstractController {
 
     
 
-    @GET("list")
+    @POST("list")     
     @SetDatabaseFromToken()
-    public async GetAllAsync(): Promise<ActionResult> 
-    {
-        return this.OK(await this._service.GetAllAsync());
+    public async GetAllAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    {             
+        return this.OK(await this._service.GetAllAsync(params));
     }
 
 

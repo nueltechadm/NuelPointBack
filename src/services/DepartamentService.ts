@@ -5,6 +5,8 @@ import Departament from "../core/entities/Departament";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
+import Appointment from "../core/entities/Appointment";
 
 
 
@@ -85,9 +87,24 @@ export default class DepartamentService  extends AbstractDepartamentService
 
         return this._context.Collection(Departament).DeleteAsync(curr);
     }
-    public override async GetAllAsync(): Promise<Departament[]> {
-        return await this._context.Collection(Departament).OrderBy("Name").ToListAsync();
-    }  
+
+    
+    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Departament>> 
+    {
+        let offset = request.Page - 1 * request.Quantity; 
+
+        let total = await this._context.Collection(Departament).CountAsync();
+
+        let departaments = await this._context.Collection(Departament).OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        let result = new PaginatedFilterResult<Departament>();
+        result.Page = request.Page;
+        result.Quantity = departaments.Count();
+        result.Total = total;
+        result.Result = departaments;
+
+        return result;
+    }
 
     public override ValidateObject(obj: Departament) : void
     {

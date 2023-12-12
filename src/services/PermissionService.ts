@@ -4,6 +4,8 @@ import Permission, {PermissionName} from "../core/entities/Permission";
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
+import Departament from "../core/entities/Departament";
 
 export default class PermissionService  extends AbstractPermissionService
 {
@@ -84,9 +86,22 @@ export default class PermissionService  extends AbstractPermissionService
     }
 
 
-    public override async GetAllAsync(): Promise<Permission[]> {
-        return await this._context.Collection(Permission).OrderBy("Description").ToListAsync();
-    }  
+    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Permission>> 
+    {
+        let offset = request.Page - 1 * request.Quantity; 
+
+        let total = await this._context.Collection(Permission).CountAsync();
+
+        let permissions = await this._context.Collection(Permission).OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        let result = new PaginatedFilterResult<Permission>();
+        result.Page = request.Page;
+        result.Quantity = permissions.Count();
+        result.Total = total;
+        result.Result = permissions;
+
+        return result;
+    }
 
     public override ValidateObject(obj : Permission) : void
     {

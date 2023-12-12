@@ -5,6 +5,7 @@ import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
 
 export default class JobRoleService  extends AbstractJobRoleService
 {
@@ -89,9 +90,22 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
 
 
-    public override async GetAllAsync(): Promise<JobRole[]> {
-        return await this._context.Collection(JobRole).OrderBy("Description").ToListAsync();
-    }  
+    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<JobRole>> 
+    {
+        let offset = request.Page - 1 * request.Quantity; 
+
+        let total = await this._context.Collection(JobRole).CountAsync();
+
+        let jobs = await this._context.Collection(JobRole).OrderBy("Description").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        let result = new PaginatedFilterResult<JobRole>();
+        result.Page = request.Page;
+        result.Quantity = jobs.Count();
+        result.Total = total;
+        result.Result = jobs;
+
+        return result;
+    }
 
     public override ValidateObject(obj: JobRole) : void
     {

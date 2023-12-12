@@ -5,6 +5,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import AbstractAppointmentService  from "../core/abstractions/AbstractAppointmentService";
 import User from "../core/entities/User";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import { PaginatedFilterResult, PaginatedFilterRequest } from '../core/abstractions/AbstractService';
 
 
 export default class AppointmentService extends AbstractAppointmentService {
@@ -68,11 +69,23 @@ export default class AppointmentService extends AbstractAppointmentService {
         return this._context.Collection(Appointment).DeleteAsync(obj);
     }
 
+    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Appointment>> 
+    {
+        let offset = request.Page - 1 * request.Quantity; 
 
-    public override async GetAllAsync(): Promise<Appointment[]> {
-        return await this._context.Collection(Appointment).OrderDescendingBy("Date").ToListAsync();
+        let total = await this._context.Collection(Appointment).CountAsync();
+
+        let appointaments = await this._context.Collection(Appointment).OrderBy("Date").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        let result = new PaginatedFilterResult<Appointment>();
+        result.Page = request.Page;
+        result.Quantity = appointaments.Count();
+        result.Total = total;
+        result.Result = appointaments;
+
+        return result;
     }
-
+    
     public override async GetByAndLoadAsync<K extends keyof Appointment>(key: K, value: Appointment[K], load: (keyof Appointment)[]): Promise<Appointment[]> 
     {
        this._context.Collection(Appointment).Where({Field : key, Value : value});

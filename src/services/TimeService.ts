@@ -5,6 +5,7 @@ import Time from "../core/entities/Time";
 import AbstractTimeService from "../core/abstractions/AbstractTimeService";
 import AbstractDBContext from '../data/abstract/AbstractDBContext';
 import User from '../core/entities/User';
+import { PaginatedFilterRequest, PaginatedFilterResult } from '../core/abstractions/AbstractService';
 
 
 
@@ -75,10 +76,22 @@ export default class TimeService extends AbstractTimeService {
     }
 
 
-    public override async GetAllAsync(): Promise<Time[]> {
-        return await this._context.Collection(Time).OrderBy("Description").ToListAsync();
-    }
+    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Time>> 
+    {
+        let offset = request.Page - 1 * request.Quantity; 
 
+        let total = await this._context.Collection(Time).CountAsync();
+
+        let times = await this._context.Collection(Time).OrderBy("Id").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        let result = new PaginatedFilterResult<Time>();
+        result.Page = request.Page;
+        result.Quantity = times.Count();
+        result.Total = total;
+        result.Result = times;
+
+        return result;
+    }
 
     public override async GetByDayOfWeekAsync(userId: number, day: number): Promise<Time | undefined> {
         

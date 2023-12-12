@@ -2,12 +2,11 @@ import Company from "../entities/Company";
 import Departament from "../entities/Departament";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
-export default abstract class AbstractCompanyService extends AbstractService<Company>
+export default abstract class AbstractCompanyService extends AbstractService<Company, CompanyPaginatedFilterRequest, CompanyPaginatedFilterResponse>
 {
     abstract GetByIdAsync(id : number) : Promise<Company | undefined>;    
     abstract GetByNameAsync(name : string) : Promise<Company[]>;   
-    abstract AddDepartamentToAllAsync(departament : Departament) : Promise<void>;   
-    abstract FilterAsync(params : CompanyPaginatedFilterRequest) : Promise<CompanyPaginatedFilterResponse>
+    abstract AddDepartamentToAllAsync(departament : Departament) : Promise<void>;       
 
 }
 

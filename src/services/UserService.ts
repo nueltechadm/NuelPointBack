@@ -8,6 +8,7 @@ import Access from "../core/entities/Access";
 import { Inject } from "web_api_base";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
 import Permission from "../core/entities/Permission";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
 
 
 export default class UserService  extends AbstractUserService
@@ -169,10 +170,22 @@ export default class UserService  extends AbstractUserService
        return await this._context.Collection(User).DeleteAsync(obj)!;
     }
 
-    public override async GetAllAsync(): Promise<User[]> {
+    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<User>> 
+    {
+        let offset = request.Page - 1 * request.Quantity; 
 
-        return await this._context.Collection(User).OrderBy("Name").ToListAsync()!;
-    }  
+        let total = await this._context.Collection(User).CountAsync();
+
+        let users = await this._context.Collection(User).OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        let result = new PaginatedFilterResult<User>();
+        result.Page = request.Page;
+        result.Quantity = users.Count();
+        result.Total = total;
+        result.Result = users;
+
+        return result;
+    }
     
     public override ValidateObject(obj : User) : void
     {

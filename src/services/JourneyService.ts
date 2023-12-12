@@ -4,6 +4,8 @@ import Journey from "../core/entities/Journey";
 import Type from "../utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
+import Departament from "../core/entities/Departament";
 
 export default class JourneyService  extends AbstractJorneyService
 {
@@ -76,9 +78,23 @@ export default class JourneyService  extends AbstractJorneyService
     }
 
 
-    public override async GetAllAsync(): Promise<Journey[]> {
-        return await this._context.Collection(Journey).OrderBy("Description").ToListAsync();
-    }  
+    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Journey>> 
+    {
+        let offset = request.Page - 1 * request.Quantity; 
+
+        let total = await this._context.Collection(Journey).CountAsync();
+
+        let journeis = await this._context.Collection(Journey).OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        let result = new PaginatedFilterResult<Journey>();
+        result.Page = request.Page;
+        result.Quantity = journeis.Count();
+        result.Total = total;
+        result.Result = journeis;
+
+        return result;
+    }
+
 
     public override ValidateObject(obj : Journey) : void
     {

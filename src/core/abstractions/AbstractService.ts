@@ -1,6 +1,6 @@
 
 
-export default abstract class AbstractService<T>
+export default abstract class AbstractService<T, R extends PaginatedFilterRequest, U extends PaginatedFilterResult<T>>
 {
     abstract SetClientDatabaseAsync(client : string) : Promise<void>;
     abstract ExistsAsync(id : number) : Promise<boolean>;
@@ -8,7 +8,7 @@ export default abstract class AbstractService<T>
     abstract UpdateAsync(obj : T) : Promise<T>;
     abstract UpdateObjectAndRelationsAsync<U extends keyof T>(obj : T, relations : U[]) : Promise<T>;
     abstract DeleteAsync(obj : T) : Promise<T>;
-    abstract GetAllAsync() : Promise<T[]>;
+    abstract GetAllAsync(request : R) : Promise<U>;
     abstract GetByIdAsync(id : number) : Promise<T | undefined>;
     abstract GetByAndLoadAsync<K extends keyof T>(key : K, value : T[K], load : (keyof T)[]) : Promise<T[]>;
     abstract CountAsync() : Promise<number>;
@@ -22,7 +22,7 @@ export class PaginatedFilterResult<T>
    Result : T[] = []; 
    Quantity : number = 10;
    Total : number = 0;
-   Page : number = 1;
+   Page : number = 1;   
 }
 
 export class PaginatedFilterRequest
@@ -30,3 +30,4 @@ export class PaginatedFilterRequest
    Quantity : number = 10;   
    Page : number = 1;
 }
+

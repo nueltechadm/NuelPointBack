@@ -9,6 +9,7 @@ import Type from "../utils/Type";
 import AbstractController from "./AbstractController";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
 import Authorization from "../utils/Authorization";
+import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -29,17 +30,13 @@ export default class JobRoleController extends AbstractController
 
 
 
-    @GET("list")    
+    @POST("list")     
     @SetDatabaseFromToken()
-    public async GetAllAsync() : Promise<ActionResult>
-    {
-       let jobs = await this._service.GetAllAsync();
+    public async GetAllAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    {             
+        return this.OK(await this._service.GetAllAsync(params));
+    }
 
-       for(let j of jobs)      
-            delete (j as any).Employers;
-
-       return this.OK(jobs);
-    }    
 
 
     

@@ -8,6 +8,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Company from "../core/entities/Company";
 import User from "../core/entities/User";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import { PaginatedFilterResult, PaginatedFilterRequest } from '../core/abstractions/AbstractService';
 
 export default class CheckpointService  extends AbstractCheckpointService
 {   
@@ -116,10 +117,23 @@ export default class CheckpointService  extends AbstractCheckpointService
         return this._context.Collection(Checkpoint).DeleteAsync(obj);
     }
 
+    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Checkpoint>> 
+    {
+        let offset = request.Page - 1 * request.Quantity; 
 
-    public override async GetAllAsync(): Promise<Checkpoint[]> {
-        return await this._context.Collection(Checkpoint).OrderDescendingBy("Date").ToListAsync();
-    }  
+        let total = await this._context.Collection(Checkpoint).CountAsync();
+
+        let checkpoints = await this._context.Collection(Checkpoint).OrderBy("Date").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        let result = new PaginatedFilterResult<Checkpoint>();
+        result.Page = request.Page;
+        result.Quantity = checkpoints.Count();
+        result.Total = total;
+        result.Result = checkpoints;
+
+        return result;
+    }
+   
 
     public override async GetByRangeAndEmployer(userId: number, begin: Date, end?: Date | undefined): Promise<Checkpoint[]> {
 
