@@ -60,7 +60,7 @@ export default class DBContext extends PGDBContext implements IDBChangeable
         this._manager["_connection"]["_database"] = database;
         this._manager["_connection"]["DataBaseName"] = database;
 
-        let worked = await this._manager.CheckConnection();     
+        let worked = await this._manager.CheckConnectionAsync();     
             
         if(!worked)
             throw new DatabaseException(`Can not connect to ${database}`);  

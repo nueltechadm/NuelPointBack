@@ -16,6 +16,7 @@ import JobRole from "../core/entities/JobRole";
 import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
 import AbstractAccessService from "../core/abstractions/AbstractAccessService";
 import Contact from "../core/entities/Contact";
+import Access from "../core/entities/Access";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -77,8 +78,6 @@ export default class UserController extends AbstractController
     }    
 
 
-
-
     
     @GET("getById")   
     @SetDatabaseFromToken() 
@@ -86,10 +85,7 @@ export default class UserController extends AbstractController
     @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"}) 
     public async GetByIdAsync(@FromQuery()id : number) : Promise<ActionResult>
     { 
-        if(!id || typeof id != "number")
-            return this.BadRequest({Message : "Invalid userId"});
-
-       let users = await this._userService.GetByAndLoadAsync("Id", id, ["Access", "Contacts", "JobRole", "Journey"]);
+       let users = await this._userService.GetByAndLoadAsync("Id", id, ["Access", "Company" ,"Contacts", "JobRole", "Journey"]);
 
        if(users.length == 0)
             return this.NotFound();
@@ -102,10 +98,13 @@ export default class UserController extends AbstractController
     
     @POST("insert")
     @SetDatabaseFromToken()
-    @UserController.ProducesType(200, "The just created user", User) 
+    @UserController.ProducesType(200, 'The just created user', User) 
+    @UserController.ProducesMessage(400, 'Error message', {Message : 'The company of the user is required'}) 
     public async InsertAsync(@FromBody()user : User) : Promise<ActionResult>
     {         
-        return this.OK(await this._userService.AddAsync(user));
+        await this._userService.AddAsync(user);
+
+        return this.OK({Message : 'User created', Id : user.Id});
     }
 
 
@@ -131,22 +130,17 @@ export default class UserController extends AbstractController
     
     @PUT("access")  
     @SetDatabaseFromToken()       
-    public async UpdateAccess(@FromQuery()userId : number, @FromQuery()accessId : number) : Promise<ActionResult>
+    public async UpdateAccess(@FromQuery()userId : number, @FromBody()access : Access) : Promise<ActionResult>
     {
         
-        let users= await this._userService.GetByAndLoadAsync("Id", userId, ["Access"]);
+        let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["Access"])).FirstOrDefault();
 
-        if(!users.Any())
-            return this.NotFound({Message : `User with Id ${userId} not exists`});        
+        if(!user)
+            return this.NotFound({Message : `User with Id ${userId} not exists`});          
+            
+        user.Access = access;       
 
-        let accesses = await this._accessService.GetByAndLoadAsync("Id", accessId, []);
-
-        if(!accesses.Any())
-            return this.NotFound({Message : `Access with Id ${accessId} not exists`});
-
-        users.First().Access = accesses.First();       
-
-        await this._userService.UpdateAsync(users.First());
+        await this._userService.UpdateAsync(user);
 
         return this.OK('User´s access updated');
     }
@@ -158,19 +152,19 @@ export default class UserController extends AbstractController
     public async UpdateJouney(@FromQuery()userId : number, @FromQuery()journeyId : number) : Promise<ActionResult>
     {
         
-        let users= await this._userService.GetByAndLoadAsync("Id", userId, ["Journey"]);
+        let user= (await this._userService.GetByAndLoadAsync("Id", userId, ["Journey"])).FirstOrDefault();
 
-        if(!users.Any())
+        if(!user)
             return this.NotFound({Message : `User with Id ${userId} not exists`});        
 
-        let journeis = await this._journeyService.GetByAndLoadAsync("Id", journeyId, []);
+        let journey = (await this._journeyService.GetByAndLoadAsync("Id", journeyId, [])).FirstOrDefault();
 
-        if(!journeis.Any())
+        if(!journey)
             return this.NotFound({Message : `Journey with Id ${journeyId} not exists`});
 
-        users.First().Journey = journeis.First();       
+        user.Journey = journey;       
 
-        await this._userService.UpdateAsync(users.First());
+        await this._userService.UpdateAsync(user);
 
         return this.OK('User´s journey updated');
     }
@@ -184,19 +178,19 @@ export default class UserController extends AbstractController
     public async UpdateCompany(@FromQuery()userId : number, @FromQuery()companyId : number) : Promise<ActionResult>
     {
         
-        let users= await this._userService.GetByAndLoadAsync("Id", userId, ["Company"]);
+        let user= (await this._userService.GetByAndLoadAsync("Id", userId, ["Company"])).FirstOrDefault();
 
-        if(!users.Any())
+        if(!user)
             return this.NotFound({Message : `User with Id ${userId} not exists`});        
 
-        let companies = await this._companyService.GetByAndLoadAsync("Id", companyId, []);
+        let company = (await this._companyService.GetByAndLoadAsync("Id", companyId, [])).FirstOrDefault();
 
-        if(!companies.Any())
+        if(!company)
             return this.NotFound({Message : `Company with Id ${companyId} not exists`});
 
-        users.First().Company = companies.First();       
+        user.Company = company;       
 
-        await this._userService.UpdateAsync(users.First());
+        await this._userService.UpdateAsync(user);
 
         return this.OK('User´s company updated');
     }
@@ -209,19 +203,19 @@ export default class UserController extends AbstractController
     public async UpdatejobRole(@FromQuery()userId : number, @FromQuery()jobRoleId : number) : Promise<ActionResult>
     {
         
-        let users= await this._userService.GetByAndLoadAsync("Id", userId, ["JobRole"]);
+        let user= (await this._userService.GetByAndLoadAsync("Id", userId, ["JobRole"])).FirstOrDefault();
 
-        if(!users.Any())
+        if(!user)
             return this.NotFound({Message : `User with Id ${userId} not exists`});        
 
-        let jobs = await this._jobRoleService.GetByAndLoadAsync("Id", jobRoleId, []);
+        let job = (await this._jobRoleService.GetByAndLoadAsync("Id", jobRoleId, [])).FirstOrDefault();
 
-        if(!jobs.Any())
+        if(!job)
             return this.NotFound({Message : `JobRole with Id ${jobRoleId} not exists`});
 
-        users.First().JobRole = jobs.First();       
+        user.JobRole = job;       
 
-        await this._userService.UpdateAsync(users.First());
+        await this._userService.UpdateAsync(user);
 
         return this.OK('User´s job updated');
     }

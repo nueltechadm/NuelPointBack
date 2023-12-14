@@ -53,9 +53,7 @@ export default class AcessService extends AbstractAccessService {
     public override async GetByIdAsync(id: number): Promise<Access | undefined> {
         return await this._context.Collection(Access)
         .WhereField("Id")
-        .IsEqualTo(id)
-        .LoadRelationOn("Company")
-        .LoadRelationOn("Departaments")
+        .IsEqualTo(id)        
         .LoadRelationOn("Permissions")
         .LoadRelationOn("User")
         .FirstOrDefaultAsync();
@@ -91,7 +89,7 @@ export default class AcessService extends AbstractAccessService {
 
         let total = await this._context.Collection(Access).CountAsync();
 
-        let accesses = await this._context.Collection(Access).OrderBy("Company").Offset(offset).Limit(request.Quantity).ToListAsync();
+        let accesses = await this._context.Collection(Access).OrderBy("Username").Offset(offset).Limit(request.Quantity).ToListAsync();
 
         let result = new PaginatedFilterResult<Access>();
         result.Page = request.Page;
@@ -112,9 +110,7 @@ export default class AcessService extends AbstractAccessService {
 
         if(!obj.Password)
             throw new InvalidEntityException(`The password of ${Access.name} is required`);
-
-        if(!obj.Company?.Id)
-            throw new InvalidEntityException(`The company of ${Access.name} is required`);
+        
 
     }    
 

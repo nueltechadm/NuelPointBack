@@ -27,25 +27,16 @@ export default class Access
    
     @Column()
     @ManyToMany(() => Permission)
-    public Permissions : Permission[];   
+    public Permissions : Permission[];  
 
-    @Column()
-    @ManyToOne(() => Company)
-    public Company? : Company;
-
-    @Column()
-    @OneToMany(()=> Departament)
-    public Departaments : Departament[];
 
     constructor(user : User, username : string, password : string, description? : string)
     {
         this.Id = -1;  
         this.User = user;      
         this.Username = username;
-        this.Password = password;
-        this.Departaments = []; 
-        this.Permissions = [];
-        this.Company = undefined;
+        this.Password = password;        
+        this.Permissions = [];        
         this.Description = description ?? "";        
     }
 }

@@ -79,7 +79,7 @@ export default class CompanyController extends AbstractController {
 
         await this._companyService.AddAsync(company);
 
-        return this.OK({Message : "Company created", Id : 1})
+        return this.OK({Message : "Company created", Id : company.Id})
     }
 
 
@@ -91,7 +91,7 @@ export default class CompanyController extends AbstractController {
     @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})
     public async UpdateAsync(@FromBody() company: Company) : Promise<ActionResult> 
     {        
-        if(!company || !company.Id)
+        if(!company.Id)
             return this.BadRequest({ Message: "Id is required" });
 
         let fromDB = await this._companyService.GetByIdAsync(company.Id);
@@ -118,24 +118,53 @@ export default class CompanyController extends AbstractController {
     @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company with Id ${companyId} not exists'})      
     public async AddDepartament(@FromQuery()companyId : number, @FromQuery() departamentId : number) : Promise<ActionResult>
     {
-        let companies = await this._companyService.GetByAndLoadAsync("Id", companyId, ["Departaments"]);
+        let company = (await this._companyService.GetByAndLoadAsync("Id", companyId, ["Departaments"])).FirstOrDefault();
 
-        if(!companies.Any())
+        if(!company)
             return this.NotFound({Message : `Company with Id ${companyId} not exists`});
         
-        let departaments = await this._departamentService.GetByAndLoadAsync("Id", departamentId, []);
+        let departament = (await this._departamentService.GetByAndLoadAsync("Id", departamentId, [])).FirstOrDefault();
 
-        if(!departaments.Any())
+        if(!departament)
             return this.NotFound({Message : `Departament with Id ${departamentId} not exists`});     
          
-        if(companies.First().Departaments.Any(s => s.Id == departaments.First().Id))
-            return this.BadRequest({Message : `Departament ${departaments.First().Name} already is of ${companies.First().Name}`}); 
+        if(company.Departaments.Any(s => s.Id == departament!.Id))
+            return this.BadRequest({Message : `Departament ${departament!.Name} already is of ${company.Name}`}); 
 
-        companies.First().Departaments.Add(departaments.First());
+        company.Departaments.Add(departament);
 
-        await this._companyService.UpdateObjectAndRelationsAsync(companies.First(), ["Departaments"]);
+        await this._companyService.UpdateObjectAndRelationsAsync(company, ["Departaments"]);
 
-        return this.OK({Message : `Departament ${departaments.First().Name} added to company ${companies.First().Name}`});
+        return this.OK({Message : `Departament ${departament.Name} added to company ${company.Name}`});
+    }
+
+
+
+    @PUT("departament/delete")  
+    @SetDatabaseFromToken()    
+    @CompanyController.ProducesMessage(200, 'Success message', {Message : 'Departament ${departament} added to company ${company}'})     
+    @CompanyController.ProducesMessage(400, 'Error message', {Message : 'Departament ${departament} already is of ${company}'})      
+    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company with Id ${companyId} not exists'})      
+    public async DeleteDepartament(@FromQuery()companyId : number, @FromQuery() departamentId : number) : Promise<ActionResult>
+    {
+        let company = (await this._companyService.GetByAndLoadAsync("Id", companyId, ["Departaments"])).FirstOrDefault();
+
+        if(!company)
+            return this.NotFound({Message : `Company with Id ${companyId} not exists`});
+        
+        let departament = (await this._departamentService.GetByAndLoadAsync("Id", departamentId, [])).FirstOrDefault();
+
+        if(!departament)
+            return this.NotFound({Message : `Departament with Id ${departamentId} not exists`});     
+         
+        if(!company.Departaments.Any(s => s.Id == departament!.Id))
+            return this.BadRequest({Message : `Departament ${departament!.Name} not is part of ${company.Name}`}); 
+
+        company.Departaments.RemoveAll(s => s.Id == departament?.Id);
+
+        await this._companyService.UpdateObjectAndRelationsAsync(company, ["Departaments"]);
+
+        return this.OK({Message : `Departament ${departament.Name} deleted of company ${company.Name}`});
     }
     
 

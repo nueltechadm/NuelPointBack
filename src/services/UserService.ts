@@ -69,9 +69,7 @@ export default class UserService  extends AbstractUserService
                                     .And(Access, { Field : "Password", Value : MD5(password)})       
                                     .Select(Access)                                    
                                     .Join("User")
-                                    .Join("Permissions")
-                                    .Join("Departaments")
-                                    .Join("Company")                                    
+                                    .Join("Permissions")                                                                       
                                     .FirstOrDefaultAsync();   
         if(!access)
             return undefined;
@@ -105,23 +103,22 @@ export default class UserService  extends AbstractUserService
 
     public override async AddAsync(obj: User): Promise<User> 
     { 
-        if(!obj.Access || obj.Access.Id < 1)
-            throw new InvalidEntityException("Access is required");
+        
+        if(obj.Access)
+        {
+            obj.Access.Id = -1;
 
-        obj.Access = await this.GetAccessByIdAsync(obj.Access.Id);
-
-        if(!obj.Access)
-            throw new InvalidEntityException("To create a user, you must select a valid access object");
-
-        await this.SyncPermissionsAsync(obj.Access);
+            obj.Access!.Password = MD5(obj.Access!.Password);
+        
+            await this.SyncPermissionsAsync(obj.Access!);
+        }  
 
         if(!obj.Company && !obj.IsSuperUser)
             throw new InvalidEntityException("The company of the user is required");
 
         if(!obj.JobRole && !obj.IsSuperUser)
-            throw new InvalidEntityException("The jobrole of the user is required");        
-
-        obj.Access!.Password = MD5(obj.Access!.Password);
+            throw new InvalidEntityException("The jobrole of the user is required"); 
+        
 
         return await this._context.Collection(User).AddAsync(obj)!;        
     }
@@ -130,36 +127,41 @@ export default class UserService  extends AbstractUserService
 
         this.ValidateObject(obj);
 
-        let curr = await this.GetByIdAsync(obj.Id);
+        let curr = (await this.GetByAndLoadAsync("Id", obj.Id, ["Access"])).FirstOrDefault();
 
         if(!curr)
             throw new ObjectNotFoundExcpetion(`This user do not exists on database`);
-
-        if(obj.Access && curr.Access!.Password != obj.Access!.Password)
+        
+        if(obj.Access)
         {
+            obj.Access.Id = curr.Access?.Id ?? -1;
+
             obj.Access!.Password = MD5(obj.Access!.Password);
         
-            await this.SyncPermissionsAsync(obj.Access!);
-        }            
+            await this.SyncPermissionsAsync(obj.Access!);           
+        } 
 
-        return await this._context.Collection(User).UpdateAsync(obj)!;
+        return await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, ["Access"])!;
     }
 
     public override async UpdateObjectAndRelationsAsync<U extends keyof User>(obj: User, relations: U[]): Promise<User> {
 
         this.ValidateObject(obj);
 
-        let curr = await this.GetByIdAsync(obj.Id);
+        let curr = (await this.GetByAndLoadAsync("Id", obj.Id, ["Access"])).FirstOrDefault();
 
         if(!curr)
             throw new ObjectNotFoundExcpetion(`This user do not exists on database`);
 
-        if(obj.Access && curr.Access!.Password != obj.Access!.Password)
-        {
-            obj.Access!.Password = MD5(obj.Access!.Password);
-        
-            await this.SyncPermissionsAsync(obj.Access!);
-        }            
+            if(obj.Access)
+            {
+                obj.Access.Id = curr.Access?.Id ?? -1;
+    
+                obj.Access!.Password = MD5(obj.Access!.Password);
+            
+                await this.SyncPermissionsAsync(obj.Access!);           
+            } 
+             
 
         return await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, relations);
     }
