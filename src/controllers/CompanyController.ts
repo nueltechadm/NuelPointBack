@@ -104,7 +104,7 @@ export default class CompanyController extends AbstractController {
         if(exists.Any(s => s.Id != company.Id))
             return this.BadRequest({Message : `Already exists a company with name : "${company.Name}"`});
 
-        await this._companyService.UpdateObjectAndRelationsAsync(company, ["Departaments", "Contacts"]);
+        await this._companyService.UpdateObjectAndRelationsAsync(company, ["Departaments", "Contacts", "Address"]);
 
         return this.OK({Message : "Company updated"});
     }

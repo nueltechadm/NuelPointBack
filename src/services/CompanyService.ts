@@ -132,7 +132,7 @@ export default class CompanyService  extends AbstractCompanyService
      
 
     public override async GetByNameAsync(name: string): Promise<Company[]> {        
-        return await this._context.Collection(Company).Where({Field: "Name", Kind: Operation.CONSTAINS,  Value : name}).ToListAsync();
+        return await this._context.Collection(Company).Where({Field: "Name", Kind: Operation.CONSTAINS,  Value : name.Trim()}).ToListAsync();
     }
 
     public override ValidateObject(obj : Company) : void
