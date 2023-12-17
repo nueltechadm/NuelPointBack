@@ -38,17 +38,14 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
 
     public override async GetByIdAsync(id: number): Promise<JobRole | undefined> {       
-        return await this._context.Collection(JobRole).WhereField("Id").IsEqualTo(id).LoadRelationOn("Company").FirstOrDefaultAsync();
+        return await this._context.Collection(JobRole).WhereField("Id").IsEqualTo(id).LoadRelationOn("Users").FirstOrDefaultAsync();
     }
     
     public override async AddAsync(obj: JobRole): Promise<JobRole> {
 
-        this.ValidateObject(obj);
+        this.ValidateObject(obj);        
 
-        if(!obj.Company)
-            throw new InvalidEntityException(`The company of ${JobRole.name} is required`); 
-
-        return this._context.Collection(JobRole).AddAsync(obj);
+        return this._context.Collection(JobRole).AddObjectAndRelationsAsync(obj, []);
     }
 
     public override async GetByAndLoadAsync<K extends keyof JobRole>(key: K, value: JobRole[K], load: (keyof JobRole)[]): Promise<JobRole[]> 
@@ -113,10 +110,7 @@ export default class JobRoleService  extends AbstractJobRoleService
             throw new InvalidEntityException(`The object is not of ${JobRole.name} type`);        
 
         if(!obj.Description)
-            throw new InvalidEntityException(`The description of ${JobRole.name} is required`);
-
-        if(!obj.Company)
-            throw new InvalidEntityException(`The company of ${JobRole.name} is required`);
+            throw new InvalidEntityException(`The description of ${JobRole.name} is required`);       
       
     }
 }

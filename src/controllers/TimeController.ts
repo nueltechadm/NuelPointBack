@@ -25,13 +25,6 @@ export default class TimeController extends AbstractController {
 
 
 
-
-    public override async SetClientDatabaseAsync(): Promise<void> {
-        await this._service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-    }
-
-
-
     @POST("list")     
     @SetDatabaseFromToken()
     public async GetAllAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 

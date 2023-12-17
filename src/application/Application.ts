@@ -110,7 +110,7 @@ export default class App extends Application
         response.status(500);
 
         if(Application.Configurations.DEBUG)
-            response.json(exception);
+            response.json(exception); 
         else
             response.json({Message: "Error while processing the request"});
     }      

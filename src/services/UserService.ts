@@ -131,6 +131,8 @@ export default class UserService  extends AbstractUserService
 
         if(!curr)
             throw new ObjectNotFoundExcpetion(`This user do not exists on database`);
+
+        await this._context.Collection(User).UpdateAsync(obj);
         
         if(obj.Access)
         {
@@ -138,10 +140,12 @@ export default class UserService  extends AbstractUserService
 
             obj.Access!.Password = MD5(obj.Access!.Password);
         
-            await this.SyncPermissionsAsync(obj.Access!);           
+            await this.SyncPermissionsAsync(obj.Access!);       
+            
+            await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, ["Access"])!
         } 
 
-        return await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, ["Access"])!;
+        return obj;
     }
 
     public override async UpdateObjectAndRelationsAsync<U extends keyof User>(obj: User, relations: U[]): Promise<User> {

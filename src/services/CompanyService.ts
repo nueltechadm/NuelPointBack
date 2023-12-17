@@ -36,8 +36,7 @@ export default class CompanyService  extends AbstractCompanyService
     public override async GetByIdAsync(id: number): Promise<Company | undefined> {       
         return await this._context.Collection(Company)
         .WhereField("Id")
-        .IsEqualTo(id)
-        .LoadRelationOn("Departaments")
+        .IsEqualTo(id)        
         .LoadRelationOn("Address")
         .LoadRelationOn("Accesses")
         .LoadRelationOn("Contacts")
@@ -68,30 +67,20 @@ export default class CompanyService  extends AbstractCompanyService
         if(params.Document)
             this._context.Collection(Company).Where({Field: "Document", Kind : Operation.CONSTAINS, Value: params.Document});
         if(params.Active)
-            this._context.Collection(Company).Where({Field: "Active", Kind : Operation.CONSTAINS, Value: params.Active});
+            this._context.Collection(Company).Where({Field: "Active", Value: params.Active});
 
         return this._context.Collection(Company);
     }
    
     
-    public override async AddDepartamentToAllAsync(departament: Departament): Promise<void> {
-        
-        let companies = await this._context.Collection(Company).LoadRelationOn("Departaments").ToListAsync();     
-        
-        for(let c of companies)
-        {
-            c.Departaments.Add(departament);
-            await this._context.Collection(Company).UpdateAsync(c);
-        }
-
-    }
-      
 
     public override async AddAsync(obj: Company): Promise<Company> {
 
+        obj.Id = -1;  
+
         this.ValidateObject(obj);
 
-        return this._context.Collection(Company).AddAsync(obj);
+        return this._context.Collection(Company).AddObjectAndRelationsAsync(obj, ["Contacts", "Address"]);
     }
 
 

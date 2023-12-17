@@ -53,16 +53,6 @@ export default class UserController extends AbstractController
         this._accessService = accessService;
     }    
 
-
-    
-    public override async SetClientDatabaseAsync(): Promise<void> {
-        await this._userService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-        await this._companyService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-        await this._jobRoleService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-        await this._journeyService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-    }
-
-
     
 
     @POST("list")

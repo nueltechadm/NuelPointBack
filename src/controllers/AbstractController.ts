@@ -1,8 +1,9 @@
 import { ControllerBase, OKResult, ProducesResponse, RequestJson } from "web_api_base";
 import Type from "../utils/Type";
+import AbstractService from "../core/abstractions/AbstractService";
+import Authorization from "../utils/Authorization";
 
-export default abstract class AbstractController extends ControllerBase {
-    abstract SetClientDatabaseAsync(): Promise<void>; 
+export default abstract class AbstractController extends ControllerBase {    
     
     public override OK<T>(result?: T): OKResult<T> 
     {
@@ -59,5 +60,16 @@ export default abstract class AbstractController extends ControllerBase {
         return ProducesResponse({Status : status, Description: description, JSON : JSON.stringify(result, null, 2)});
 
     }
+
+    public async SetClientDatabaseAsync(): Promise<void>
+    {
+        for(let key of Object.keys(this))
+        {
+            let service = Reflect.get(this, key);
+
+            if(service && service instanceof AbstractService)
+                await service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
+        }
+    } 
     
 }

@@ -9,6 +9,8 @@ import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
 import Departament from "../core/entities/Departament";
 import Contact from "../core/entities/Contact";
 import AbstractDepartamentService from "../core/abstractions/AbstractDepartamentService";
+import Address from "../core/entities/Address";
+import AbstractUserService from "../core/abstractions/AbstractUserService";
 
 
 
@@ -24,19 +26,22 @@ export default class CompanyController extends AbstractController {
     private _departamentService: AbstractDepartamentService;
 
 
+    @Inject()
+    private _userService: AbstractUserService;
+
+
     constructor(
         companyService: AbstractCompanyService, 
-        departamentService : AbstractDepartamentService
+        departamentService : AbstractDepartamentService,
+        userService : AbstractUserService
         ) {
         super();
         this._companyService = companyService;
         this._departamentService = departamentService;
+        this._userService = userService;       
+        
     }
 
-    public override async SetClientDatabaseAsync(): Promise<void> {
-        await this._companyService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-        await this._departamentService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-    }
 
     @POST("filter")    
     @SetDatabaseFromToken()
@@ -69,12 +74,10 @@ export default class CompanyController extends AbstractController {
     @CompanyController.ProducesMessage(200, 'Success message', {Message : "Company created", Id : 1})
     @CompanyController.ProducesMessage(400, 'Error message', {Message : 'Message describing the error'})    
     public async InsertAsync(@FromBody() company: Company) : Promise<ActionResult>
-    {        
-        company.Id = -1;               
-
+    { 
         let exists = await this._companyService.GetByNameAsync(company.Name);
 
-        if(exists)
+        if(exists.Any())
             return this.BadRequest({Message : `Already exists a company with name : "${company.Name}"`});
 
         await this._companyService.AddAsync(company);
@@ -94,79 +97,85 @@ export default class CompanyController extends AbstractController {
         if(!company.Id)
             return this.BadRequest({ Message: "Id is required" });
 
-        let fromDB = await this._companyService.GetByIdAsync(company.Id);
+        let exists = await this._companyService.GetByAndLoadAsync("Id", company.Id, []);
 
-        if (!fromDB)
-            return this.NotFound({ Message: "Company not found" }); 
+        if (!exists.Any())
+            return this.NotFound({ Message: 'Company not found' }); 
         
-        let exists = await this._companyService.GetByNameAsync(company.Name);
+        exists = await this._companyService.GetByNameAsync(company.Name);
 
         if(exists.Any(s => s.Id != company.Id))
             return this.BadRequest({Message : `Already exists a company with name : "${company.Name}"`});
 
-        await this._companyService.UpdateObjectAndRelationsAsync(company, ["Departaments", "Contacts", "Address"]);
+        await this._companyService.UpdateObjectAndRelationsAsync(company, ["Contacts", "Address"]);
 
-        return this.OK({Message : "Company updated"});
+        return this.OK({Message : 'Company updated'});
+    }
+
+    @PUT("activate")    
+    @SetDatabaseFromToken()    
+    @CompanyController.ProducesMessage(200, 'Success message', {Message : 'Company activated'})     
+    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})  
+    public async ActiveAsync(@FromQuery() id: number) : Promise<ActionResult>
+    {      
+        let active = (await this._companyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
+
+        if (!active)
+            return this.NotFound({ Message: 'Company not found' });
+
+        active.Active = true;
+
+        await this._companyService.UpdateAsync(active);
+
+        return this.OK({Message : 'Company activated'});
     }
 
 
     
-    @PUT("departament")  
+    @PUT("desactivate")    
     @SetDatabaseFromToken()    
-    @CompanyController.ProducesMessage(200, 'Success message', {Message : 'Departament ${departament} added to company ${company}'})     
-    @CompanyController.ProducesMessage(400, 'Error message', {Message : 'Departament ${departament} already is of ${company}'})      
-    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company with Id ${companyId} not exists'})      
-    public async AddDepartament(@FromQuery()companyId : number, @FromQuery() departamentId : number) : Promise<ActionResult>
-    {
-        let company = (await this._companyService.GetByAndLoadAsync("Id", companyId, ["Departaments"])).FirstOrDefault();
+    @CompanyController.ProducesMessage(200, 'Success message', {Message : 'Company desactivated'})     
+    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})  
+    public async DesactiveAsync(@FromQuery() id: number) : Promise<ActionResult>
+    {      
+        let desactive = (await this._companyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
 
-        if(!company)
-            return this.NotFound({Message : `Company with Id ${companyId} not exists`});
-        
-        let departament = (await this._departamentService.GetByAndLoadAsync("Id", departamentId, [])).FirstOrDefault();
+        if (!desactive)
+            return this.NotFound({ Message: 'Company not found' });
 
-        if(!departament)
-            return this.NotFound({Message : `Departament with Id ${departamentId} not exists`});     
-         
-        if(company.Departaments.Any(s => s.Id == departament!.Id))
-            return this.BadRequest({Message : `Departament ${departament!.Name} already is of ${company.Name}`}); 
+        desactive.Active = false;
 
-        company.Departaments.Add(departament);
+        await this._companyService.UpdateAsync(desactive);
 
-        await this._companyService.UpdateObjectAndRelationsAsync(company, ["Departaments"]);
-
-        return this.OK({Message : `Departament ${departament.Name} added to company ${company.Name}`});
+        return this.OK({Message : 'Company desactivated'});
     }
 
 
-
-    @PUT("departament/delete")  
-    @SetDatabaseFromToken()    
-    @CompanyController.ProducesMessage(200, 'Success message', {Message : 'Departament ${departament} added to company ${company}'})     
-    @CompanyController.ProducesMessage(400, 'Error message', {Message : 'Departament ${departament} already is of ${company}'})      
-    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company with Id ${companyId} not exists'})      
-    public async DeleteDepartament(@FromQuery()companyId : number, @FromQuery() departamentId : number) : Promise<ActionResult>
-    {
-        let company = (await this._companyService.GetByAndLoadAsync("Id", companyId, ["Departaments"])).FirstOrDefault();
-
-        if(!company)
-            return this.NotFound({Message : `Company with Id ${companyId} not exists`});
-        
-        let departament = (await this._departamentService.GetByAndLoadAsync("Id", departamentId, [])).FirstOrDefault();
-
-        if(!departament)
-            return this.NotFound({Message : `Departament with Id ${departamentId} not exists`});     
-         
-        if(!company.Departaments.Any(s => s.Id == departament!.Id))
-            return this.BadRequest({Message : `Departament ${departament!.Name} not is part of ${company.Name}`}); 
-
-        company.Departaments.RemoveAll(s => s.Id == departament?.Id);
-
-        await this._companyService.UpdateObjectAndRelationsAsync(company, ["Departaments"]);
-
-        return this.OK({Message : `Departament ${departament.Name} deleted of company ${company.Name}`});
-    }
     
+    @PUT("add/user")       
+    @SetDatabaseFromToken()
+    public async AddUserAsync(@FromQuery()companyId : number, @FromQuery()userId : number) : Promise<ActionResult>
+    {  
+        let company = (await this._companyService.GetByAndLoadAsync("Id", companyId, ["Users"])).FirstOrDefault();
+
+        if(!company)
+             return this.NotFound({Message : "Company not found"}); 
+
+        let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["Company"])).FirstOrDefault();
+
+        if(!user)
+            return this.NotFound({Message : "User not found"}); 
+                         
+        company.Users.RemoveAll(s => s.Id == userId);
+
+        company.Users.Add(user);
+
+        await this._userService.UpdateAsync(user);
+
+        return this.OK({Message : `Company updated`});
+
+    }
+
 
 
     @DELETE("delete")    
@@ -175,10 +184,10 @@ export default class CompanyController extends AbstractController {
     @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})  
     public async DeleteAsync(@FromQuery() id: number) : Promise<ActionResult>
     {      
-        let del = await this._companyService.GetByIdAsync(id);
+        let del = (await this._companyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
 
         if (!del)
-            return this.NotFound({ Message: "Company not found" });
+            return this.NotFound({ Message: 'Company not found' });
 
         await this._companyService.DeleteAsync(del);
 
@@ -200,10 +209,9 @@ export default class CompanyController extends AbstractController {
     {
         let o = Type.CreateTemplateFrom(Company);
         o = Type.Delete(o, 'Accesses');
-        o = Type.Delete(o, 'Users');
-        let d = Type.CreateTemplateFrom(Departament);        
-        o.Departaments = [Type.Delete(d, 'JobRoles')];
+        o = Type.Delete(o, 'Users');        
         o.Contacts = [Type.CreateTemplateFrom(Contact)];
+        o.Address = Type.CreateTemplateFrom(Address);
         return JSON.stringify(o, null, 2);
     }
 

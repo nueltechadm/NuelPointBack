@@ -18,21 +18,17 @@ export default class JobRole
     @Column()
     @OneToMany(()=> User)
     public Users : User[];
-
-    @Column()
-    @ManyToOne(() => Company)
-    public Company : Company;
+    
 
     @Column()
     @ManyToOne(() => Departament)
     public Departament : Departament;
     
-    constructor(description : string, company : Company, departament: Departament)
+    constructor(description : string, departament: Departament)
     {
         this.Id = -1;
         this.Description = description;        
-        this.Users = [];
-        this.Company = company;
+        this.Users = [];       
         this.Departament = departament;      
     }
 }

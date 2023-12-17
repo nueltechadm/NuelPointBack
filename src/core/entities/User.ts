@@ -40,7 +40,7 @@ export default class User
 
     @Column()
     @ManyToOne(()=> JobRole, "Users")
-    public JobRole: JobRole;
+    public JobRole?: JobRole;
 
     @Column()
     @ManyToOne(() => Company)

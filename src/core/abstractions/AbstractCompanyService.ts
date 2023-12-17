@@ -6,7 +6,7 @@ export default abstract class AbstractCompanyService extends AbstractService<Com
 {
     abstract GetByIdAsync(id : number) : Promise<Company | undefined>;    
     abstract GetByNameAsync(name : string) : Promise<Company[]>;   
-    abstract AddDepartamentToAllAsync(departament : Departament) : Promise<void>;       
+           
 
 }
 

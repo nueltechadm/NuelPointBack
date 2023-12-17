@@ -27,11 +27,6 @@ export default class LoginController extends AbstractController
         this._databaseService = databaseService;
     }    
 
-    
-    public override async SetClientDatabaseAsync(): Promise<void> {
-        await this._userService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-    }    
-
 
     @POST("login")   
     public async LoginAsync(@FromBody()user : LoginDTO) : Promise<ActionResult>

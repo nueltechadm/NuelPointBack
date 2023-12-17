@@ -68,17 +68,6 @@ export default class AppointamentController extends AbstractController
     }   
     
     
-
-        
-    public override async SetClientDatabaseAsync(): Promise<void> {
-        await this._checkpointService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-        await this._appointamentService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-        await this._userService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-        await this._timeService.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-    }
-
-
-    
     @POST("insert")    
     @SetDatabaseFromToken()
     @AppointamentController.ProducesType(200, 'The just created Appointment object', AppointmentDTO)

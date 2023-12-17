@@ -24,12 +24,6 @@ export default class PermissionController extends AbstractController
     }        
 
 
-    public override async SetClientDatabaseAsync(): Promise<void> {
-        await this._service.SetClientDatabaseAsync(Authorization.CastRequest(this.Request).GetClientDatabase());
-    }
-
-
-
 
     @POST("list")     
     @SetDatabaseFromToken()

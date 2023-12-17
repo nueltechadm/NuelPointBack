@@ -34,10 +34,6 @@ export default class Company
     public Users : User[];
 
     @Column()
-    @OneToMany(()=> Departament)
-    public Departaments : Departament[];
-
-    @Column()
     @OneToMany(() => Contact)
     public Contacts : Contact[];
 
@@ -58,8 +54,7 @@ export default class Company
         this.Description = description;   
         this.Document = document;    
         this.Logo = undefined; 
-        this.Users = [];
-        this.Departaments= [];       
+        this.Users = [];       
         this.Contacts = [];
         this.Accesses = [];
         this.Address = undefined;

@@ -23,7 +23,7 @@ export default class DepartamentService  extends AbstractDepartamentService
     }
 
     public override IsCompatible(obj: any): obj is Departament {        
-        return Type.HasKeys<Departament>(obj, "Name", "Company");  
+        return Type.HasKeys<Departament>(obj, "Name");  
     }
 
     public override async SetClientDatabaseAsync(client: string): Promise<void> {       
@@ -43,7 +43,7 @@ export default class DepartamentService  extends AbstractDepartamentService
 
         this.ValidateObject(obj);      
 
-        return this._context.Collection(Departament).AddAsync(obj);
+        return this._context.Collection(Departament).AddObjectAndRelationsAsync(obj, []);
     }
 
     public override async ExistsAsync(id: number): Promise<boolean> {
