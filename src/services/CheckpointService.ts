@@ -119,7 +119,7 @@ export default class CheckpointService  extends AbstractCheckpointService
 
     public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Checkpoint>> 
     {
-        let offset = request.Page - 1 * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity;  
 
         let total = await this._context.Collection(Checkpoint).CountAsync();
 

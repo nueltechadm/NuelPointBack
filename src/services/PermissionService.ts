@@ -88,7 +88,7 @@ export default class PermissionService  extends AbstractPermissionService
 
     public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Permission>> 
     {
-        let offset = request.Page - 1 * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity; 
 
         let total = await this._context.Collection(Permission).CountAsync();
 

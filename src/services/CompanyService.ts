@@ -47,7 +47,7 @@ export default class CompanyService  extends AbstractCompanyService
 
     public override async GetAllAsync(request : CompanyPaginatedFilterRequest) : Promise<CompanyPaginatedFilterResponse>  
     {
-        let offset = request.Page - 1 * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity; 
 
         let total = await this.BuildQuery(request).CountAsync();
 

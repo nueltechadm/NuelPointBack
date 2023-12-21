@@ -178,7 +178,7 @@ export default class UserService  extends AbstractUserService
 
     public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<User>> 
     {
-        let offset = request.Page - 1 * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity; 
 
         let total = await this._context.Collection(User).CountAsync();
 

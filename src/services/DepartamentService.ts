@@ -23,7 +23,7 @@ export default class DepartamentService  extends AbstractDepartamentService
     }
 
     public override IsCompatible(obj: any): obj is Departament {        
-        return Type.HasKeys<Departament>(obj, "Name");  
+        return Type.HasKeys<Departament>(obj, "Description");  
     }
 
     public override async SetClientDatabaseAsync(client: string): Promise<void> {       
@@ -91,11 +91,11 @@ export default class DepartamentService  extends AbstractDepartamentService
     
     public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Departament>> 
     {
-        let offset = request.Page - 1 * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity;  
 
         let total = await this._context.Collection(Departament).CountAsync();
 
-        let departaments = await this._context.Collection(Departament).OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
+        let departaments = await this._context.Collection(Departament).OrderBy("Description").Offset(offset).Limit(request.Quantity).ToListAsync();
 
         let result = new PaginatedFilterResult<Departament>();
         result.Page = request.Page;
@@ -111,7 +111,7 @@ export default class DepartamentService  extends AbstractDepartamentService
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${Departament.name} type`);
 
-        if(!obj.Name)
+        if(!obj.Description)
             throw new InvalidEntityException(`The name of ${Departament.name} is required`);
        
     }

@@ -85,7 +85,7 @@ export default class AcessService extends AbstractAccessService {
     
     public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Access>> 
     {
-        let offset = request.Page - 1 * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity; 
 
         let total = await this._context.Collection(Access).CountAsync();
 

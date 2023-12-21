@@ -1,4 +1,4 @@
-import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
+import AbstractJobRoleService, { JobRolePaginatedFilteRequest } from "../core/abstractions/AbstractJobRoleService";
 import {Inject} from'web_api_base'
 import JobRole from "../core/entities/JobRole";
 import Type from "../utils/Type";
@@ -6,6 +6,8 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
 import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
+import { AbstractSet, Operation } from "myorm_core";
+import Departament from "../core/entities/Departament";
 
 export default class JobRoleService  extends AbstractJobRoleService
 {
@@ -24,7 +26,7 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
 
     public override IsCompatible(obj: any): obj is JobRole {        
-        return Type.HasKeys<JobRole>(obj, "Description", "Company");  
+        return Type.HasKeys<JobRole>(obj, "Description");  
     }
 
     public override async ExistsAsync(id: number): Promise<boolean> {
@@ -45,7 +47,7 @@ export default class JobRoleService  extends AbstractJobRoleService
 
         this.ValidateObject(obj);        
 
-        return this._context.Collection(JobRole).AddObjectAndRelationsAsync(obj, []);
+        return this._context.Collection(JobRole).AddObjectAndRelationsAsync(obj, ["Departament"]);
     }
 
     public override async GetByAndLoadAsync<K extends keyof JobRole>(key: K, value: JobRole[K], load: (keyof JobRole)[]): Promise<JobRole[]> 
@@ -87,22 +89,30 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
 
 
-    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<JobRole>> 
+    public override async GetAllAsync(request : JobRolePaginatedFilteRequest) : Promise<PaginatedFilterResult<JobRole>> 
     {
-        let offset = request.Page - 1 * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity;         
 
-        let total = await this._context.Collection(JobRole).CountAsync();
+        if(request.Description)
+            this._context.Collection(JobRole).Where({Field : "Description", Kind: Operation.CONSTAINS, Value : request.Description});
 
-        let jobs = await this._context.Collection(JobRole).OrderBy("Description").Offset(offset).Limit(request.Quantity).ToListAsync();
+        let rows = await this._context.Collection(JobRole).Join("Departament").ToListAsync();
 
+        let total = rows.Count();
+
+        if(request.Departament){
+            rows = rows.Where(s => s.Departament && s.Departament.Id == request.Departament);
+        }
+        
         let result = new PaginatedFilterResult<JobRole>();
         result.Page = request.Page;
-        result.Quantity = jobs.Count();
+        result.Quantity = rows.Count();
         result.Total = total;
-        result.Result = jobs;
+        result.Result = rows;
 
         return result;
     }
+    
 
     public override ValidateObject(obj: JobRole) : void
     {

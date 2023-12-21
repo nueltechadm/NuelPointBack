@@ -9,10 +9,7 @@ export default class Journey
     @Column()
     @PrimaryKey()
     @DataType(DBTypes.SERIAL)
-    public Id : number;
-
-    @Column()    
-    public Name : string;
+    public Id : number;   
 
     @Column()
     public Description : string;   
@@ -25,10 +22,9 @@ export default class Journey
    @OneToMany(() => DayOfWeek)
    public DaysOfWeek : DayOfWeek[];
 
-    constructor(name : string, description : string, days : number[], company : Company)
+    constructor(description : string, days : number[], company : Company)
     {
-        this.Id = -1;
-        this.Name = name;
+        this.Id = -1;      
         this.Description = description;       
         this.Company = company;
         this.DaysOfWeek = [];

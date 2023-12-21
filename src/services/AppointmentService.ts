@@ -71,7 +71,7 @@ export default class AppointmentService extends AbstractAppointmentService {
 
     public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Appointment>> 
     {
-        let offset = request.Page - 1 * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity; 
 
         let total = await this._context.Collection(Appointment).CountAsync();
 

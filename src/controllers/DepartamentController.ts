@@ -1,4 +1,4 @@
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, RequestJson } from "web_api_base";
 import { IsLogged } from '../filters/AuthFilter';
 import AbstractDepartamentService from "../core/abstractions/AbstractDepartamentService";
 import Departament from "../core/entities/Departament";
@@ -8,6 +8,7 @@ import Authorization from "../utils/Authorization";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
 import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
 import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
+import JobRole from "../core/entities/JobRole";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -40,7 +41,7 @@ export default class DepartamentController extends AbstractController {
     @SetDatabaseFromToken()
     public async GetByIdAsync(@FromQuery() id: number) : Promise<ActionResult>
     {        
-        let departament = await this._departamentService.GetByIdAsync(id);
+        let departament = (await this._departamentService.GetByAndLoadAsync("Id", id, ["JobRoles"])).FirstOrDefault();
 
         if (!departament)
             return this.NotFound({ Message: "departament not found" });
@@ -51,13 +52,14 @@ export default class DepartamentController extends AbstractController {
 
 
     @POST("insert")
-    @SetDatabaseFromToken()
+    @SetDatabaseFromToken()  
+    @RequestJson(JSON.stringify(Type.CreateTemplateFrom(JobRole, true), null, 2))  
     public async InsertAsync(@FromBody() departament: Departament) : Promise<ActionResult>
     {
-        let fromDB = await this._departamentService.GetByAndLoadAsync("Name", departament.Name.Trim(), []);
+        let fromDB = await this._departamentService.GetByAndLoadAsync("Description", departament.Description.Trim(), []);
 
         if(fromDB.Any(s => s.Id != departament.Id))
-            return this.BadRequest(`Departament ${departament.Name} already exists on database`);
+            return this.BadRequest(`Departament ${departament.Description} already exists on database`);
 
         await this._departamentService.AddAsync(departament);
 
@@ -72,12 +74,12 @@ export default class DepartamentController extends AbstractController {
         let exists = await this._departamentService.GetByAndLoadAsync("Id", departament.Id, []);
 
         if(!exists.Any())
-            return this.NotFound(`Departament ${departament.Name} not exists on database`);     
+            return this.NotFound(`Departament ${departament.Description} not exists on database`);     
 
-        let fromDB = await this._departamentService.GetByAndLoadAsync("Name", departament.Name.Trim(), []);
+        let fromDB = await this._departamentService.GetByAndLoadAsync("Description", departament.Description.Trim(), []);
 
         if(fromDB.Any(s => s.Id != departament.Id))
-            return this.BadRequest(`Departament ${departament.Name} already exists on database`);
+            return this.BadRequest(`Departament ${departament.Description} already exists on database`);
 
         await this._departamentService.UpdateAsync(departament);
 

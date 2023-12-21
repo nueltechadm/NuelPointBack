@@ -7,10 +7,7 @@ export default class Time
     @Column()
     @PrimaryKey()
     @DataType(DBTypes.SERIAL)
-    public Id : number;
-
-    @Column()    
-    public Name : string;
+    public Id : number;    
 
     @Column()
     public Description : string;      
@@ -31,10 +28,9 @@ export default class Time
     @DataType(DBTypes.DOUBLE)
     public Time4 : number; 
 
-    constructor(name : string, description : string,  time1 : number, time2 : number, time3 : number , time4 : number)
+    constructor(description : string,  time1 : number, time2 : number, time3 : number , time4 : number)
     {
-        this.Id = -1;
-        this.Name = name;
+        this.Id = -1;        
         this.Description = description;
         this.Time1 = time1;
         this.Time2 = time2;

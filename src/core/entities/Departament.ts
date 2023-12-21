@@ -12,7 +12,7 @@ export default class Departament
     public Id : number;
 
     @Column()
-    public Name : string;   
+    public Description : string;   
 
     @Column()
     @OneToMany(() => JobRole)
@@ -21,7 +21,7 @@ export default class Departament
     constructor(name : string)
     {
         this.Id = -1;
-        this.Name = name;        
+        this.Description = name;        
         this.JobRoles = [];                
     }
 }

@@ -80,11 +80,11 @@ export default class JourneyService  extends AbstractJorneyService
 
     public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Journey>> 
     {
-        let offset = request.Page - 1 * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity;  
 
         let total = await this._context.Collection(Journey).CountAsync();
 
-        let journeis = await this._context.Collection(Journey).OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
+        let journeis = await this._context.Collection(Journey).OrderBy("Description").Offset(offset).Limit(request.Quantity).ToListAsync();
 
         let result = new PaginatedFilterResult<Journey>();
         result.Page = request.Page;
