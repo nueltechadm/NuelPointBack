@@ -12,6 +12,7 @@ import AbstractUserService from "../core/abstractions/AbstractUserService";
 import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
 import JobRoleDTO from "../dto/JobRoleDTO";
 import AbstractDepartamentService from "../core/abstractions/AbstractDepartamentService";
+import Departament from "../core/entities/Departament";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -73,18 +74,40 @@ export default class JobRoleController extends AbstractController
     @POST("insert")     
     @SetDatabaseFromToken()
     public async InsertAsync(@FromBody()dto : JobRoleDTO) : Promise<ActionResult>
-    {  
-
-        let departament = await this._departamentService.GetByIdAsync(dto.DepartamentId);
+    { 
+        let departament = (await this._departamentService.GetByAndLoadAsync("Id", dto.DepartamentId, [])).FirstOrDefault();
 
         if(!departament)
             return this.NotFound(`Departament with Id ${dto.DepartamentId}`);
 
         let jobrole = new JobRole(dto.Description, departament);
 
-        let r = await this._jobRoleService.AddAsync(jobrole);
+        await this._jobRoleService.AddAsync(jobrole);
 
-        return this.OK({Message : 'JobRole created', Id : r.Id});
+        return this.OK({Message : 'JobRole created', Id : jobrole.Id});
+    }
+
+    
+    @POST("update")     
+    @SetDatabaseFromToken()
+    public async UpdateAsync(@FromBody()dto : JobRoleDTO) : Promise<ActionResult>
+    {
+        let departament = (await this._departamentService.GetByAndLoadAsync("Id", dto.DepartamentId, [])).FirstOrDefault();
+
+        if(!departament)
+            return this.NotFound(`Departament with Id ${dto.DepartamentId}`);
+
+        let job = (await this._jobRoleService.GetByAndLoadAsync("Id", dto.Id, ["Departament"])).FirstOrDefault();
+
+        if(!job)
+            return this.NotFound(`JobRole with Id ${dto.Id}`);
+
+        job.Description = dto.Description;
+        job.Departament = departament;
+
+        await this._jobRoleService.UpdateObjectAndRelationsAsync(job, ["Departament"]);
+
+        return this.OK({Message : 'JobRole updated'});
     }
 
    
@@ -142,28 +165,6 @@ export default class JobRoleController extends AbstractController
     }
 
     
-    @POST("update")     
-    @SetDatabaseFromToken()
-    public async UpdateAsync(@FromBody()dto : JobRoleDTO) : Promise<ActionResult>
-    {  
-
-        let departament = await this._departamentService.GetByIdAsync(dto.DepartamentId);
-
-        if(!departament)
-            return this.NotFound(`Departament with Id ${dto.DepartamentId}`);
-
-        let job = await this._jobRoleService.GetByIdAsync(dto.Id);
-
-        if(!job)
-            return this.NotFound(`JobRole with Id ${dto.DepartamentId}`);
-
-        job.Description = dto.Description;
-        job.Departament = departament;
-
-        let r = await this._jobRoleService.UpdateObjectAndRelationsAsync(job, ["Departament"]);
-
-        return this.OK({Message : 'JobRole updated'});
-    }
 
 
     @DELETE("delete")     

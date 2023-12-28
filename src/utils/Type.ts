@@ -108,7 +108,7 @@ export default class Type
         return o;
     }
 
-    public static CreateTemplateFrom<T extends object>(ctor : new (...args: any[]) => T, recursive = false) : T
+    public static CreateTemplateFrom<T extends object>(ctor : new (...args: any[]) => T, recursive = false, exclude : (keyof T)[] = [] ) : T
     {
         let base = Reflect.construct(ctor, []) as T;
 
@@ -127,7 +127,12 @@ export default class Type
                 }
             }       
 
-        return Type.FillObject(base);
+        let o = Type.FillObject(base);
+
+        for(let e of  exclude)
+            Type.Delete(o, e);
+
+        return o;
     }
 
     public static RemoveAllRelationedObject<T extends object>(obj : T) : T

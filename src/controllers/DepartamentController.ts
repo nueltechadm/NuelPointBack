@@ -53,7 +53,7 @@ export default class DepartamentController extends AbstractController {
 
     @POST("insert")
     @SetDatabaseFromToken()  
-    @RequestJson(JSON.stringify(Type.CreateTemplateFrom(JobRole, true), null, 2))  
+    @RequestJson(JSON.stringify(Type.CreateTemplateFrom<Departament>(Departament, false, ["JobRoles"]), null, 2))  
     public async InsertAsync(@FromBody() departament: Departament) : Promise<ActionResult>
     {
         let fromDB = await this._departamentService.GetByAndLoadAsync("Description", departament.Description.Trim(), []);
@@ -69,6 +69,7 @@ export default class DepartamentController extends AbstractController {
 
     @PUT("update")
     @SetDatabaseFromToken()
+    @RequestJson(JSON.stringify(Type.CreateTemplateFrom<Departament>(Departament, false, ["JobRoles"]), null, 2))  
     public async UpdateAsync(@FromBody() departament: Departament) : Promise<ActionResult>
     {   
         let exists = await this._departamentService.GetByAndLoadAsync("Id", departament.Id, []);
@@ -106,8 +107,11 @@ export default class DepartamentController extends AbstractController {
     @SetDatabaseFromToken()
     public GetJson() : ActionResult
     {
-        return this.OK(Type.CreateTemplateFrom<Departament>(Departament));
+        return this.OK(Type.CreateTemplateFrom<Departament>(Departament, false, ["JobRoles"]));
+       
     }
+
+    
 
 
 }

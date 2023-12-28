@@ -2,12 +2,12 @@
 import File from 'fs';
 import FileAsync from 'fs/promises';
 import Path from 'path';
-import FileServiceBase from "./abstractions/AbstractFileService";
+import AbstractFileService from "./abstractions/AbstractFileService";
 import { Application, ApplicationConfiguration, Exception } from 'web_api_base';
 import Checkpoint from '../core/entities/Checkpoint';
 
 
-export default class FileService extends FileServiceBase
+export default class FileService extends AbstractFileService
 {
       
 

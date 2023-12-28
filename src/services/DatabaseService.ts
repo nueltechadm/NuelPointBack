@@ -46,9 +46,7 @@ export default class DatabaseService extends AbstractDatabaseService{
 
     public override async UpdateDatabaseSchemaAsync(db: Database): Promise<void> 
     {
-        if(db.Status == DababaseStatus.CREATED || db.Status == DababaseStatus.UPDATED)
-        {
-            db.Status = DababaseStatus.UPDATING;
+        db.Status = DababaseStatus.UPDATING;
 
             await this._controlContext.Collection(Database).UpdateAsync(db);
 
@@ -66,13 +64,12 @@ export default class DatabaseService extends AbstractDatabaseService{
             
             db.LasUpdate = new Date();
             await this._controlContext.Collection(Database).UpdateAsync(db);
-        }
     }
 
     public override async CreateDabaseAsync(dabataseName: string): Promise<void> {
         let db = await this._controlContext.Collection(Database).Where({ Field: 'Name', Value: dabataseName }).FirstOrDefaultAsync();
 
-        if (!db || db.Status == DababaseStatus.DELETED) {
+        if (!db) {
 
             await (this._context as any)["_manager"].CreateDataBase(dabataseName);            
 
