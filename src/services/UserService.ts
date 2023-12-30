@@ -176,7 +176,7 @@ export default class UserService  extends AbstractUserService
        return await this._context.Collection(User).DeleteAsync(obj)!;
     }
 
-    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<User>> 
+    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<User>> 
     {
         let offset = (request.Page - 1) * request.Quantity; 
 

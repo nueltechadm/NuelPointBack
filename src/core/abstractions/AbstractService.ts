@@ -7,8 +7,8 @@ export default abstract class AbstractService<T, R extends PaginatedFilterReques
     abstract AddAsync(obj : T) : Promise<T>;
     abstract UpdateAsync(obj : T) : Promise<T>;
     abstract UpdateObjectAndRelationsAsync<U extends keyof T>(obj : T, relations : U[]) : Promise<T>;
-    abstract DeleteAsync(obj : T) : Promise<T>;
-    abstract GetAllAsync(request : R) : Promise<U>;
+    abstract DeleteAsync(obj : T) : Promise<T>;    
+    abstract PaginatedFilterAsync(request : R) : Promise<U>;
     abstract GetByIdAsync(id : number) : Promise<T | undefined>;
     abstract GetByAndLoadAsync<K extends keyof T>(key : K, value : T[K], load : (keyof T)[]) : Promise<T[]>;
     abstract CountAsync() : Promise<number>;

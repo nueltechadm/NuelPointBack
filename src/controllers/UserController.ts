@@ -58,9 +58,9 @@ export default class UserController extends AbstractController
     @POST("list")
     @SetDatabaseFromToken()
     @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
-    public async GetAllAsync(@FromBody()params : PaginatedFilterRequest) : Promise<ActionResult>
+    public async PaginatedFilterAsync(@FromBody()params : PaginatedFilterRequest) : Promise<ActionResult>
     {       
-       let paginatedResult =  await this._userService.GetAllAsync(params);
+       let paginatedResult =  await this._userService.PaginatedFilterAsync(params);
 
        paginatedResult.Result.forEach(s => this.RemovePassword(s));
 

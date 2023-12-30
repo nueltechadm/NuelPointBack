@@ -1,4 +1,4 @@
-import AbstractDepartamentService from "../core/abstractions/AbstractDepartamentService";
+import AbstractDepartamentService, { DepartamentPaginatedRequest } from "../core/abstractions/AbstractDepartamentService";
 import {Inject} from'web_api_base'
 import Type from "../utils/Type";
 import Departament from "../core/entities/Departament";
@@ -7,6 +7,7 @@ import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
 import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
 import Appointment from "../core/entities/Appointment";
+import { AbstractSet } from "myorm_core";
 
 
 
@@ -39,6 +40,11 @@ export default class DepartamentService  extends AbstractDepartamentService
         return await this._context.Collection(Departament).WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }
     
+    public async GetAllAsync(): Promise<Departament[]> {        
+        return await this._context.Collection(Departament).OrderBy("Description").ToListAsync();
+    }
+
+
     public override async AddAsync(obj: Departament): Promise<Departament> {
 
         this.ValidateObject(obj);      
@@ -89,13 +95,13 @@ export default class DepartamentService  extends AbstractDepartamentService
     }
 
     
-    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Departament>> 
+    public override async PaginatedFilterAsync(request : DepartamentPaginatedRequest) : Promise<PaginatedFilterResult<Departament>> 
     {
         let offset = (request.Page - 1) * request.Quantity;  
 
-        let total = await this._context.Collection(Departament).CountAsync();
+        let total = await this.BuildQuery(request).CountAsync();
 
-        let departaments = await this._context.Collection(Departament).OrderBy("Description").Offset(offset).Limit(request.Quantity).ToListAsync();
+        let departaments = await this.BuildQuery(request).OrderBy("Description").Offset(offset).Limit(request.Quantity).ToListAsync();
 
         let result = new PaginatedFilterResult<Departament>();
         result.Page = request.Page;
@@ -104,6 +110,16 @@ export default class DepartamentService  extends AbstractDepartamentService
         result.Result = departaments;
 
         return result;
+    }
+
+    protected BuildQuery(request : DepartamentPaginatedRequest) : AbstractSet<Departament>
+    {
+        let collection = this._context.Collection(Departament);
+
+        if(request.Description)
+            collection.WhereField("Description").Constains(request.Description.Trim());
+
+        return collection;
     }
 
     public override ValidateObject(obj: Departament) : void

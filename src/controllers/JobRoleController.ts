@@ -1,6 +1,6 @@
 
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
-import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
+import AbstractJobRoleService, { JobRolePaginatedFilteRequest } from "../core/abstractions/AbstractJobRoleService";
 import JobRole from "../core/entities/JobRole";
 import {IsLogged} from '../filters/AuthFilter';
 import Type from "../utils/Type";
@@ -49,9 +49,9 @@ export default class JobRoleController extends AbstractController
 
     @POST("list")     
     @SetDatabaseFromToken()
-    public async GetAllAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    public async PaginatedFilterAsync(@FromBody()params : JobRolePaginatedFilteRequest): Promise<ActionResult> 
     {             
-        return this.OK(await this._jobRoleService.GetAllAsync(params));
+        return this.OK(await this._jobRoleService.PaginatedFilterAsync(params));
     }
 
 

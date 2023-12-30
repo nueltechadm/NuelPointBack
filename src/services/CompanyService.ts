@@ -45,7 +45,7 @@ export default class CompanyService  extends AbstractCompanyService
     }   
     
 
-    public override async GetAllAsync(request : CompanyPaginatedFilterRequest) : Promise<CompanyPaginatedFilterResponse>  
+    public override async PaginatedFilterAsync(request : CompanyPaginatedFilterRequest) : Promise<CompanyPaginatedFilterResponse>  
     {
         let offset = (request.Page - 1) * request.Quantity; 
 

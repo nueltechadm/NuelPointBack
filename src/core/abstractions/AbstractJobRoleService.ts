@@ -8,8 +8,8 @@ export default abstract class AbstractJobRoleService extends AbstractService<Job
 
 export /* sealed */ class JobRolePaginatedFilteRequest extends PaginatedFilterRequest
 {
-    Description? : string = undefined;
-    Departament? : number = undefined;   
+    JobroleDescription? : string = "";
+    DepartamentId? : number = -1;   
 
     constructor()
     {

@@ -1,13 +1,13 @@
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, RequestJson } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, RequestJson, ProducesResponse } from "web_api_base";
 import { IsLogged } from '../filters/AuthFilter';
-import AbstractDepartamentService from "../core/abstractions/AbstractDepartamentService";
+import AbstractDepartamentService, { DepartamentPaginatedRequest } from "../core/abstractions/AbstractDepartamentService";
 import Departament from "../core/entities/Departament";
 import Type from "../utils/Type";
 import AbstractController from "./AbstractController";
 import Authorization from "../utils/Authorization";
 import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
 import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
-import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
 import JobRole from "../core/entities/JobRole";
 
 @UseBefore(IsLogged)
@@ -30,15 +30,24 @@ export default class DepartamentController extends AbstractController {
 
     @POST("list")     
     @SetDatabaseFromToken()
-    public async GetAllAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    @DepartamentController.ProducesType(200, "A page of departaments", PaginatedFilterResult<Departament>)
+    public async PaginatedFilterAsync(@FromBody()params : DepartamentPaginatedRequest): Promise<ActionResult> 
     {             
-        return this.OK(await this._departamentService.GetAllAsync(params));
+        return this.OK(await this._departamentService.PaginatedFilterAsync(params));
     }
 
-
+    @POST("all")     
+    @SetDatabaseFromToken()
+    @ProducesResponse({ Status: 200, Description: "All departaments without jobroles relateds", JSON: JSON.stringify([Type.CreateTemplateFrom(Departament, false, ["JobRoles"])], null, 2)})
+    public async GetAllAsync(): Promise<ActionResult> 
+    {             
+        return this.OK((await this._departamentService.GetAllAsync()).Select(s => Type.Delete(s, "JobRoles")));
+    }
 
     @GET("getById")
     @SetDatabaseFromToken()
+    @DepartamentController.ProducesType(200, "The departament", Departament)
+    @DepartamentController.ProducesMessage(404, "The departament", { Message: "departament not found" })
     public async GetByIdAsync(@FromQuery() id: number) : Promise<ActionResult>
     {        
         let departament = (await this._departamentService.GetByAndLoadAsync("Id", id, ["JobRoles"])).FirstOrDefault();

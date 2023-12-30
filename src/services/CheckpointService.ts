@@ -117,7 +117,7 @@ export default class CheckpointService  extends AbstractCheckpointService
         return this._context.Collection(Checkpoint).DeleteAsync(obj);
     }
 
-    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Checkpoint>> 
+    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Checkpoint>> 
     {
         let offset = (request.Page - 1) * request.Quantity;  
 

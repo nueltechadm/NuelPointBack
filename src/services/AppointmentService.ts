@@ -69,7 +69,7 @@ export default class AppointmentService extends AbstractAppointmentService {
         return this._context.Collection(Appointment).DeleteAsync(obj);
     }
 
-    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Appointment>> 
+    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Appointment>> 
     {
         let offset = (request.Page - 1) * request.Quantity; 
 

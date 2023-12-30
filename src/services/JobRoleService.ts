@@ -6,7 +6,7 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
 import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
-import { AbstractSet, Operation } from "myorm_core";
+import { AbstractSet, IJoinSelectable, IJoiningQuery, Operation } from "myorm_core";
 import Departament from "../core/entities/Departament";
 
 export default class JobRoleService  extends AbstractJobRoleService
@@ -89,30 +89,35 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
 
 
-    public override async GetAllAsync(request : JobRolePaginatedFilteRequest) : Promise<PaginatedFilterResult<JobRole>> 
+    public override async PaginatedFilterAsync(request : JobRolePaginatedFilteRequest) : Promise<PaginatedFilterResult<JobRole>> 
     {
         let offset = (request.Page - 1) * request.Quantity;         
 
-        if(request.Description)
-            this._context.Collection(JobRole).Where({Field : "Description", Kind: Operation.CONSTAINS, Value : request.Description});
+        let total = await this.BuildQuery(request).CountAsync();
 
-        let rows = await this._context.Collection(JobRole).Join("Departament").ToListAsync();
-
-        let total = rows.Count();
-
-        if(request.Departament){
-            rows = rows.Where(s => s.Departament && s.Departament.Id == request.Departament);
-        }
+        let jobs = await this.BuildQuery(request).Offset(offset).Limit(request.Quantity).ToListAsync();
         
         let result = new PaginatedFilterResult<JobRole>();
         result.Page = request.Page;
-        result.Quantity = rows.Count();
+        result.Quantity = jobs.Count();
         result.Total = total;
-        result.Result = rows;
+        result.Result = jobs;
 
         return result;
     }
     
+    protected BuildQuery(request : JobRolePaginatedFilteRequest) : IJoinSelectable<JobRole>
+    {
+        let collection = this._context.Join(JobRole, Departament)
+                                      .On(JobRole, "Departament", Departament, "Id"); 
+
+        if(request.JobroleDescription)
+            collection.Where(JobRole, {Field: "Description", Kind: Operation.CONSTAINS, Value: request.JobroleDescription});
+        if(request.DepartamentId && request.DepartamentId > 0)
+            collection.Where(Departament, {Field: "Id", Value: request.DepartamentId});
+
+        return collection.Select(JobRole);
+    }
 
     public override ValidateObject(obj: JobRole) : void
     {

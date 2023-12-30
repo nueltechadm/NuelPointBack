@@ -23,9 +23,9 @@ export default class JourneyController extends AbstractController {
 
     @POST("list")     
     @SetDatabaseFromToken()
-    public async GetAllAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    public async PaginatedFilterAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
     {             
-        return this.OK(await this._service.GetAllAsync(params));
+        return this.OK(await this._service.PaginatedFilterAsync(params));
     }
 
 

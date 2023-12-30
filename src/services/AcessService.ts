@@ -83,7 +83,7 @@ export default class AcessService extends AbstractAccessService {
         return this._context.Collection(Access).DeleteAsync(obj);
     }
     
-    public override async GetAllAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Access>> 
+    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Access>> 
     {
         let offset = (request.Page - 1) * request.Quantity; 
 

@@ -47,9 +47,9 @@ export default class CompanyController extends AbstractController {
     @SetDatabaseFromToken()
     @CompanyController.ReceiveType(CompanyPaginatedFilterRequest)
     @CompanyController.ProducesType(200, 'List of all comapanies retrived by filters' , CompanyPaginatedFilterResponse)    
-    public async FilterAsync(@FromBody()params : CompanyPaginatedFilterRequest) : Promise<ActionResult>
+    public async PaginatedFilterAsync(@FromBody()params : CompanyPaginatedFilterRequest) : Promise<ActionResult>
     {  
-        return this.OK(await this._companyService.GetAllAsync(params));
+        return this.OK(await this._companyService.PaginatedFilterAsync(params));
     }
 
 

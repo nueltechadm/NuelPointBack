@@ -1,9 +1,10 @@
-import { Inject, GET, ControllerBase, FromQuery, UseBefore, ActionResult } from "web_api_base";
+import { Inject, GET, ControllerBase, FromQuery, UseBefore, ActionResult, Validate } from "web_api_base";
 import { DababaseStatus } from "../core/entities/Database";
 import AbstractDatabaseService from "../services/abstractions/AbstractDatabaseService";
 import   DatabasesAuthFilter from "../filters/DatabasesAuthFilter";
 
 @UseBefore(DatabasesAuthFilter)
+@Validate()
 export default class ControlController extends ControllerBase {
     @Inject()
     private _service: AbstractDatabaseService;
@@ -19,10 +20,6 @@ export default class ControlController extends ControllerBase {
     @GET("init")
     public async CreateDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
     {
-
-        if(!name)
-            return this.BadRequest({Message : "The parameter \"name\" is required"});
-
         let exist = await this._service.CheckIfDatabaseExists(name);
 
         if(exist)
@@ -60,13 +57,13 @@ export default class ControlController extends ControllerBase {
     public async CheckDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
     {
 
-        if(!name)
-            return this.BadRequest({Message : "The parameter \"name\" is required"});
-
         let db = await this._service.GetDabaseAsync(name);
 
-        if (db)
-            return this.OK(db);       
+        if (db){
+
+            (db as any)["StatusString"] = db.Status.toString();
+            return this.OK(db);  
+        }     
         else 
             return this.NotFound();       
             
@@ -75,9 +72,6 @@ export default class ControlController extends ControllerBase {
     @GET("force-update")
     public async ForceUpdateDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
     {
-        if(!name)
-        return this.BadRequest({Message : "The parameter \"name\" is required"});
-
         let db = await this._service.GetDabaseAsync(name);
 
         if (!db)           
@@ -100,10 +94,6 @@ export default class ControlController extends ControllerBase {
     @GET("update")
     public async UpdateDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
     {
-
-        if(!name)
-            return this.BadRequest({Message : "The parameter \"name\" is required"});
-
         let db = await this._service.GetDabaseAsync(name);
 
         if (!db)           
