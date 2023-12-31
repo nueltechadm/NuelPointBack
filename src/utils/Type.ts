@@ -108,25 +108,34 @@ export default class Type
         return o;
     }
 
-    public static CreateTemplateFrom<T extends object>(ctor : new (...args: any[]) => T, recursive = false, exclude : (keyof T)[] = [] ) : T
+    public static CreateTemplateFrom<T extends object>(ctor : new (...args: any[]) => T, recursive = false, include : (keyof T)[] = [], exclude : (keyof T)[] = [] ) : T
     {
         let base = Reflect.construct(ctor, []) as T;
 
-        if(recursive)
-            for(let map of TP.GetColumnNameAndType(ctor))
+        for(let map of TP.GetColumnNameAndType(ctor))
+        {           
+
+            if(exclude.Any(s => s == map.Field))
+                continue;
+                
+            let relation = Schema.GetRelationAttribute(ctor, map.Field);
+            let designType = TP.GetDesingType(ctor, map.Field);
+
+            if(relation && designType)
             {
-                let relation = Schema.GetRelationAttribute(ctor, map.Field);
-                let designType = TP.GetDesingType(ctor, map.Field);
-
-                if(relation && designType)
+                if(!(recursive || include.Any(s => s == map.Field)))
                 {
-                    if(designType != Array)                
-                        (base as any)[map.Field] = Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object);
-                    else
-                        (base as any)[map.Field] = [Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object)];
+                    exclude.push(map.Field as keyof T);
+                    continue;
                 }
-            }       
 
+                if(designType != Array)                
+                    (base as any)[map.Field] = Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object);
+                else
+                    (base as any)[map.Field] = [Type.FillObject(Reflect.construct(relation.TypeBuilder(), []) as object)];
+            }
+        }      
+       
         let o = Type.FillObject(base);
 
         for(let e of  exclude)

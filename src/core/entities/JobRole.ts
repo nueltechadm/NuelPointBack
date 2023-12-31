@@ -4,7 +4,7 @@ import Company from './Company';
 import Departament from './Departament';
 
 
-@Table()
+@Table("jobrole_tb")
 export default class JobRole
 {
     @Column()

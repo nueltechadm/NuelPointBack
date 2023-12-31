@@ -16,9 +16,9 @@
     "formidable": "^2.1.2",
     "jsonwebtoken": "^9.0.0",
     "myorm_core": "^4.0.0",
-    "myorm_pg": "^6.2.1",
+    "myorm_pg": "^6.2.2",
     "ts_linq_base": "^1.1.0",
-    "web_api_base": "^4.0.4"
+    "web_api_base": "^4.0.6"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",

@@ -97,13 +97,7 @@ export default class TimeService extends AbstractTimeService {
         
         let u = await this._context.Collection(User).WhereField("Id").IsEqualTo(userId).LoadRelationOn("Journey").FirstOrDefaultAsync();
 
-        let d = u?.Journey?.DaysOfWeek.filter(s => s.Day == day);
-
-        if(d && d?.length > 0)
-            return d[0].Time;
-        else
-            return undefined;
-
+        return u?.Journey?.Times.filter(s => s.DayOfweek?.Day == day).FirstOrDefault();
     }
 
     public override ValidateObject(obj: Time): void {

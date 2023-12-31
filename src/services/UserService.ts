@@ -7,7 +7,8 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Access from "../core/entities/Access";
 import { Inject } from "web_api_base";
 import AbstractDBContext from "../data/abstract/AbstractDBContext";
-import Permission from "../core/entities/Permission";
+
+
 import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
 
 
@@ -24,7 +25,7 @@ export default class UserService  extends AbstractUserService
     }
 
     public override IsCompatible(obj: any): obj is User {
-        return Type.HasKeys<User>(obj, "Name", "Email");
+        return Type.HasKeys<User>(obj, "Name");
     }
 
     public override async SetClientDatabaseAsync(client: string): Promise<void> {    
@@ -69,7 +70,7 @@ export default class UserService  extends AbstractUserService
                                     .And(Access, { Field : "Password", Value : MD5(password)})       
                                     .Select(Access)                                    
                                     .Join("User")
-                                    .Join("Permissions")                                                                       
+                                    .Join("Perfil")                                                                       
                                     .FirstOrDefaultAsync();   
         if(!access)
             return undefined;
@@ -89,83 +90,44 @@ export default class UserService  extends AbstractUserService
        return await this._context.Collection(User).ToListAsync();
     } 
 
-    public override async GetByEmailAsync(email: string): Promise<User | undefined> 
-    {       
-
-        return await this._context.Collection(User).Where(
-                                            {
-                                                Field : "Email", 
-                                                Value : email
-                                            })                                            
-                                            .Join("Company")                                            
-                                            .FirstOrDefaultAsync();
-    }
-
+   
     public override async AddAsync(obj: User): Promise<User> 
     { 
+        if(!obj.Access)
+            throw new InvalidEntityException(`The ${Access.name} of the ${User.name} is required`);
         
-        if(obj.Access)
-        {
-            obj.Access.Id = -1;
+        obj.Access.Id = -1;
 
-            obj.Access!.Password = MD5(obj.Access!.Password);
-        
-            await this.SyncPermissionsAsync(obj.Access!);
-        }  
+        obj.Access!.Password = MD5(obj.Access!.Password);  
 
-        if(!obj.Company && !obj.IsSuperUser)
+        if(!obj.Company && !obj.IsSuperUser())
             throw new InvalidEntityException("The company of the user is required");
 
-        if(!obj.JobRole && !obj.IsSuperUser)
+        if(!obj.JobRole && !obj.IsSuperUser())
             throw new InvalidEntityException("The jobrole of the user is required"); 
         
 
         return await this._context.Collection(User).AddAsync(obj)!;        
     }
 
-    public override async UpdateAsync(obj: User): Promise<User> {
+    public override async UpdateAsync(obj: User): Promise<User> 
+    {     
+        return await this._context.Collection(User).UpdateAsync(obj);        
+    }
 
-        this.ValidateObject(obj);
-
-        let curr = (await this.GetByAndLoadAsync("Id", obj.Id, ["Access"])).FirstOrDefault();
+    public override async UpdateObjectAndRelationsAsync<U extends keyof User>(obj: User, relations: U[]): Promise<User> 
+    {
+        let curr = (await this.GetByAndLoadAsync("Id", obj.Id, relations)).FirstOrDefault();
 
         if(!curr)
             throw new ObjectNotFoundExcpetion(`This user do not exists on database`);
 
-        await this._context.Collection(User).UpdateAsync(obj);
-        
         if(obj.Access)
         {
             obj.Access.Id = curr.Access?.Id ?? -1;
-
-            obj.Access!.Password = MD5(obj.Access!.Password);
-        
-            await this.SyncPermissionsAsync(obj.Access!);       
-            
-            await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, ["Access"])!
-        } 
-
-        return obj;
-    }
-
-    public override async UpdateObjectAndRelationsAsync<U extends keyof User>(obj: User, relations: U[]): Promise<User> {
-
-        this.ValidateObject(obj);
-
-        let curr = (await this.GetByAndLoadAsync("Id", obj.Id, ["Access"])).FirstOrDefault();
-
-        if(!curr)
-            throw new ObjectNotFoundExcpetion(`This user do not exists on database`);
-
-            if(obj.Access)
-            {
-                obj.Access.Id = curr.Access?.Id ?? -1;
     
-                obj.Access!.Password = MD5(obj.Access!.Password);
-            
-                await this.SyncPermissionsAsync(obj.Access!);           
-            } 
-             
+            obj.Access!.Password = MD5(obj.Access!.Password);
+        } 
 
         return await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, relations);
     }
@@ -196,18 +158,15 @@ export default class UserService  extends AbstractUserService
     public override ValidateObject(obj : User) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`This object is not of ${User.name} type`); 
+            throw new InvalidEntityException(`This object is not of ${User.name} type`);        
 
-        if(!obj.Email && !obj.IsSuperUser)
-          throw new InvalidEntityException(`The email of user is required`);
-
-        if(!obj.Name && !obj.IsSuperUser)
+        if(!obj.Name && !obj.IsSuperUser())
           throw new InvalidEntityException(`The name of user is required`);
 
-        if(!obj.Company && !obj.IsSuperUser)
+        if(!obj.Company && !obj.IsSuperUser())
           throw new InvalidEntityException("The company of the user is required");
 
-       if(!obj.JobRole && !obj.IsSuperUser)
+       if(!obj.JobRole && !obj.IsSuperUser())
           throw new InvalidEntityException("The jobrole of the user is required");    
     }
 
@@ -217,18 +176,7 @@ export default class UserService  extends AbstractUserService
             return undefined;
 
         return await this._context.Collection(Access).Where({ Field : "Id", Value : id}).FirstOrDefaultAsync();
-    }
-
-    private async SyncPermissionsAsync(obj : Access) : Promise<void>
-    {
-        let permissionsIds = obj.Permissions != undefined ? obj.Permissions.map(s => s.Id) : [];
-
-        if(permissionsIds)
-        {
-            obj.Permissions = await this._context.Collection(Permission).WhereField("Id").IsInsideIn(permissionsIds).ToListAsync();
-        }
-    }
-
+    }   
 }
 
 

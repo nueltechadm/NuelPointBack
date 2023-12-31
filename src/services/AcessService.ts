@@ -53,8 +53,7 @@ export default class AcessService extends AbstractAccessService {
     public override async GetByIdAsync(id: number): Promise<Access | undefined> {
         return await this._context.Collection(Access)
         .WhereField("Id")
-        .IsEqualTo(id)        
-        .LoadRelationOn("Permissions")
+        .IsEqualTo(id) 
         .LoadRelationOn("User")
         .FirstOrDefaultAsync();
     }

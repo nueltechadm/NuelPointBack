@@ -1,5 +1,5 @@
 
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ProducesResponse, ActionResult } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ProducesResponse, ActionResult, RequestJson, Description } from "web_api_base";
 import AbstractUserService from "../core/abstractions/AbstractUserService";
 import User from "../core/entities/User";
 import {IsLogged} from '../filters/AuthFilter';
@@ -16,7 +16,8 @@ import JobRole from "../core/entities/JobRole";
 import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
 import AbstractAccessService from "../core/abstractions/AbstractAccessService";
 import Contact from "../core/entities/Contact";
-import Access from "../core/entities/Access";
+import Access, { PERFILTYPE } from "../core/entities/Access";
+import { MD5 } from "../utils/Cryptography";
 
 @UseBefore(IsLogged)
 @Validate()
@@ -58,6 +59,7 @@ export default class UserController extends AbstractController
     @POST("list")
     @SetDatabaseFromToken()
     @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
+    @Description(`Utilize esse metodo para realizar consulta de ${User.name}`)   
     public async PaginatedFilterAsync(@FromBody()params : PaginatedFilterRequest) : Promise<ActionResult>
     {       
        let paginatedResult =  await this._userService.PaginatedFilterAsync(params);
@@ -73,6 +75,7 @@ export default class UserController extends AbstractController
     @SetDatabaseFromToken() 
     @UserController.ProducesType(200,  "A completed loaded user", User)
     @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"}) 
+    @Description(`Utilize esse metodo para obter um ${User.name} por id e carregar as demais relações`)   
     public async GetByIdAsync(@FromQuery()id : number) : Promise<ActionResult>
     { 
        let users = await this._userService.GetByAndLoadAsync("Id", id, ["Access", "Company" ,"Contacts", "JobRole", "Journey"]);
@@ -84,12 +87,23 @@ export default class UserController extends AbstractController
     }       
     
     
+    @POST("perfils")
+    @SetDatabaseFromToken()
+    @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
+    @Description(`Utilize esse metodo obter todos os tipos de perfis disponiveis`)   
+    public async GetPerfils() : Promise<ActionResult>
+    {       
+      return this.OK(Object.values(PERFILTYPE));
+    }    
+    
 
     
     @POST("insert")
     @SetDatabaseFromToken()
     @UserController.ProducesType(200, 'The just created user', User) 
     @UserController.ProducesMessage(400, 'Error message', {Message : 'The company of the user is required'}) 
+    @RequestJson(JSON.stringify(Type.CreateTemplateFrom(User, false, ["Access"], []), null, 2)) 
+    @Description(`Utilize esse metodo para criad um novo ${User.name}`)   
     public async InsertAsync(@FromBody()user : User) : Promise<ActionResult>
     {         
         await this._userService.AddAsync(user);
@@ -99,7 +113,8 @@ export default class UserController extends AbstractController
 
 
     @PUT("contact")  
-    @SetDatabaseFromToken()       
+    @SetDatabaseFromToken()   
+    @Description(`Utilize esse metodo para adicionar ou editar um ${Contact.name} de um ${User.name}`)       
     public async UpdateContact(@FromQuery()userId : number, @FromBody()contact : Contact) : Promise<ActionResult>
     {        
         let users= await this._userService.GetByAndLoadAsync("Id", userId, ["Contacts"]);
@@ -116,19 +131,43 @@ export default class UserController extends AbstractController
         return this.OK('User´s contacts updated');
     }
 
+    @PUT("delete/contact")  
+    @SetDatabaseFromToken()    
+    @Description(`Utilize esse metodo para remover um ${Contact.name} de um ${User.name}`)   
+    public async DeleteContact(@FromQuery()userId : number, @FromQuery()contactId : number) : Promise<ActionResult>
+    {        
+        let user= (await this._userService.GetByAndLoadAsync("Id", userId, ["Contacts"])).FirstOrDefault();
+
+        if(!user)
+            return this.NotFound({Message : `User with Id ${userId} not exists`});        
+
+        if(!user.Contacts.Any(s => s.Id == contactId))
+            return this.NotFound({Message : `User with Id ${userId} dot not have a contact with Id ${contactId}`});        
+
+        user.Contacts.RemoveAll(s => s.Id == contactId);              
+
+        await this._userService.UpdateAsync(user);
+
+        return this.OK('User´s contacts updated');
+    }
     
     
     @PUT("access")  
     @SetDatabaseFromToken()       
+    @Description(`Utilize esse metodo para atualizar o ${Access.name} de um ${User.name}`)   
     public async UpdateAccess(@FromQuery()userId : number, @FromBody()access : Access) : Promise<ActionResult>
-    {
-        
+    {        
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["Access"])).FirstOrDefault();
 
         if(!user)
             return this.NotFound({Message : `User with Id ${userId} not exists`});          
-            
-        user.Access = access;       
+        
+        access.Id = user.Access.Id;
+
+        if(access.Password != user.Access.Password)
+            access.Password = MD5(access.Password);
+
+        Object.assign(user.Access, access);            
 
         await this._userService.UpdateAsync(user);
 
@@ -138,10 +177,10 @@ export default class UserController extends AbstractController
 
     
     @PUT("journey")  
-    @SetDatabaseFromToken()       
+    @SetDatabaseFromToken() 
+    @Description(`Utilize esse metodo para atualizar a ${Journey.name} de um ${User.name}`) 
     public async UpdateJouney(@FromQuery()userId : number, @FromQuery()journeyId : number) : Promise<ActionResult>
-    {
-        
+    {        
         let user= (await this._userService.GetByAndLoadAsync("Id", userId, ["Journey"])).FirstOrDefault();
 
         if(!user)
@@ -164,10 +203,10 @@ export default class UserController extends AbstractController
 
     
     @PUT("company")  
-    @SetDatabaseFromToken()       
+    @SetDatabaseFromToken()   
+    @Description(`Utilize esse metodo para atualizar a ${Company.name} de um ${User.name}`)     
     public async UpdateCompany(@FromQuery()userId : number, @FromQuery()companyId : number) : Promise<ActionResult>
-    {
-        
+    {        
         let user= (await this._userService.GetByAndLoadAsync("Id", userId, ["Company"])).FirstOrDefault();
 
         if(!user)
@@ -189,10 +228,10 @@ export default class UserController extends AbstractController
 
 
     @PUT("jobRole")  
-    @SetDatabaseFromToken()       
+    @SetDatabaseFromToken()      
+    @Description(`Utilize esse metodo para atualizar a ${JobRole.name} de um ${User.name}`)  
     public async UpdatejobRole(@FromQuery()userId : number, @FromQuery()jobRoleId : number) : Promise<ActionResult>
-    {
-        
+    {        
         let user= (await this._userService.GetByAndLoadAsync("Id", userId, ["JobRole"])).FirstOrDefault();
 
         if(!user)
@@ -218,17 +257,20 @@ export default class UserController extends AbstractController
     @UserController.ProducesType(200, "The just updated user", User)   
     @UserController.ProducesMessage(400, "A message telling what is missing", {Message : "The ID must be greater than 0"})
     @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "User not found"})  
+    @Description(`Utilize esse metodo para atualizar apenas dados do ${User.name}. Nenhuma das relações será atualizada`)
     public async UpdateAsync(@FromBody()user : User) : Promise<ActionResult>
     {        
         if(user.Id == undefined || user.Id <= 0)
             return this.BadRequest({ Message : "The ID must be greater than 0"});
         
-        let update = await this._userService.GetByIdAsync(user.Id);
+        let update = (await this._userService.GetByAndLoadAsync("Id", user.Id, [])).FirstOrDefault();
 
         if(!update)
             return this.NotFound({Message : "User not found"});
 
-        return this.OK(await this._userService.UpdateAsync(user));
+        Object.assign(update, user);
+
+        return this.OK(await this._userService.UpdateObjectAndRelationsAsync(update!, []));
     }
 
 

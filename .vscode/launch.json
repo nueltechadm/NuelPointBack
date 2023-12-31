@@ -16,14 +16,19 @@
         }, 
 
         {
-            "type": "node",
+            "type": "node",            
             "request": "launch",
-            "name": "Debug Seed",
+            "name": "Debug some test with ts-jest",
             "skipFiles": [
                 "<node_internals>/**"
-            ],            
-            "runtimeExecutable": "node", 
-            "runtimeArgs": ["${workspaceFolder}//dist/Seed.js"]
+            ],
+            
+            "runtimeExecutable": "npx", 
+            "runtimeArgs": ["jest",  "./${fileDirnameBasename}/${fileBasename}"], 
+            "internalConsoleOptions": "neverOpen", 
+            "console": "integratedTerminal"
         }
+
+        
     ]
 }

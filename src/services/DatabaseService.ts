@@ -1,6 +1,6 @@
 import { Inject } from 'web_api_base';
 import Database, { DababaseStatus } from '../core/entities/Database';
-import Access from '../core/entities/Access';
+import Access, { PERFILTYPE } from '../core/entities/Access';
 import User from '../core/entities/User';
 import AbstractDatabaseService from './abstractions/AbstractDatabaseService';
 import { MD5 } from '../utils/Cryptography';
@@ -74,7 +74,7 @@ export default class DatabaseService extends AbstractDatabaseService{
 
         if (!db) 
         {
-            await (this._context as any)["_manager"].CreateDataBase(dabataseName);            
+            await (this._context as any)["_manager"].CreateDataBaseAsync(dabataseName);            
 
             await this._context.SetDatabaseAsync(dabataseName);
 
@@ -112,11 +112,9 @@ export default class DatabaseService extends AbstractDatabaseService{
     {
         let user = Reflect.construct(User, []) as User;
 
-        user.Name = dabataseName.Trim();            
+        user.Name = dabataseName.Trim(); 
 
-        user.Access = new Access(user, dabataseName, MD5(`${dabataseName}123`));
-
-        user.IsSuperUser = true;
+        user.Access = new Access(user, dabataseName, MD5(`${dabataseName}123`), PERFILTYPE.SUPER);        
         
         await this._context.SetDatabaseAsync(dabataseName);
 

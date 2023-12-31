@@ -1,7 +1,7 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany, ManyToOne, OneToMany, OneToOne} from 'myorm_pg'; 
 import JobRole from './JobRole';
 import Company from './Company';
-import Access from './Access';
+import Access, { PERFILTYPE } from './Access';
 import Contact from './Contact';
 import Address from './Address';
 import Journey from './Journey';
@@ -25,18 +25,12 @@ export default class User
     public Birthdate : Date;
 
     @Column()
-    public IsSuperUser : Boolean;
-
-    @Column()
     @DataType(DBTypes.DATE)
     public AdmisionDate : Date;
 
     @Column()
     @DataType(DBTypes.DATE)
-    public DemissionDate? : Date;
-    
-    @Column()
-    public Email : string; 
+    public DemissionDate? : Date;    
 
     @Column()
     @ManyToOne(()=> JobRole, "Users")
@@ -52,7 +46,7 @@ export default class User
 
     @Column()
     @ManyToOne(() => Access)
-    public Access? : Access;
+    public Access : Access;
 
     @Column()
     @OneToMany(() => Contact)
@@ -62,22 +56,25 @@ export default class User
     @ManyToOne(() => Address)
     public Address? : Address;
 
-    constructor(name : string, email : string, job : JobRole)
+    constructor(name : string, job : JobRole, access : Access)
     {
         this.Id = -1;
         this.Active = true;
         this.Name = name;
         this.Birthdate = new Date();
         this.AdmisionDate = new Date();
-        this.DemissionDate = undefined;
-        this.Email = email;        
+        this.DemissionDate = undefined;               
         this.JobRole = job;         
         this.Company = undefined;
         this.Journey = undefined;
-        this.Access = undefined;
+        this.Access = access;
         this.Contacts = [];
-        this.Address = undefined;
-        this.IsSuperUser = false;
+        this.Address = undefined;        
+    }
+
+    public IsSuperUser() : boolean
+    {
+        return this.Access.Perfil == PERFILTYPE.SUPER;
     }
 }
 

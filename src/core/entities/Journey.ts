@@ -1,9 +1,10 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, OneToMany, ManyToMany, ManyToOne} from 'myorm_pg'; 
 import Company from './Company';
 import DayOfWeek from './DayOfWeek';
+import Time from './Time';
 
 
-@Table()
+@Table("journey_tb")
 export default class Journey
 {
     @Column()
@@ -19,15 +20,15 @@ export default class Journey
     public Company : Company;
 
    @Column()
-   @OneToMany(() => DayOfWeek)
-   public DaysOfWeek : DayOfWeek[];
+   @ManyToMany(() => Time)
+   public Times : Time[];
 
     constructor(description : string, days : number[], company : Company)
     {
         this.Id = -1;      
         this.Description = description;       
         this.Company = company;
-        this.DaysOfWeek = [];
+        this.Times = [];
     }
 }
 

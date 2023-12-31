@@ -1,7 +1,4 @@
 import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany, ManyToOne, OneToOne, OneToMany} from 'myorm_pg'; 
-import Permission from './Permission';
-import Company from './Company';
-import Departament from './Departament';
 import User from './User';
 
 @Table("access_tb")
@@ -14,29 +11,33 @@ export default class Access
     
     @Column()
     @OneToOne(() => User)
-    public User : User;
-
-    @Column()
-    public Description : string;
+    public User : User;    
 
     @Column()
     public Username : string;
     
     @Column()
-    public Password : string;    
-   
-    @Column()
-    @ManyToMany(() => Permission)
-    public Permissions : Permission[];  
+    public Password : string;      
+    
+
+    @Column()    
+    public Perfil : PERFILTYPE;
 
 
-    constructor(user : User, username : string, password : string, description? : string)
+    constructor(user : User, username : string, password : string, perfil : PERFILTYPE)
     {
         this.Id = -1;  
         this.User = user;      
         this.Username = username;
         this.Password = password;        
-        this.Permissions = [];        
-        this.Description = description ?? "";        
+        this.Perfil = perfil;
     }
+}
+
+
+export enum PERFILTYPE
+{    
+    USER = "USER",
+    ADM = "ADM",
+    SUPER = "SUPER"
 }

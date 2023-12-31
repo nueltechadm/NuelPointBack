@@ -2,14 +2,11 @@ import 'ts_linq_base';
 import '../extensions';
 
 
-import { Application, IApplicationConfiguration, DependecyService } from 'web_api_base';
+import { Application, IApplicationConfiguration, DependecyService, BodyParseException } from 'web_api_base';
 import DBContext from '../data/DBContext';
 
 import AbstractUserService from '../core/abstractions/AbstractUserService';
 import UserService from '../services/UserService';
-
-import AbstractPermissionService from '../core/abstractions/AbstractPermissionService';
-import PermissionService from '../services/PermissionService';
 
 import AbstractJobRoleService from '../core/abstractions/AbstractJobRoleService';
 import JobRoleService from '../services/JobRoleService';
@@ -73,7 +70,6 @@ export default class App extends Application
 
         appConfig.AddScoped(AbstractUserService, UserService);
         appConfig.AddScoped(AbstractDepartamentService, DepartamentService);
-        appConfig.AddScoped(AbstractPermissionService, PermissionService);
         appConfig.AddScoped(AbstractJobRoleService, JobRoleService);       
         appConfig.AddScoped(AbstractCheckpointService, CheckpointService);
         appConfig.AddScoped(AbstractFileService, FileService);
@@ -92,7 +88,7 @@ export default class App extends Application
 
     protected ApplicationThreadExeptionEvent : ApplicationExceptionHandler =  (request, response, exception) => 
     {
-        if(exception instanceof InvalidEntityException)
+        if(exception instanceof InvalidEntityException || BodyParseException)
         {
             response.status(400);
             response.json({Message : exception.Message});
