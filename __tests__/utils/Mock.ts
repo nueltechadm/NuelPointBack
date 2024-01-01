@@ -19,11 +19,13 @@ export default class Mock
 export interface IChangeble<T extends object>
 {
     ChangeBehavior<U extends keyof T>(member : U, callback : T[U]): T & IChangeble<T>;
+    HasCalled<U extends keyof T>(member : U): number;
 }
 
 export class Changeable<T extends object> implements IChangeble<T>
 {
     private _source : T;
+    private _counter : {[key : string] : number} = {};
 
     constructor(source : T | undefined)
     {
@@ -34,16 +36,35 @@ export class Changeable<T extends object> implements IChangeble<T>
 
         Object.keys(this._source).forEach(c => 
         {
-            (this as any)[c] = (this._source as any)[c];
+            if(typeof (this._source as any)[c] == "function")
+            {
+                (this as any)[c] = (...args: any[]) : any =>
+                {
+                    if(Object.keys(this._counter).Any(s => s == c))
+                        this._counter[c]++;
+                    else
+                        this._counter[c] = 1;
+                }
+            }
+            else
+                (this as any)[c] = (this._source as any)[c];
         });
 
     }
 
-    ChangeBehavior<U extends keyof T>(member: U, callback: T[U]): T & IChangeble<T> {
+    public ChangeBehavior<U extends keyof T>(member: U, callback: T[U]): T & IChangeble<T> {
         
         this._source[member] = callback;
         (this as any)[member] = callback;
         return this as any as T & IChangeble<T>;
+    }
+
+    public HasCalled<U extends keyof T>(member: U): number {
+        
+        if(Object.keys(this._counter).Any(s => s == member))
+            return this._counter[member.toString()];
+        else 
+            return 0;
     }
 
 }

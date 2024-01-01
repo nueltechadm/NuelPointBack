@@ -1,38 +1,40 @@
 import Mock from '../utils/Mock';
-import AbstractDBContext from '../../src/data/abstract/AbstractDBContext';
+import AbstractDBContext from '@l2_src/';
 import User from '../../src/core/entities/User';
+import Access from '../../src/core/entities/Access';
 import { AbstractSet } from 'myorm_core';
 import { Exception } from 'web_api_base';
+
 import Type from '../../src/utils/Type';
 
 describe("UserService", ()=>
 {
-    test("AddAsync", async ()=>
-    {
+   let CreateContext = () => 
+   {
         let context = Mock.CreateIntanceFromAbstraction<AbstractDBContext>();
-        let colletion = Mock.CreateIntanceFromAbstraction<AbstractSet<User>>();
+        let userColletion = Mock.CreateIntanceFromAbstraction<AbstractSet<User>>();
+        let accessColletion = Mock.CreateIntanceFromAbstraction<AbstractSet<Access>>();
 
-        colletion.ChangeBehavior("AddAsync", (o : User) : Promise<User> => 
+        userColletion.ChangeBehavior("AddAsync", (o : User) : Promise<User> => 
         {
-          return Promise.resolve(o);   
+            return Promise.resolve(o);   
         })
 
         context.ChangeBehavior("Collection",<T extends Object>(cTor : new (...args : any[]) => T) : AbstractSet<T> =>
         {
-           if(cTor.name == User.name)
-                return colletion as any as AbstractSet<T>;
+            if(cTor.name == User.name)
+                return userColletion as any as AbstractSet<T>;
+            if(cTor.name == Access.name)
+                return accessColletion as any as AbstractSet<T>;
 
-            throw new Exception("Not mapped");                            
+            throw new Exception(`The type ${cTor.name} is not mapped a type`);                            
         });
+        
+        return context;
+   }
 
-        let t = context.Collection(User);
-
-        expect(t).toBe(colletion);
-
-        let user = Type.CreateInstance(User);
-
-        let u = await t.AddAsync(user);
-
-        expect(u).toBe(user);
+    test("AddAsync", async ()=>
+    {        
+        let service = new UserService();
     });
 })

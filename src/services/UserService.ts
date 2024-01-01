@@ -34,7 +34,7 @@ export default class UserService  extends AbstractUserService
 
     public override async ExistsAsync(id: number): Promise<boolean> {
         
-        return (await this._context.Collection(User).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+        return (await this._context.Collection(User).Where({Field: "Id", Value : id}).CountAsync()) > 0;
     }
 
     public override async CountAsync(): Promise<number> {

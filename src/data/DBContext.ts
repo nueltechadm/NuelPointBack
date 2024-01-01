@@ -1,6 +1,6 @@
 import {PGDBContext, PGDBSet, PGDBManager, PGDBConnection} from 'myorm_pg';
 
-import User from '../core/entities/User';
+import User from '@entities/User';
 import Access from '../core/entities/Access';
 import JobRole from '../core/entities/JobRole';
 import Checkpoint from '../core/entities/Checkpoint';
