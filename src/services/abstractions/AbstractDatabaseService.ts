@@ -1,4 +1,4 @@
-import Database from "../../core/entities/Database";
+import Database from "@entities/Database";
 
 
 export default abstract class AbstractDatabaseService {

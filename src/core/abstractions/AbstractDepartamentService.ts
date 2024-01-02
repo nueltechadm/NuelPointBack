@@ -1,4 +1,4 @@
-import Departament from "../entities/Departament";
+import Departament from "@entities/Departament";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 export default abstract class AbstractDepartamentService extends AbstractService<Departament, DepartamentPaginatedRequest, PaginatedFilterResult<Departament>>

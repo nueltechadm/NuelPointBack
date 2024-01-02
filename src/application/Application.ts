@@ -5,45 +5,45 @@ import '../extensions';
 import { Application, IApplicationConfiguration, DependecyService, BodyParseException } from 'web_api_base';
 import DBContext from '../data/DBContext';
 
-import AbstractUserService from '../core/abstractions/AbstractUserService';
+import AbstractUserService from '@contracts/AbstractUserService';
 import UserService from '../services/UserService';
 
-import AbstractJobRoleService from '../core/abstractions/AbstractJobRoleService';
+import AbstractJobRoleService from '@contracts/AbstractJobRoleService';
 import JobRoleService from '../services/JobRoleService';
 
-import AbstractFileService from '../services/abstractions/AbstractFileService';
+import AbstractFileService from '@non-core-contracts/AbstractFileService';
 import FileService from '../services/FileService';
 
-import AbstractCheckpointService from '../core/abstractions/AbstractCheckpointService';
+import AbstractCheckpointService from '@contracts/AbstractCheckpointService';
 import CheckpointService from '../services/CheckpointService';
 
-import AbstractCompanyService from '../core/abstractions/AbstractCompanyService';
+import AbstractCompanyService from '@contracts/AbstractCompanyService';
 import CompanyService from '../services/CompanyService';
 
-import AbstractJorneyService from '../core/abstractions/AbstractJorneyService';
+import AbstractJorneyService from '@contracts/AbstractJorneyService';
 import JourneyService from '../services/JourneyService';
 
-import AbstractTimeService from '../core/abstractions/AbstractTimeService';
+import AbstractTimeService from '@contracts/AbstractTimeService';
 import TimeService  from "../services/TimeService";
 
-import AbstractDepartamentService from '../core/abstractions/AbstractDepartamentService';
+import AbstractDepartamentService from '@contracts/AbstractDepartamentService';
 import DepartamentService  from "../services/DepartamentService";
 
 import AcessService from '../services/AcessService';
-import  AbstractAccessService  from '../core/abstractions/AbstractAccessService';
-import  AbstractAppointmentService  from '../core/abstractions/AbstractAppointmentService';
+import  AbstractAccessService  from '@contracts/AbstractAccessService';
+import  AbstractAppointmentService  from '@contracts/AbstractAppointmentService';
 import AppointmentService from '../services/AppointmentService';
 import  ControlContext  from '../data/ControlContext';
 import  DatabaseService  from '../services/DatabaseService';
-import AbstractDatabaseService from '../services/abstractions/AbstractDatabaseService';
+import AbstractDatabaseService from '@non-core-contracts/AbstractDatabaseService';
 import InvalidEntityException from '../exceptions/InvalidEntityException';
 import EntityNotFoundException from '../exceptions/EntityNotFoundException';
 
 
 import { ApplicationExceptionHandler } from 'web_api_base/dist/interfaces/IApplication';
-import AbstractDBContext from '../data/abstract/AbstractDBContext';
-import AbstractControlContext from '../data/abstract/AbstractControlContext';
-import AbstractMultiPartRequestService from '../services/abstractions/AbstractMultiPartRequestService';
+import AbstractDBContext from '@data-contracts/AbstractDBContext';
+import AbstractControlContext from '@data-contracts/AbstractControlContext';
+import AbstractMultiPartRequestService from '@non-core-contracts/AbstractMultiPartRequestService';
 import FormidableMultiPartRequestService from '../services/FormidableMultiPartRequestService';
 
 

@@ -1,11 +1,11 @@
 import { Inject } from 'web_api_base';
-import Appointment from "../core/entities/Appointment";
+import Appointment from "@entities/Appointment";
 import { Operation } from "myorm_core";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import AbstractAppointmentService  from "../core/abstractions/AbstractAppointmentService";
-import User from "../core/entities/User";
-import AbstractDBContext from "../data/abstract/AbstractDBContext";
-import { PaginatedFilterResult, PaginatedFilterRequest } from '../core/abstractions/AbstractService';
+import AbstractAppointmentService  from "@contracts/AbstractAppointmentService";
+import User from "@entities/User";
+import AbstractDBContext from "@data-contracts/AbstractDBContext";
+import { PaginatedFilterResult, PaginatedFilterRequest } from '@contracts/AbstractService';
 
 
 export default class AppointmentService extends AbstractAppointmentService {

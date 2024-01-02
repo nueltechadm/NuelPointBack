@@ -1,18 +1,18 @@
 import {PGDBContext, PGDBSet, PGDBManager, PGDBConnection} from 'myorm_pg';
 
 import User from '@entities/User';
-import Access from '../core/entities/Access';
-import JobRole from '../core/entities/JobRole';
-import Checkpoint from '../core/entities/Checkpoint';
-import Company from '../core/entities/Company';
-import Time from '../core/entities/Time';
-import Journey from '../core/entities/Journey';
-import Departament from '../core/entities/Departament';
-import Address from '../core/entities/Address';
-import Contact from '../core/entities/Contact';
-import Appointment from '../core/entities/Appointment';
+import Access from '@entities/Access';
+import JobRole from '@entities/JobRole';
+import Checkpoint from '@entities/Checkpoint';
+import Company from '@entities/Company';
+import Time from '@entities/Time';
+import Journey from '@entities/Journey';
+import Departament from '@entities/Departament';
+import Address from '@entities/Address';
+import Contact from '@entities/Contact';
+import Appointment from '@entities/Appointment';
 import DatabaseException from '../exceptions/DatabaseException';
-import DayOfWeek from '../core/entities/DayOfWeek';
+import DayOfWeek from '@entities/DayOfWeek';
 import AbstractDBContext, {IDBChangeable} from './abstract/AbstractDBContext';
 
 

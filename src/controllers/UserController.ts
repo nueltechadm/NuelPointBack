@@ -1,23 +1,23 @@
 
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ProducesResponse, ActionResult, RequestJson, Description } from "web_api_base";
-import AbstractUserService from "../core/abstractions/AbstractUserService";
-import User from "../core/entities/User";
-import {IsLogged} from '../filters/AuthFilter';
-import Type from "../utils/Type";
+import AbstractUserService from "@contracts/AbstractUserService";
+import User from "@entities/User";
+import {IsLogged} from '@filters/AuthFilter';
+import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
-import Authorization from "../utils/Authorization";
-import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
-import Journey from "../core/entities/Journey";
-import AbstractJorneyService from "../core/abstractions/AbstractJorneyService";
-import Company from "../core/entities/Company";
-import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
-import AbstractJobRoleService from "../core/abstractions/AbstractJobRoleService";
-import JobRole from "../core/entities/JobRole";
-import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
-import AbstractAccessService from "../core/abstractions/AbstractAccessService";
-import Contact from "../core/entities/Contact";
-import Access, { PERFILTYPE } from "../core/entities/Access";
-import { MD5 } from "../utils/Cryptography";
+import Authorization from "@utils/Authorization";
+import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
+import Journey from "@entities/Journey";
+import AbstractJorneyService from "@contracts/AbstractJorneyService";
+import Company from "@entities/Company";
+import AbstractCompanyService from "@contracts/AbstractCompanyService";
+import AbstractJobRoleService from "@contracts/AbstractJobRoleService";
+import JobRole from "@entities/JobRole";
+import { PaginatedFilterRequest } from "@contracts/AbstractService";
+import AbstractAccessService from "@contracts/AbstractAccessService";
+import Contact from "@entities/Contact";
+import Access, { PERFILTYPE } from "@entities/Access";
+import { MD5 } from "@utils/Cryptography";
 
 @UseBefore(IsLogged)
 @Validate()

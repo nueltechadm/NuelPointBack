@@ -1,14 +1,14 @@
 import {Inject} from'web_api_base'
-import AbstractCheckpointService from "../core/abstractions/AbstractCheckpointService";
-import Checkpoint from "../core/entities/Checkpoint";
+import AbstractCheckpointService from "@contracts/AbstractCheckpointService";
+import Checkpoint from "@entities/Checkpoint";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import { Operation } from "myorm_core";
 import Path from 'path';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import Company from "../core/entities/Company";
-import User from "../core/entities/User";
-import AbstractDBContext from "../data/abstract/AbstractDBContext";
-import { PaginatedFilterResult, PaginatedFilterRequest } from '../core/abstractions/AbstractService';
+import Company from "@entities/Company";
+import User from "@entities/User";
+import AbstractDBContext from "@data-contracts/AbstractDBContext";
+import { PaginatedFilterResult, PaginatedFilterRequest } from '@contracts/AbstractService';
 
 export default class CheckpointService  extends AbstractCheckpointService
 {   

@@ -1,4 +1,4 @@
-import Checkpoint from "../entities/Checkpoint";
+import Checkpoint from "@entities/Checkpoint";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 

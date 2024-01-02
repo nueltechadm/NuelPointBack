@@ -1,13 +1,13 @@
-import AbstractJobRoleService, { JobRolePaginatedFilteRequest } from "../core/abstractions/AbstractJobRoleService";
+import AbstractJobRoleService, { JobRolePaginatedFilteRequest } from "@contracts/AbstractJobRoleService";
 import {Inject} from'web_api_base'
-import JobRole from "../core/entities/JobRole";
-import Type from "../utils/Type";
+import JobRole from "@entities/JobRole";
+import Type from "@utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
-import AbstractDBContext from "../data/abstract/AbstractDBContext";
-import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
+import AbstractDBContext from "@data-contracts/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
 import { AbstractSet, IJoinSelectable, IJoiningQuery, Operation } from "myorm_core";
-import Departament from "../core/entities/Departament";
+import Departament from "@entities/Departament";
 
 export default class JobRoleService  extends AbstractJobRoleService
 {

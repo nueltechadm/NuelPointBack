@@ -1,11 +1,11 @@
 import { Inject } from 'web_api_base';
-import Database, { DababaseStatus } from '../core/entities/Database';
-import Access, { PERFILTYPE } from '../core/entities/Access';
-import User from '../core/entities/User';
+import Database, { DababaseStatus } from '@entities/Database';
+import Access, { PERFILTYPE } from '@entities/Access';
+import User from '@entities/User';
 import AbstractDatabaseService from './abstractions/AbstractDatabaseService';
-import { MD5 } from '../utils/Cryptography';
-import AbstractControlContext from '../data/abstract/AbstractControlContext';
-import AbstractDBContext from '../data/abstract/AbstractDBContext';
+import { MD5 } from '@utils/Cryptography';
+import AbstractControlContext from '@data-contracts/AbstractControlContext';
+import AbstractDBContext from '@data-contracts/AbstractDBContext';
 
 
 export default class DatabaseService extends AbstractDatabaseService{

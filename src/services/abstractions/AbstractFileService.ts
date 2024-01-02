@@ -1,4 +1,4 @@
-import Checkpoint from "../../core/entities/Checkpoint";
+import Checkpoint from "@entities/Checkpoint";
 
 export default abstract class AbstractFileService 
 {

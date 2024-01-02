@@ -1,15 +1,17 @@
-import User from "../core/entities/User";
-import AbstractUserService from "../core/abstractions/AbstractUserService";
-import {MD5} from '../utils/Cryptography';
+import User from "@entities/User";
+import AbstractUserService from "@contracts/AbstractUserService";
+import {MD5} from '@utils/Cryptography';
 import ObjectNotFoundExcpetion from "../exceptions/ObjectNotFoundExcpetion";
-import Type from "../utils/Type";
+import Type from "@utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import Access from "../core/entities/Access";
+import Access from "@entities/Access";
 import { Inject } from "web_api_base";
-import AbstractDBContext from "../data/abstract/AbstractDBContext";
+import AbstractDBContext from "@data-contracts/AbstractDBContext";
 
 
-import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
+import Company from "@src/core/entities/Company";
+import JobRole from "@src/core/entities/JobRole";
 
 
 export default class UserService  extends AbstractUserService
@@ -101,10 +103,10 @@ export default class UserService  extends AbstractUserService
         obj.Access!.Password = MD5(obj.Access!.Password);  
 
         if(!obj.Company && !obj.IsSuperUser())
-            throw new InvalidEntityException("The company of the user is required");
+            throw new InvalidEntityException(`The ${Company.name} of the ${User.name} is required`);
 
         if(!obj.JobRole && !obj.IsSuperUser())
-            throw new InvalidEntityException("The jobrole of the user is required"); 
+            throw new InvalidEntityException(`The ${JobRole.name} of the ${User.name} is required`); 
         
 
         return await this._context.Collection(User).AddAsync(obj)!;        
@@ -122,12 +124,13 @@ export default class UserService  extends AbstractUserService
         if(!curr)
             throw new ObjectNotFoundExcpetion(`This user do not exists on database`);
 
-        if(obj.Access)
-        {
-            obj.Access.Id = curr.Access?.Id ?? -1;
-    
-            obj.Access!.Password = MD5(obj.Access!.Password);
-        } 
+        if(relations.Any(s => s == "Access") && !obj.Access)        
+            throw new InvalidEntityException(`The ${Access.name} of the ${User.name} is required`);
+       
+        obj.Access.Id = curr.Access?.Id ?? -1;
+        
+        if(obj.Access.Password != curr.Access.Password)
+            obj.Access.Password = MD5(obj.Access.Password);        
 
         return await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, relations);
     }

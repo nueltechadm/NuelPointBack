@@ -1,4 +1,4 @@
-import {Table, Column, DataType, PrimaryKey, DBTypes, ManyToMany, ManyToOne, OneToOne, OneToMany} from 'myorm_pg'; 
+import {Table, Column, DataType, PrimaryKey, DBTypes, OneToOne} from 'myorm_pg'; 
 import User from './User';
 
 @Table("access_tb")

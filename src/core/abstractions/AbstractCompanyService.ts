@@ -1,5 +1,5 @@
-import Company from "../entities/Company";
-import Departament from "../entities/Departament";
+import Company from "@entities/Company";
+import Departament from "@entities/Departament";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 export default abstract class AbstractCompanyService extends AbstractService<Company, CompanyPaginatedFilterRequest, CompanyPaginatedFilterResponse>

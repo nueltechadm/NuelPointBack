@@ -1,14 +1,14 @@
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
-import { IsLogged } from '../filters/AuthFilter';
+import { IsLogged } from '@filters/AuthFilter';
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
-import AbstractTimeService from "../core/abstractions/AbstractTimeService";
-import Time from "../core/entities/Time";
-import Type from "../utils/Type";
+import AbstractTimeService from "@contracts/AbstractTimeService";
+import Time from "@entities/Time";
+import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
-import Authorization from "../utils/Authorization";
-import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
-import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
+import Authorization from "@utils/Authorization";
+import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
+import { PaginatedFilterRequest } from "@contracts/AbstractService";
 
 @UseBefore(IsLogged)
 @Validate()

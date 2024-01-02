@@ -1,18 +1,18 @@
 
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
-import AbstractJobRoleService, { JobRolePaginatedFilteRequest } from "../core/abstractions/AbstractJobRoleService";
-import JobRole from "../core/entities/JobRole";
-import {IsLogged} from '../filters/AuthFilter';
-import Type from "../utils/Type";
+import AbstractJobRoleService, { JobRolePaginatedFilteRequest } from "@contracts/AbstractJobRoleService";
+import JobRole from "@entities/JobRole";
+import {IsLogged} from '@filters/AuthFilter';
+import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
-import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
-import Authorization from "../utils/Authorization";
-import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
-import AbstractUserService from "../core/abstractions/AbstractUserService";
-import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
+import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
+import Authorization from "@utils/Authorization";
+import { PaginatedFilterRequest } from "@contracts/AbstractService";
+import AbstractUserService from "@contracts/AbstractUserService";
+import AbstractCompanyService from "@contracts/AbstractCompanyService";
 import JobRoleDTO from "../dto/JobRoleDTO";
-import AbstractDepartamentService from "../core/abstractions/AbstractDepartamentService";
-import Departament from "../core/entities/Departament";
+import AbstractDepartamentService from "@contracts/AbstractDepartamentService";
+import Departament from "@entities/Departament";
 
 @UseBefore(IsLogged)
 @Validate()

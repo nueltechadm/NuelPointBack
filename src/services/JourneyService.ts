@@ -1,11 +1,11 @@
-import AbstractJorneyService from "../core/abstractions/AbstractJorneyService";
+import AbstractJorneyService from "@contracts/AbstractJorneyService";
 import {Inject} from'web_api_base';
-import Journey from "../core/entities/Journey";
-import Type from "../utils/Type";
+import Journey from "@entities/Journey";
+import Type from "@utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import AbstractDBContext from "../data/abstract/AbstractDBContext";
-import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
-import Departament from "../core/entities/Departament";
+import AbstractDBContext from "@data-contracts/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
+import Departament from "@entities/Departament";
 
 export default class JourneyService  extends AbstractJorneyService
 {

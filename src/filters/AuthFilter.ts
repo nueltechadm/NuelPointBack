@@ -1,6 +1,6 @@
 import {Application, ControllerBase, IHTTPRequestContext} from 'web_api_base';
-import {Decode, DecodeResult} from '../utils/JWT';
-import Authorization from '../utils/Authorization';
+import {Decode, DecodeResult} from '@utils/JWT';
+import Authorization from '@utils/Authorization';
 
 export function IsLogged(context : IHTTPRequestContext) : void
 {   

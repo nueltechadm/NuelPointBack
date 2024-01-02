@@ -1,4 +1,4 @@
-import Contact from "../entities/Contact";
+import Contact from "@entities/Contact";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 

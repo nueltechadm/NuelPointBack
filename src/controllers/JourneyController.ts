@@ -1,12 +1,12 @@
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
-import { IsLogged } from '../filters/AuthFilter';
-import Type from "../utils/Type";
+import { IsLogged } from '@filters/AuthFilter';
+import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
-import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
-import Authorization from "../utils/Authorization";
-import AbstractJorneyService from "../core/abstractions/AbstractJorneyService";
-import Journey from "../core/entities/Journey";
-import { PaginatedFilterRequest } from "../core/abstractions/AbstractService";
+import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
+import Authorization from "@utils/Authorization";
+import AbstractJorneyService from "@contracts/AbstractJorneyService";
+import Journey from "@entities/Journey";
+import { PaginatedFilterRequest } from "@contracts/AbstractService";
 
 
 @UseBefore(IsLogged)

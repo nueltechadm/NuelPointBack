@@ -1,20 +1,18 @@
 import { POST, PUT, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, RequestJson } from "web_api_base";
-import {IsLogged} from '../filters/AuthFilter';
-import AbstractCheckpointService from "../core/abstractions/AbstractCheckpointService";
-import AbstractFileService from "../services/abstractions/AbstractFileService";
-import AbstractUserService from "../core/abstractions/AbstractUserService";
-
-import Appointment  from "../core/entities/Appointment";
-import  AbstractAppointmentService  from "../core/abstractions/AbstractAppointmentService";
-import Type from "../utils/Type";
+import {IsLogged} from '@filters/AuthFilter';
+import AbstractCheckpointService from "@contracts/AbstractCheckpointService";
+import AbstractFileService from "@non-core-contracts/AbstractFileService";
+import AbstractUserService from "@contracts/AbstractUserService";
+import Appointment  from "@entities/Appointment";
+import  AbstractAppointmentService  from "@contracts/AbstractAppointmentService";
+import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
-import Authorization from "../utils/Authorization";
-import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
-import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
-import AbstractTimeService from "../core/abstractions/AbstractTimeService";
-import Checkpoint from "../core/entities/Checkpoint";
+import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
+import AbstractCompanyService from "@contracts/AbstractCompanyService";
+import AbstractTimeService from "@contracts/AbstractTimeService";
+import Checkpoint from "@entities/Checkpoint";
 import AppointmentDTO from "../dto/AppointmentDTO";
-import AbstractMultiPartRequestService, { PartType } from "../services/abstractions/AbstractMultiPartRequestService";
+import AbstractMultiPartRequestService, { PartType } from "@non-core-contracts/AbstractMultiPartRequestService";
 
 
 

@@ -1,4 +1,4 @@
-import JobRole from "../entities/JobRole";
+import JobRole from "@entities/JobRole";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 export default abstract class AbstractJobRoleService extends AbstractService<JobRole, JobRolePaginatedFilteRequest, PaginatedFilterResult<JobRole>>

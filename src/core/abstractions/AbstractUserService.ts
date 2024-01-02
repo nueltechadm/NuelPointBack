@@ -1,5 +1,5 @@
-import Access from "../entities/Access";
-import User from "../entities/User";
+import Access from "@entities/Access";
+import User from "@entities/User";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 

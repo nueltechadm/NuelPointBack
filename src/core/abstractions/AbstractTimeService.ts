@@ -1,6 +1,4 @@
-import Access from "../entities/Access";
-import Time from "../entities/Time";
-import User from "../entities/User";
+import Time from "@entities/Time";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 

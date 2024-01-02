@@ -1,11 +1,11 @@
 import { Inject } from 'web_api_base';
-import Type from "../utils/Type";
+import Type from "@utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import Time from "../core/entities/Time";
-import AbstractTimeService from "../core/abstractions/AbstractTimeService";
-import AbstractDBContext from '../data/abstract/AbstractDBContext';
-import User from '../core/entities/User';
-import { PaginatedFilterRequest, PaginatedFilterResult } from '../core/abstractions/AbstractService';
+import Time from "@entities/Time";
+import AbstractTimeService from "@contracts/AbstractTimeService";
+import AbstractDBContext from '@data-contracts/AbstractDBContext';
+import User from '@entities/User';
+import { PaginatedFilterRequest, PaginatedFilterResult } from '@contracts/AbstractService';
 
 
 

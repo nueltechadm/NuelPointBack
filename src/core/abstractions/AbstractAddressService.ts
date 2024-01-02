@@ -1,4 +1,4 @@
-import Address from "../entities/Address";
+import Address from "@entities/Address";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 

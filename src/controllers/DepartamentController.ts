@@ -1,14 +1,14 @@
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, RequestJson, ProducesResponse } from "web_api_base";
-import { IsLogged } from '../filters/AuthFilter';
-import AbstractDepartamentService, { DepartamentPaginatedRequest } from "../core/abstractions/AbstractDepartamentService";
-import Departament from "../core/entities/Departament";
-import Type from "../utils/Type";
+import { IsLogged } from '@filters/AuthFilter';
+import AbstractDepartamentService, { DepartamentPaginatedRequest } from "@contracts/AbstractDepartamentService";
+import Departament from "@entities/Departament";
+import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
-import Authorization from "../utils/Authorization";
-import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
-import AbstractCompanyService from "../core/abstractions/AbstractCompanyService";
-import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
-import JobRole from "../core/entities/JobRole";
+import Authorization from "@utils/Authorization";
+import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
+import AbstractCompanyService from "@contracts/AbstractCompanyService";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
+import JobRole from "@entities/JobRole";
 
 @UseBefore(IsLogged)
 @Validate()

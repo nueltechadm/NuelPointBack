@@ -1,12 +1,12 @@
-import AbstractCompanyService, { CompanyPaginatedFilterRequest, CompanyPaginatedFilterResponse } from "../core/abstractions/AbstractCompanyService";
+import AbstractCompanyService, { CompanyPaginatedFilterRequest, CompanyPaginatedFilterResponse } from "@contracts/AbstractCompanyService";
 import {Inject} from'web_api_base'
-import Company from "../core/entities/Company";
-import Type from "../utils/Type";
+import Company from "@entities/Company";
+import Type from "@utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import Departament from "../core/entities/Departament";
+import Departament from "@entities/Departament";
 import { AbstractSet, Operation } from "myorm_core";
-import AbstractDBContext from "../data/abstract/AbstractDBContext";
-import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
+import AbstractDBContext from "@data-contracts/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
 
 export default class CompanyService  extends AbstractCompanyService
 {

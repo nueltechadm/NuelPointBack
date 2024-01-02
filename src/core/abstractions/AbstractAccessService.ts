@@ -1,4 +1,4 @@
-import Access from "../entities/Access";
+import Access from "@entities/Access";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 

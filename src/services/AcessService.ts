@@ -1,10 +1,10 @@
 import { Inject } from 'web_api_base';
-import Type from "../utils/Type";
+import Type from "@utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import Access from "../core/entities/Access";
-import AbstractAccessService from "../core/abstractions/AbstractAccessService";
-import AbstractDBContext from "../data/abstract/AbstractDBContext";
-import { PaginatedFilterRequest, PaginatedFilterResult } from '../core/abstractions/AbstractService';
+import Access from "@entities/Access";
+import AbstractAccessService from "@contracts/AbstractAccessService";
+import AbstractDBContext from "@data-contracts/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from '@contracts/AbstractService';
 
 
 

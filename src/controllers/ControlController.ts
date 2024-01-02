@@ -1,7 +1,7 @@
 import { Inject, GET, ControllerBase, FromQuery, UseBefore, ActionResult, Validate } from "web_api_base";
-import { DababaseStatus } from "../core/entities/Database";
-import AbstractDatabaseService from "../services/abstractions/AbstractDatabaseService";
-import   DatabasesAuthFilter from "../filters/DatabasesAuthFilter";
+import { DababaseStatus } from "@entities/Database";
+import AbstractDatabaseService from "@non-core-contracts/AbstractDatabaseService";
+import   DatabasesAuthFilter from "@filters/DatabasesAuthFilter";
 
 @UseBefore(DatabasesAuthFilter)
 @Validate()

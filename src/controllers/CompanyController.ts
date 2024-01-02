@@ -1,16 +1,14 @@
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RequestJson, ActionResult } from "web_api_base";
-import { IsLogged } from '../filters/AuthFilter';
-import AbstractCompanyService, { CompanyPaginatedFilterRequest, CompanyPaginatedFilterResponse } from "../core/abstractions/AbstractCompanyService";
-import Company from "../core/entities/Company";
-import Type from "../utils/Type";
+import { IsLogged } from '@filters/AuthFilter';
+import AbstractCompanyService, { CompanyPaginatedFilterRequest, CompanyPaginatedFilterResponse } from "@contracts/AbstractCompanyService";
+import Company from "@entities/Company";
+import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
-import Authorization from "../utils/Authorization";
-import SetDatabaseFromToken from "../decorators/SetDatabaseFromToken";
-import Departament from "../core/entities/Departament";
-import Contact from "../core/entities/Contact";
-import AbstractDepartamentService from "../core/abstractions/AbstractDepartamentService";
-import Address from "../core/entities/Address";
-import AbstractUserService from "../core/abstractions/AbstractUserService";
+import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
+import Contact from "@entities/Contact";
+import AbstractDepartamentService from "@contracts/AbstractDepartamentService";
+import Address from "@entities/Address";
+import AbstractUserService from "@contracts/AbstractUserService";
 
 
 

@@ -1,12 +1,12 @@
-import AbstractDepartamentService, { DepartamentPaginatedRequest } from "../core/abstractions/AbstractDepartamentService";
+import AbstractDepartamentService, { DepartamentPaginatedRequest } from "@contracts/AbstractDepartamentService";
 import {Inject} from'web_api_base'
-import Type from "../utils/Type";
-import Departament from "../core/entities/Departament";
+import Type from "@utils/Type";
+import Departament from "@entities/Departament";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
-import AbstractDBContext from "../data/abstract/AbstractDBContext";
-import { PaginatedFilterRequest, PaginatedFilterResult } from "../core/abstractions/AbstractService";
-import Appointment from "../core/entities/Appointment";
+import AbstractDBContext from "@data-contracts/AbstractDBContext";
+import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
+import Appointment from "@entities/Appointment";
 import { AbstractSet } from "myorm_core";
 
 

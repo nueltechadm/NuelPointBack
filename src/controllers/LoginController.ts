@@ -1,13 +1,13 @@
 
 import { POST, Inject, FromBody, RunBefore, GET, ActionResult } from "web_api_base";
-import AbstractUserService from "../core/abstractions/AbstractUserService";
-import {Generate} from '../utils/JWT';
-import { IsLogged } from "../filters/AuthFilter";
-import Type from "../utils/Type";
-import Authorization from "../utils/Authorization";
+import AbstractUserService from "@contracts/AbstractUserService";
+import {Generate} from '@utils/JWT';
+import { IsLogged } from "@filters/AuthFilter";
+import Type from "@utils/Type";
+import Authorization from "@utils/Authorization";
 import AbstractController from "./AbstractController";
-import AbstractDatabaseService from "../services/abstractions/AbstractDatabaseService";
-import { DababaseStatus } from "../core/entities/Database";
+import AbstractDatabaseService from "@non-core-contracts/AbstractDatabaseService";
+import { DababaseStatus } from "@entities/Database";
 import LoginDTO from "../dto/LoginDTO";
 
 

@@ -1,7 +1,7 @@
 import { ControllerBase, OKResult, ProducesResponse, RequestJson } from "web_api_base";
-import Type from "../utils/Type";
-import AbstractService from "../core/abstractions/AbstractService";
-import Authorization from "../utils/Authorization";
+import Type from "@utils/Type";
+import AbstractService from "@contracts/AbstractService";
+import Authorization from "@utils/Authorization";
 
 export default abstract class AbstractController extends ControllerBase {    
     

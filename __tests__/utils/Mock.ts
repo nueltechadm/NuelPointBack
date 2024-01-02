@@ -1,70 +1,120 @@
+import 'ts_linq_base';
 export default class Mock
-{
-    public static Copy<T extends object>(source : T) : T & IChangeble<T>
-    {
-        return (new Changeable<T>(source) as any) as T & IChangeble<T>;     
-    }  
+{    
     
     public static CreateInstance<T extends object>(cTor : new (...args : any[]) => T) : T & IChangeble<T>
-    {       
-        return (new Changeable<T>(Reflect.construct(cTor, []) as T) as any) as T & IChangeble<T>;     
+    {
+        return (Builder.MakeChangeable(cTor) as any) as T & IChangeble<T>;     
     }     
 
     public static CreateIntanceFromAbstraction<T extends object>() : T & IChangeble<T>
     {
-       return (new Changeable<T>(undefined) as any) as T & IChangeble<T>;        
+        return (Builder.MakeChangeable(Object) as any) as T & IChangeble<T>;       
     }
-}
 
-export interface IChangeble<T extends object>
-{
-    ChangeBehavior<U extends keyof T>(member : U, callback : T[U]): T & IChangeble<T>;
-    HasCalled<U extends keyof T>(member : U): number;
-}
-
-export class Changeable<T extends object> implements IChangeble<T>
-{
-    private _source : T;
-    private _counter : {[key : string] : number} = {};
-
-    constructor(source : T | undefined)
+    public static Cast<T extends object>(o : T) :  T & IChangeble<T>
     {
-        this._source = source ?? {} as T;
+        return o as T & IChangeble<T>;
+    }
+    
+}
 
-        if(source)
-            (this as any).__proto__ = this._source.constructor;
+const counterSymbol = Symbol("_counter");
+export class Builder
+{   
+    public _counter : {[key : string] : number} = {};
+    
+    public static MakeChangeable<T extends object>(cTor : new (...args : any[]) => T)
+    {
+        let instance = Reflect.construct(cTor, []);
 
-        Object.keys(this._source).forEach(c => 
-        {
-            if(typeof (this._source as any)[c] == "function")
+        let instanceAsAny = instance as any;
+
+        instanceAsAny[counterSymbol] = {};
+
+        let members = Reflect.ownKeys(cTor.prototype);       
+
+        if(cTor.name != Object.name)
+            members.forEach(c => 
             {
-                (this as any)[c] = (...args: any[]) : any =>
+                if(typeof instanceAsAny[c] == "function" && c.toString() != "constructor")
                 {
-                    if(Object.keys(this._counter).Any(s => s == c))
-                        this._counter[c]++;
-                    else
-                        this._counter[c] = 1;
-                }
-            }
+                    let o = instanceAsAny[c];
+
+                    instanceAsAny[c] = (...args: any[]) : any =>
+                    {
+                        if(Object.keys(instanceAsAny[counterSymbol] ?? {}).Any(s => s == c))
+                            instanceAsAny[counterSymbol][c.toString()]++;
+                        else
+                            instanceAsAny[counterSymbol][c.toString()] = 1;
+
+                        return Reflect.apply(o, instanceAsAny, args);
+                    }
+                }            
+            });
+
+        cTor.prototype.DefineBehavior = function<U extends keyof T>(member: U, callback: (...args: any[]) => any): T & IChangeble<T> 
+        {
+            return Builder.DefineBehavior(this, member, callback);
+        }
+
+        cTor.prototype.ChangeBehavior = function<U extends keyof T>(member: U, callback: (...args: any[]) => any): T & IChangeble<T> 
+        {
+            return Builder.ChangeBehavior(this, member, callback);
+        }
+
+        cTor.prototype.HasCalled = function<U extends keyof T>(member: U): number 
+        {
+            return Builder.HasCalled(this, member);
+        }
+
+        return instance;
+
+    }
+
+
+    public static DefineBehavior<T extends object, U extends keyof T>(source : T, member: U, callback: (...args: any[]) => any): T & IChangeble<T> { 
+
+       return Builder.ChangeBehavior(source ,member, callback as T[U]);
+    }
+    
+    public static ChangeBehavior<T extends object, U extends keyof T>(source : T,member: U, callback: T[U]): T & IChangeble<T> { 
+       
+        (source as any)[member] = callback;
+
+        let sourceAsAny = source as any;
+
+        let o = sourceAsAny[member];
+
+        sourceAsAny[member] = (...args: any[]) => 
+        {
+            if(Object.keys(sourceAsAny[counterSymbol] ?? {}).Any(s => s == member.toString()))
+                sourceAsAny[counterSymbol][member.toString()]++;
             else
-                (this as any)[c] = (this._source as any)[c];
-        });
-
+                sourceAsAny[counterSymbol][member.toString()] = 1;
+            
+            return Reflect.apply(o, sourceAsAny, args);
+        };
+        
+        return source as any as T & IChangeble<T>;
     }
 
-    public ChangeBehavior<U extends keyof T>(member: U, callback: T[U]): T & IChangeble<T> {
+    public static HasCalled<T extends object, U extends keyof T>(source : T, member: U): number {
         
-        this._source[member] = callback;
-        (this as any)[member] = callback;
-        return this as any as T & IChangeble<T>;
-    }
-
-    public HasCalled<U extends keyof T>(member: U): number {
+        let sourceAsAny = source as any;
         
-        if(Object.keys(this._counter).Any(s => s == member))
-            return this._counter[member.toString()];
+        if(Object.keys(sourceAsAny[counterSymbol] ?? {}).Any(s => s == member))
+            return sourceAsAny[counterSymbol][member.toString()];
         else 
             return 0;
     }
 
 }
+
+export interface IChangeble<T>
+{    
+    DefineBehavior<U extends keyof T>(member : U, callback : (...args: any[]) => any): T & IChangeble<T>;
+    ChangeBehavior<U extends keyof T>(member : U, callback : T[U]): T & IChangeble<T>;
+    HasCalled<U extends keyof T>(member : U): number;
+}
+

@@ -1,5 +1,5 @@
-import  Appointment  from "../entities/Appointment";
-import User from "../entities/User";
+import  Appointment  from "@entities/Appointment";
+import User from "@entities/User";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
 
 

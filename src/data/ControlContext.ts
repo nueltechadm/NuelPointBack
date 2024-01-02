@@ -1,5 +1,5 @@
 import { PGDBSet, PGDBManager, PGDBContext } from 'myorm_pg';
-import Database from '../core/entities/Database';
+import Database from '@entities/Database';
 
 export default class ControlContext extends PGDBContext {
 
