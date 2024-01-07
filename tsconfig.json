@@ -17,7 +17,7 @@
       "@decorators/*" : ["./src/decorators/*"],
       "@exceptions/*" : ["./src/exceptions/*"],
       "@utils/*" : ["./src/utils/*"],
-      "@controllers/*" : ["./src/controllers/*"]      
+      "@controllers/*" : ["./src/controllers/*"]        
      },                                     
      "rootDirs": ["./src", "./__tests__"],                                 
     

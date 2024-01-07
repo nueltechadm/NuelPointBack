@@ -1,5 +1,5 @@
-import Schema from '../../node_modules/myorm_pg/lib/core/decorators/SchemasDecorators';
-import TP  from '../../node_modules/myorm_pg/lib/core/design/Type';
+import Schema from 'myorm_pg/lib/core/decorators/SchemasDecorators';
+import TP  from 'myorm_pg/lib/core/design/Type';
 
 
 export default class Type

@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],            
             "runtimeExecutable": "node", 
-            "runtimeArgs": ["${workspaceFolder}//dist/Index.js", "--debug", "--dark"]
+            "runtimeArgs": ["${workspaceFolder}//dist/src/Index.js", "--debug", "--dark"]
         }, 
 
         {
@@ -27,6 +27,17 @@
             "runtimeArgs": ["jest",  "./${fileDirnameBasename}/${fileBasename}"], 
             "internalConsoleOptions": "neverOpen", 
             "console": "integratedTerminal"
+        },
+
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug some js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],            
+            "runtimeExecutable": "node", 
+            "runtimeArgs": ["./${fileDirnameBasename}/${fileBasename}"]
         }
 
         
