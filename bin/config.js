@@ -66,7 +66,7 @@ function ask(question)
     terminal.close();
     if(y == 'y' || y == 'Y'){
         fs.writeFileSync(p.join(process.cwd(), out, 'src', 'config.json'), JSON.stringify(samples, null, 2), 'utf-8');
-        console.log(style.strong+text.red+'File created'+style.reset);
+        console.log(style.strong+text.green+'File created'+style.reset);
     }
     else
         console.log(style.strong+text.red+'Operation aborted'+style.reset);

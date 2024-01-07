@@ -6,9 +6,9 @@
   "scripts": {
     "test": "jest",
     "start": "node ./dist/Index",
-    "build": "npm install && npm install ts_linq_base myorm_core myorm_pg --save && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
-    "compile" : "tsc -p . && node ./bin/paths.js && node ./bin/config.js",
-    "recompile" : "del ./dist/ && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
+    "restore": "npm install && npm install ts_linq_base myorm_core myorm_pg --save && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
+    "build": "npm install ts_linq_base myorm_core myorm_pg --save && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
+    "compile": "tsc -p . && node ./bin/paths.js && node ./bin/config.js",
     "orm": "npm install ts_linq_base myorm_core myorm_pg --save "
   },
   "author": "adriano.marino1992@gmail.com",
