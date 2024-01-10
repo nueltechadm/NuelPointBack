@@ -11,10 +11,32 @@ for(let p in paths)
 
 function findBaseUrl(file)
 {
-    return `${file}`.split('\\').length - 1;  
+    let parts = `${file}`.split('\\');  
+    
+    let p = parts.filter(s => s.indexOf(out.replace('./','')) > -1);
+
+    return parts.length - parts.indexOf(p[0]) - 2;
 }
 
-const files = fs.readdirSync(p.join(process.cwd(), out), {recursive : true}).filter(s => s.endsWith('.js'));
+function getFiles (folder)
+{
+    let r = [];
+
+    let t = fs.readdirSync(folder).map(s => p.join(folder, s));
+
+    let f = t.filter(s => s.lastIndexOf('.') >= s.length - 5);
+
+    r.push(...f);
+    
+    let d = t.filter(s => !f.includes(s));
+
+    d.forEach(s => r.push(...getFiles(s)));
+
+    return r;
+    
+}
+
+const files = getFiles(p.join(process.cwd(), out)).filter(s => s.endsWith('.js'));
 
 for(let f of files)
 {
@@ -23,7 +45,7 @@ for(let f of files)
     for(let i = 0; i < q; i++)
         b += '../';
 
-    let u = fs.readFileSync(p.join(process.cwd(), out, f), 'utf8');
+    let u = fs.readFileSync(f, 'utf8');
     
     for(let k in paths)
     {
@@ -37,6 +59,6 @@ for(let f of files)
        
     }   
 
-    fs.writeFileSync(p.join(process.cwd(), out, f), u, 'utf8');
+    fs.writeFileSync(f, u, 'utf8');
     
 }
