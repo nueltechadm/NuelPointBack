@@ -80,8 +80,17 @@ export default class App extends Application
 
             await DependecyService.Resolve<AbstractControlContext>(AbstractControlContext)?.UpdateDatabaseAsync();
 
-            if(Application.Configurations.DEBUG)
-                await DependecyService.Resolve<AbstractDatabaseService>(AbstractDatabaseService)?.CreateDabaseAsync("development");
+            if(Application.Configurations.DEBUG){
+                let dbService = DependecyService.Resolve<AbstractDatabaseService>(AbstractDatabaseService);
+
+                let dbName = "development";
+                
+                let db = await dbService?.GetDabaseAsync(dbName);
+                if(!db)
+                    await dbService!.CreateDabaseAsync(dbName);
+                else
+                    await dbService!.UpdateDatabaseSchemaAsync(db);
+            }
 
         })();
        
