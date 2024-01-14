@@ -8,14 +8,8 @@ for(let p in paths)
 {
     paths[p] = `${paths[p]}`.replace('./','').replace('*', '');    
 }
-
-
-let force = process.argv.length > 2 && process.argv[2] == '--force';
     
-if(force && fs.existsSync(p.join(process.cwd(), out)))
-{
-   fs.unlinkSync(p.join(process.cwd(), out));
-}
+let pathDist = p.join(process.cwd(), out);
 
 function findBaseUrl(file)
 {
@@ -44,7 +38,7 @@ function getFiles (folder)
     
 }
 
-const files = getFiles(p.join(process.cwd(), out)).filter(s => s.endsWith('.js'));
+const files = getFiles(pathDist).filter(s => s.endsWith('.js'));
 
 for(let f of files)
 {

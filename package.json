@@ -10,6 +10,7 @@
     "build": "npm install ts_linq_base myorm_core myorm_pg --save && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
     "compile": "tsc -p . && node ./bin/paths.js && node ./bin/config.js",
     "orm": "npm install ts_linq_base myorm_core myorm_pg --save "
+   
   },
   "author": "adriano.marino1992@gmail.com",
   "license": "ISC",
