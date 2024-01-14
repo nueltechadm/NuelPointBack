@@ -45,11 +45,11 @@ export default class Database {
 }
 
 export enum DababaseStatus {
-    CREATING = 1,
-    CREATED = 2,
-    DELETED = 3, 
-    CREATEFAIL = 4, 
-    UPDATING = 5, 
-    UPDATED = 6,
-    UPDATEFAIL = 7
+    CREATING = "creating",
+    CREATED = "created",
+    DELETED = "deleted", 
+    CREATEFAIL = "creation fail", 
+    UPDATING = "updating", 
+    UPDATED = "updated",
+    UPDATEFAIL = "update fail"
 }

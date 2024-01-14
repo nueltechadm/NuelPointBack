@@ -9,6 +9,14 @@ for(let p in paths)
     paths[p] = `${paths[p]}`.replace('./','').replace('*', '');    
 }
 
+
+let force = process.argv.length > 2 && process.argv[2] == '--force';
+    
+if(force && fs.existsSync(p.join(process.cwd(), out)))
+{
+   fs.unlinkSync(p.join(process.cwd(), out));
+}
+
 function findBaseUrl(file)
 {
     let parts = `${file}`.split('\\');  

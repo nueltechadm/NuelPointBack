@@ -7,6 +7,6 @@
         "DB_PASS": "postgres",
         "DB_PORT": 5432,
         "DB_HOST": "localhost",
-        "DB_NAME": "postgres"
+        "DB_NAME": "control_db"
     }
 }

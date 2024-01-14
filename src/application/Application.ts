@@ -62,12 +62,8 @@ export default class App extends Application
         this.ApplicationThreadExeptionHandler = this.ApplicationThreadExeptionEvent;
 
         appConfig.AddScoped(AbstractDBContext, DBContext);
-        appConfig.AddScoped(AbstractControlContext, ControlContext);  
-        
+        appConfig.AddScoped(AbstractControlContext, ControlContext);          
         appConfig.AddScoped(AbstractMultiPartRequestService, FormidableMultiPartRequestService); 
-
-        process.env["ROOT"] = appConfig.RootPath; 
-
         appConfig.AddScoped(AbstractUserService, UserService);
         appConfig.AddScoped(AbstractDepartamentService, DepartamentService);
         appConfig.AddScoped(AbstractJobRoleService, JobRoleService);       
@@ -81,7 +77,12 @@ export default class App extends Application
         appConfig.AddScoped(AbstractDatabaseService, DatabaseService);       
 
         (async()=>{
-            await DependecyService.Resolve<AbstractControlContext>(ControlContext)?.UpdateDatabaseAsync();
+
+            await DependecyService.Resolve<AbstractControlContext>(AbstractControlContext)?.UpdateDatabaseAsync();
+
+            if(Application.Configurations.DEBUG)
+                await DependecyService.Resolve<AbstractDatabaseService>(AbstractDatabaseService)?.CreateDabaseAsync("development");
+
         })();
        
     }
