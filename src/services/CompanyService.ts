@@ -138,5 +138,10 @@ export default class CompanyService  extends AbstractCompanyService
         if(!obj.Document)
             throw new InvalidEntityException(`The document of ${Company.name} is required`);
     } 
+
+    public async GetAllAsync(): Promise<Company[]>
+    {
+        return await this._context.Collection(Company).ToListAsync();
+    }
    
 }

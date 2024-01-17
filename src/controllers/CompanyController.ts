@@ -40,6 +40,13 @@ export default class CompanyController extends AbstractController {
         
     }
 
+    @POST("all")     
+    @SetDatabaseFromToken()
+    public async GetAllAsync(): Promise<ActionResult> 
+    {             
+        return this.OK((await this._companyService.GetAllAsync()));
+    }
+
 
     @POST("filter")    
     @SetDatabaseFromToken()
@@ -192,8 +199,6 @@ export default class CompanyController extends AbstractController {
         return this.OK({Message : 'Company deleted'});
     }
 
-    
-    
 
     @GET("getJson")
     @SetDatabaseFromToken()

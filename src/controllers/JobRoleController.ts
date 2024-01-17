@@ -55,6 +55,13 @@ export default class JobRoleController extends AbstractController
     }
 
 
+    @POST("all")
+    @SetDatabaseFromToken()
+    public async GetAllAync() :Promise<ActionResult>
+    {
+        return this.OK(await this._jobRoleService.GetAllAsync());
+    }
+
 
     
     @GET("getById")  

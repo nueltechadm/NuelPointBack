@@ -3,7 +3,8 @@ import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "
 
 export default abstract class AbstractJobRoleService extends AbstractService<JobRole, JobRolePaginatedFilteRequest, PaginatedFilterResult<JobRole>>
 {
-    abstract GetByIdAsync(id : number) : Promise<JobRole | undefined>;    
+    abstract GetByIdAsync(id : number) : Promise<JobRole | undefined>;  
+    abstract GetAllAsync(): Promise<JobRole[]>  
 }
 
 export /* sealed */ class JobRolePaginatedFilteRequest extends PaginatedFilterRequest

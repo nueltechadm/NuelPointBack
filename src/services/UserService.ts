@@ -98,8 +98,8 @@ export default class UserService  extends AbstractUserService
         if(!obj.Access)
             throw new InvalidEntityException(`The ${Access.name} of the ${User.name} is required`);
         
-        obj.Access.Id = -1;
-
+        obj.Access.Id = -1;   
+ 
         obj.Access!.Password = MD5(obj.Access!.Password);  
 
         if(!obj.Company && !obj.IsSuperUser())

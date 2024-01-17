@@ -5,7 +5,8 @@ import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "
 export default abstract class AbstractCompanyService extends AbstractService<Company, CompanyPaginatedFilterRequest, CompanyPaginatedFilterResponse>
 {
     abstract GetByIdAsync(id : number) : Promise<Company | undefined>;    
-    abstract GetByNameAsync(name : string) : Promise<Company[]>;   
+    abstract GetByNameAsync(name : string) : Promise<Company[]>;  
+    abstract GetAllAsync(): Promise<Company[]>;
            
 
 }

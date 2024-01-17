@@ -89,6 +89,11 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
 
 
+    public async GetAllAsync(): Promise<JobRole[]>
+    {
+        return await this._context.Collection(JobRole).ToListAsync();
+    }
+
     public override async PaginatedFilterAsync(request : JobRolePaginatedFilteRequest) : Promise<PaginatedFilterResult<JobRole>> 
     {
         let offset = (request.Page - 1) * request.Quantity;         
