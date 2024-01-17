@@ -32,6 +32,12 @@ export default class TimeController extends AbstractController {
         return this.OK(await this._service.PaginatedFilterAsync(params));
     }
 
+    @POST("all")
+    @SetDatabaseFromToken()
+    public async GetAllAsync() :Promise<ActionResult> 
+    {             
+        return this.OK((await this._service.GetAllAsync()));
+    }
     
     @GET("getById")
     @SetDatabaseFromToken()

@@ -50,6 +50,11 @@ export default class TimeService extends AbstractTimeService {
     public override async GetByIdAsync(id: number): Promise<Time | undefined> {
         return await this._context.Collection(Time).WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }     
+    
+    public async GetAllAsync(): Promise<Time[]> 
+    {
+        return await this._context.Collection(Time).OrderBy("Description").ToListAsync();
+    } 
 
     public override async AddAsync(obj: Time): Promise<Time> {
 
