@@ -1,6 +1,6 @@
 
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ProducesResponse, ActionResult, RequestJson, Description } from "web_api_base";
-import AbstractUserService from "@contracts/AbstractUserService";
+import AbstractUserService, { UserPaginatedFilterRequest } from "@contracts/AbstractUserService";
 import User from "@entities/User";
 import {IsLogged} from '@filters/AuthFilter';
 import Type from "@utils/Type";
@@ -60,7 +60,7 @@ export default class UserController extends AbstractController
     @SetDatabaseFromToken()
     @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
     @Description(`Utilize esse metodo para realizar consulta de ${User.name}`)   
-    public async PaginatedFilterAsync(@FromBody()params : PaginatedFilterRequest) : Promise<ActionResult>
+    public async PaginatedFilterAsync(@FromBody()params : UserPaginatedFilterRequest) : Promise<ActionResult>
     {       
        let paginatedResult =  await this._userService.PaginatedFilterAsync(params);
 

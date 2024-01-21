@@ -8,3 +8,7 @@ export default abstract class AbstractContactService extends AbstractService<Con
 {
     abstract GetByIdAsync(id: number): Promise<Contact | undefined>;
 }
+
+
+
+

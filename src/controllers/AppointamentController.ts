@@ -98,16 +98,14 @@ export default class AppointamentController extends AbstractController
         }catch
         { 
             return this.BadRequest(`The appointament field is not of type ${AppointmentDTO.name}`);
-        }        
-
-        let time = await this._timeService.GetByDayOfWeekAsync(user.Id, new Date().getDay());        
+        }  
 
         let currentDayOfUser = await this._appointamentService.GetCurrentDayByUser(user);
 
         if(!currentDayOfUser)
-            currentDayOfUser = new Appointment(user, time);
+            currentDayOfUser = new Appointment(user);
 
-        let checkpoint = new Checkpoint(user, dto.X, dto.Y, user.Company!, currentDayOfUser, time);
+        let checkpoint = new Checkpoint(user, dto.X, dto.Y, user.Company!, currentDayOfUser);
 
         let image = await this._fileService.ComputeNextFileNameAsync(checkpoint);        
 

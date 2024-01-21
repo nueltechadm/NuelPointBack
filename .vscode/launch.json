@@ -10,7 +10,8 @@
             "name": "Debug Program",
             "skipFiles": [
                 "<node_internals>/**"
-            ], 
+            ],             
+            "preLaunchTask": "compile",
             "runtimeExecutable": "node", 
             "runtimeArgs": ["${workspaceFolder}//dist/src/Index.js", "--debug", "--dark"]
         }, 

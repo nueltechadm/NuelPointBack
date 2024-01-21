@@ -27,6 +27,7 @@ describe("JobRoleService", () => {
 
             expect(collection.HasCalled("Where")).toBe(0);
 
+            
             expect(collection.HasCalled("ToListAsync")).toBe(1);
            
         });

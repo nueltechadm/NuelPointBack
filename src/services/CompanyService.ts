@@ -103,7 +103,7 @@ export default class CompanyService  extends AbstractCompanyService
        this._context.Collection(Company).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Collection(Company).Join(l);
+            this._context.Collection(Company).Load(l);
         
        return await this._context.Collection(Company).ToListAsync();
     } 

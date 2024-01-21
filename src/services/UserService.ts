@@ -1,5 +1,5 @@
 import User from "@entities/User";
-import AbstractUserService from "@contracts/AbstractUserService";
+import AbstractUserService, { UserPaginatedFilterRequest } from "@contracts/AbstractUserService";
 import {MD5} from '@utils/Cryptography';
 import ObjectNotFoundExcpetion from "../exceptions/ObjectNotFoundExcpetion";
 import Type from "@utils/Type";
@@ -12,6 +12,8 @@ import AbstractDBContext from "@data-contracts/AbstractDBContext";
 import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
 import Company from "@src/core/entities/Company";
 import JobRole from "@src/core/entities/JobRole";
+import Departament from "@src/core/entities/Departament";
+import { IJoinSelectable, IJoiningQuery, Operation } from "myorm_core";
 
 
 export default class UserService  extends AbstractUserService
@@ -51,28 +53,28 @@ export default class UserService  extends AbstractUserService
                                             Field : "Id", 
                                             Value : id
                                         })                                        
-                                        .Join("Access")
-                                        .Join("Company")                                        
-                                        .Join("Contacts")   
-                                        .Join("JobRole")
-                                        .Join("Journey")                                     
+                                        .Load("Access")
+                                        .Load("Company")                                        
+                                        .Load("Contacts")   
+                                        .Load("JobRole")
+                                        .Load("Journey")                                     
                                         .FirstOrDefaultAsync();
         
     }
     public override async GetByNameAsync(name: string): Promise<User[]> {
 
-        return await this._context.Collection(User).WhereField("Name").Constains(name).Join("Company").ToListAsync() ?? [];
+        return await this._context.Collection(User).WhereField("Name").Constains(name).Load("Company").ToListAsync() ?? [];
     }
 
     public override async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<Access | undefined> {
 
-       let access = await this._context.Join(User, Access)
+       let access = await this._context.From(User).InnerJoin(Access)
                                     .On(User, "Access", Access, "User")
                                     .Where(Access, { Field : "Username", Value : username})
                                     .And(Access, { Field : "Password", Value : MD5(password)})       
                                     .Select(Access)                                    
-                                    .Join("User")
-                                    .Join("Perfil")                                                                       
+                                    .Load("User")
+                                    .Load("Perfil")                                                                       
                                     .FirstOrDefaultAsync();   
         if(!access)
             return undefined;
@@ -87,7 +89,7 @@ export default class UserService  extends AbstractUserService
        this._context.Collection(User).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Collection(User).Join(l);
+            this._context.Collection(User).Load(l);
         
        return await this._context.Collection(User).ToListAsync();
     } 
@@ -140,14 +142,24 @@ export default class UserService  extends AbstractUserService
 
        return await this._context.Collection(User).DeleteAsync(obj)!;
     }
+    
 
-    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<User>> 
+
+
+    public override async PaginatedFilterAsync(request : UserPaginatedFilterRequest) : Promise<PaginatedFilterResult<User>> 
     {
         let offset = (request.Page - 1) * request.Quantity; 
 
-        let total = await this._context.Collection(User).CountAsync();
+        let total = await this.BuildQuery(request).CountAsync();
 
-        let users = await this._context.Collection(User).OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
+        let query = this.BuildQuery(request);
+
+        if(request.LoadRelations)
+        {
+            query.Load("Company").Load("JobRole");
+        }
+
+        let users = await query.OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
 
         let result = new PaginatedFilterResult<User>();
         result.Page = request.Page;
@@ -157,6 +169,33 @@ export default class UserService  extends AbstractUserService
 
         return result;
     }
+
+
+    private BuildQuery(request : UserPaginatedFilterRequest)  : IJoinSelectable<User>
+    {
+        let query = this._context.From(User)
+                                 .LeftJoin(Company)
+                                 .On(User, "Company", Company, "Id")
+                                 .LeftJoin(JobRole)
+                                 .On(User, "JobRole", JobRole, "Id")
+                                 .LeftJoin(Departament)
+                                 .On(JobRole, "Departament", Departament, "Id");
+        
+        if(request.Name)
+            query.Where(User, {Field: "Name", Kind: Operation.CONSTAINS, Value: request.Name});
+
+        if(request.CompanyId > 0)
+            query.Where(Company, {Field: "Id", Value: request.CompanyId});
+
+        if(request.JobRoleId > 0)
+            query.Where(JobRole, {Field: "Id", Value: request.JobRoleId});
+
+        if(request.DepartamentId > 0)
+            query.Where(Departament, {Field: "Id", Value: request.DepartamentId});
+
+        return query.Select(User);
+    } 
+
     
     public override ValidateObject(obj : User) : void
     {

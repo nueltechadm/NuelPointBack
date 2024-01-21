@@ -47,7 +47,8 @@ export default class CheckpointService  extends AbstractCheckpointService
 
         if(!checkpoint.User.Company)
         {
-            let r = await this._context.Join(Company, User)
+            let r = await this._context.From(Company)
+                                       .InnerJoin(User)
                                        .On(Company, "Users", User, "Company")
                                        .Where(User, {Field: "Id", Value : checkpoint.User.Id})
                                        .Select(Company)
@@ -107,7 +108,7 @@ export default class CheckpointService  extends AbstractCheckpointService
        this._context.Collection(Checkpoint).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Collection(Checkpoint).Join(l);
+            this._context.Collection(Checkpoint).Load(l);
         
        return await this._context.Collection(Checkpoint).ToListAsync();
     } 
@@ -154,7 +155,7 @@ export default class CheckpointService  extends AbstractCheckpointService
             Field : "Date", 
             Kind : Operation.SMALLEROREQUALS, 
             Value : end ?? new Date()})    
-        .Join("User")
+        .Load("User")
         .OrderDescendingBy("Date")
         .ToListAsync();
     }

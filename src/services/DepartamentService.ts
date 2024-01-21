@@ -5,8 +5,7 @@ import Departament from "@entities/Departament";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractDBContext from "@data-contracts/AbstractDBContext";
-import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
-import Appointment from "@entities/Appointment";
+import { PaginatedFilterResult } from "@contracts/AbstractService";
 import { AbstractSet } from "myorm_core";
 
 
@@ -62,7 +61,7 @@ export default class DepartamentService  extends AbstractDepartamentService
        this._context.Collection(Departament).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Collection(Departament).Join(l);
+            this._context.Collection(Departament).Load(l);
         
        return await this._context.Collection(Departament).ToListAsync();
     } 

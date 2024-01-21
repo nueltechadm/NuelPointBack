@@ -91,7 +91,7 @@ export default class AppointmentService extends AbstractAppointmentService {
        this._context.Collection(Appointment).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Collection(Appointment).Join(l);
+            this._context.Collection(Appointment).Load(l);
         
        return await this._context.Collection(Appointment).ToListAsync();
     } 
@@ -108,8 +108,8 @@ export default class AppointmentService extends AbstractAppointmentService {
                 Field: "Date",
                 Value: new Date()
             })            
-            .Join("User")
-            .Join("Checkpoints")
+            .Load("User")
+            .Load("Checkpoints")
             .OrderDescendingBy("Date")
             .FirstOrDefaultAsync();
     }
@@ -132,8 +132,8 @@ export default class AppointmentService extends AbstractAppointmentService {
                 Kind: Operation.SMALLEROREQUALS,
                 Value: end 
             })
-            .Join("User")
-            .Join("Checkpoints")
+            .Load("User")
+            .Load("Checkpoints")
             .OrderDescendingBy("Date")
             .ToListAsync();
     }

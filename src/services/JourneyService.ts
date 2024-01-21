@@ -67,7 +67,7 @@ export default class JourneyService  extends AbstractJorneyService
        this._context.Collection(Journey).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Collection(Journey).Join(l);
+            this._context.Collection(Journey).Load(l);
         
        return await this._context.Collection(Journey).ToListAsync();
     } 

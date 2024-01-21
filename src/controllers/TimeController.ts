@@ -1,12 +1,8 @@
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, RequestJson } from "web_api_base";
 import { IsLogged } from '@filters/AuthFilter';
-import InvalidEntityException from "../exceptions/InvalidEntityException";
-import EntityNotFoundException from "../exceptions/EntityNotFoundException";
 import AbstractTimeService from "@contracts/AbstractTimeService";
 import Time from "@entities/Time";
-import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
-import Authorization from "@utils/Authorization";
 import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
 import { PaginatedFilterRequest } from "@contracts/AbstractService";
 
@@ -17,12 +13,10 @@ export default class TimeController extends AbstractController {
     private _service: AbstractTimeService;
 
 
-
     constructor(service: AbstractTimeService) {
         super();
         this._service = service;
     }
-
 
 
     @POST("list")     
@@ -53,16 +47,29 @@ export default class TimeController extends AbstractController {
 
     @POST("insert")
     @SetDatabaseFromToken()
+    @RequestJson(JSON.stringify(new Time("Sample"), null, 2))
     public async InsertAsync(@FromBody() time: Time) : Promise<ActionResult>
     {
-        return this.OK(await this._service.AddAsync(time));
+        let result = await this._service.AddAsync(time);
+
+        return this.OK({Message : "Time created", Id : result.Id});
     }
 
     @PUT("update")
     @SetDatabaseFromToken()
+    @RequestJson(JSON.stringify(new Time("Sample"), null, 2))
     public async UpdateAsync(@FromBody() time: Time) : Promise<ActionResult>
     {
-        return this.OK(await this._service.UpdateAsync(time));        
+        let exists = await this._service.GetByIdAsync(time.Id);
+
+        if(!exists)
+            return this.NotFound({ Message: "Time not found" });
+
+        Object.assign(exists, time);
+
+        await this._service.UpdateAsync(exists);
+
+        return this.OK({Message : "Time updated"});  
     }
 
     @DELETE("delete")
@@ -77,14 +84,16 @@ export default class TimeController extends AbstractController {
         if (!del)
             return this.NotFound({ Message: "Time not found" });
 
-        return this.OK(await this._service.DeleteAsync(del));
+        await this._service.DeleteAsync(del);
+
+        return this.OK({ Message: "Time deleted" });
     }
 
     @GET("getJson")
     @SetDatabaseFromToken()
     public GetJson(): Promise<ActionResult>
     {
-        return Promise.resolve(this.OK(Type.CreateTemplateFrom<Time>(Time)));
+        return Promise.resolve(this.OK(new Time("Sample")));
     }
 
 

@@ -175,7 +175,7 @@ describe("UserService", ()=>
 
             context.DefineBehavior("Collection", ()=> collection);
             collection.DefineBehavior("Where", ()=> collection);
-            collection.DefineBehavior("Join", ()=> collection);
+            collection.DefineBehavior("Load", ()=> collection);
             collection.DefineBehavior("ToListAsync", ()=> Promise.resolve([current]));
             collection.DefineBehavior("UpdateObjectAndRelationsAsync", (o)=> Promise.resolve(o));
             
@@ -211,7 +211,7 @@ describe("UserService", ()=>
 
             context.DefineBehavior("Collection", ()=> collection);
             collection.DefineBehavior("Where", ()=> collection);
-            collection.DefineBehavior("Join", ()=> collection);
+            collection.DefineBehavior("Load", ()=> collection);
             collection.DefineBehavior("ToListAsync", ()=> Promise.resolve([current]));
             collection.DefineBehavior("UpdateObjectAndRelationsAsync", (o)=> Promise.resolve(o));
             

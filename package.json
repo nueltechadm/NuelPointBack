@@ -10,7 +10,6 @@
     "build": "npm install ts_linq_base myorm_core myorm_pg --save && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
     "compile": "tsc -p . && node ./bin/paths.js && node ./bin/config.js",
     "orm": "npm install ts_linq_base myorm_core myorm_pg --save "
-   
   },
   "author": "adriano.marino1992@gmail.com",
   "license": "ISC",
@@ -18,10 +17,10 @@
     "crypto-js": "^4.1.1",
     "formidable": "^2.1.2",
     "jsonwebtoken": "^9.0.0",
-    "myorm_core": "^4.0.0",
-    "myorm_pg": "^6.2.2",
+    "myorm_core": "^5.0.0",
+    "myorm_pg": "^7.0.0",
     "ts_linq_base": "^1.1.0",
-    "web_api_base": "^4.0.6"
+    "web_api_base": "^4.0.8"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",

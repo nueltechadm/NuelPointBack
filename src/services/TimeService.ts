@@ -6,6 +6,7 @@ import AbstractTimeService from "@contracts/AbstractTimeService";
 import AbstractDBContext from '@data-contracts/AbstractDBContext';
 import User from '@entities/User';
 import { PaginatedFilterRequest, PaginatedFilterResult } from '@contracts/AbstractService';
+import DayOfWeek from '@src/core/entities/DayOfWeek';
 
 
 
@@ -42,7 +43,7 @@ export default class TimeService extends AbstractTimeService {
        this._context.Collection(Time).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Collection(Time).Join(l);
+            this._context.Collection(Time).Load(l);
         
        return await this._context.Collection(Time).ToListAsync();
     } 
@@ -98,11 +99,11 @@ export default class TimeService extends AbstractTimeService {
         return result;
     }
 
-    public override async GetByDayOfWeekAsync(userId: number, day: number): Promise<Time | undefined> {
+    public override async GetByDayOfWeekAsync(userId: number, day: number): Promise<DayOfWeek | undefined> {
         
         let u = await this._context.Collection(User).WhereField("Id").IsEqualTo(userId).LoadRelationOn("Journey").FirstOrDefaultAsync();
 
-        return u?.Journey?.Times.filter(s => s.DayOfweek?.Day == day).FirstOrDefault();
+        return u?.Journey?.DaysOfWeek.filter(s => s.Day == day).FirstOrDefault();
     }
 
     public override ValidateObject(obj: Time): void {

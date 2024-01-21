@@ -55,7 +55,7 @@ export default class JobRoleService  extends AbstractJobRoleService
        this._context.Collection(JobRole).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Collection(JobRole).Join(l);
+            this._context.Collection(JobRole).Load(l);
         
        return await this._context.Collection(JobRole).ToListAsync();
     } 
@@ -113,7 +113,8 @@ export default class JobRoleService  extends AbstractJobRoleService
     
     protected BuildQuery(request : JobRolePaginatedFilteRequest) : IJoinSelectable<JobRole>
     {
-        let collection = this._context.Join(JobRole, Departament)
+        let collection = this._context.From(JobRole)
+                                      .LeftJoin(Departament)
                                       .On(JobRole, "Departament", Departament, "Id"); 
 
         if(request.JobroleDescription)

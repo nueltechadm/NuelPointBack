@@ -11,36 +11,36 @@ export default class Time
     public Id : number;    
 
     @Column()
-    public Description : string;      
+    public Description : string;    
 
-    @Column()
-    public DayOfweek? : DayOfWeek;
+    @Column()    
+    public Time1 : string;   
 
-    @Column()
-    @DataType(DBTypes.DOUBLE)
-    public Time1 : number;   
+    @Column()   
+    public Time2 : string; 
 
-    @Column()
-    @DataType(DBTypes.DOUBLE)
-    public Time2 : number; 
+    @Column()    
+    public Time3 : string; 
 
-    @Column()
-    @DataType(DBTypes.DOUBLE)
-    public Time3 : number; 
+    @Column()   
+    public Time4 : string; 
 
-    @Column()
-    @DataType(DBTypes.DOUBLE)
-    public Time4 : number; 
+    @Column()    
+    public Time5 : string; 
 
-    constructor(description : string,  time1 : number, time2 : number, time3 : number , time4 : number)
+    @Column()    
+    public Time6 : string; 
+
+    constructor(description : string)
     {
         this.Id = -1;        
         this.Description = description;
-        this.Time1 = time1;
-        this.Time2 = time2;
-        this.Time3 = time3;
-        this.Time4 = time4;
-        this.DayOfweek = undefined;
+        this.Time1 = "00:00";
+        this.Time2 = "00:00";
+        this.Time3 = "00:00";
+        this.Time4 = "00:00";
+        this.Time5 = "00:00";
+        this.Time6 = "00:00";        
     }
 }
 

@@ -20,15 +20,15 @@ export default class Journey
     public Company : Company;
 
    @Column()
-   @ManyToMany(() => Time)
-   public Times : Time[];
+   @ManyToMany(() => DayOfWeek)
+   public DaysOfWeek : DayOfWeek[];
 
-    constructor(description : string, days : number[], company : Company)
+    constructor(description : string, company : Company)
     {
         this.Id = -1;      
         this.Description = description;       
         this.Company = company;
-        this.Times = [];
+        this.DaysOfWeek = [];
     }
 }
 

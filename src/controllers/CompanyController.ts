@@ -1,4 +1,4 @@
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RequestJson, ActionResult } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, RequestJson, ActionResult, Description } from "web_api_base";
 import { IsLogged } from '@filters/AuthFilter';
 import AbstractCompanyService, { CompanyPaginatedFilterRequest, CompanyPaginatedFilterResponse } from "@contracts/AbstractCompanyService";
 import Company from "@entities/Company";
@@ -116,6 +116,48 @@ export default class CompanyController extends AbstractController {
 
         return this.OK({Message : 'Company updated'});
     }
+
+
+    
+    @PUT("contact")  
+    @SetDatabaseFromToken()   
+    @Description(`Utilize esse metodo para adicionar ou editar um ${Contact.name} de um ${Company.name}`)       
+    public async UpdateContact(@FromQuery()companyId : number, @FromBody()contact : Contact) : Promise<ActionResult>
+    {        
+        let companies= await this._companyService.GetByAndLoadAsync("Id", companyId, ["Contacts"]);
+
+        if(!companies.Any())
+            return this.NotFound({Message : `Company with Id ${companyId} not exists`});        
+
+        companies.First().Contacts.RemoveAll(s => s.Id == contact.Id);        
+
+        companies.First().Contacts.Add(contact);       
+
+        await this._companyService.UpdateAsync(companies.First());
+
+        return this.OK('Company´s contacts updated');
+    }
+
+    @PUT("delete/contact")  
+    @SetDatabaseFromToken()    
+    @Description(`Utilize esse metodo para remover um ${Contact.name} de um ${Company.name}`)   
+    public async DeleteContact(@FromQuery()companyId : number, @FromQuery()contactId : number) : Promise<ActionResult>
+    {        
+        let company= (await this._companyService.GetByAndLoadAsync("Id", companyId, ["Contacts"])).FirstOrDefault();
+
+        if(!company)
+            return this.NotFound({Message : `Company with Id ${companyId} not exists`});        
+
+        if(!company.Contacts.Any(s => s.Id == contactId))
+            return this.NotFound({Message : `Company with Id ${companyId} dot not have a contact with Id ${contactId}`});        
+
+        company.Contacts.RemoveAll(s => s.Id == contactId);              
+
+        await this._companyService.UpdateAsync(company);
+
+        return this.OK('Company´s contacts updated');
+    }
+    
 
     @PUT("activate")    
     @SetDatabaseFromToken()    

@@ -12,11 +12,6 @@ export default class Appointment {
     @DataType(DBTypes.SERIAL)
     public Id: number;
 
-
-    @Column()
-    @ManyToOne(() => Time)
-    public Time?: Time;
-
     @Column()
     @DataType(DBTypes.DATE)
     public Date : Date; 
@@ -32,11 +27,10 @@ export default class Appointment {
     @OneToOne(()=> User)
     public User : User;
 
-    public constructor(user : User, time?: Time) {
+    public constructor(user : User) {
         this.Id = -1;
         this.Checkpoints = [];
-        this.DayOfWeek = new Date().getDay() as DayOfWeek;
-        this.Time = time;
+        this.DayOfWeek = new Date().getDay() as DayOfWeek;        
         this.Date = new Date();
         this.User = user;
     }

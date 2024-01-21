@@ -44,7 +44,7 @@ export default class AcessService extends AbstractAccessService {
        this._context.Collection(Access).Where({Field : key, Value : value});
 
        for(let l of load)
-            this._context.Collection(Access).Join(l);
+            this._context.Collection(Access).Load(l);
         
        return await this._context.Collection(Access).ToListAsync();
     } 

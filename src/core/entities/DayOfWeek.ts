@@ -1,4 +1,4 @@
-import { Column, DataType, PrimaryKey, DBTypes, Table } from 'myorm_pg';
+import { Column, DataType, PrimaryKey, DBTypes, Table, OneToMany, ManyToOne } from 'myorm_pg';
 import Time from './Time';
 
 @Table("dayofweek_tb")
@@ -10,16 +10,36 @@ export default class DayOfWeek {
 
     @Column()
     @DataType(DBTypes.INTEGER)
-    public Day: number;    
+    public Day: Days;  
+    
+    @Column()    
+    public DayName: string;  
+    
+    @Column()   
+    public Time: Time; 
 
     @Column()
     public DayOff: boolean;
 
-    constructor(day: number, time: Time) {
+    constructor(day: Days, name : string, time: Time) {
         this.Id = -1;
         this.DayOff = false;
+        this.DayName = name,
         this.Day = day;       
+        this.Time = time;
     }
 
-
 }
+
+export enum Days
+{
+    ALL = -1,
+    SUNDAY = 0,
+    MONDAY = 1, 
+    TUESDAY = 2, 
+    WEDNESDAY = 3, 
+    THURSDAY = 4, 
+    FRIDAY = 5, 
+    SATURDAY = 6
+}
+
