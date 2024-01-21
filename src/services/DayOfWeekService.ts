@@ -36,7 +36,7 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
     }
 
     public override async GetByIdAsync(id: number): Promise<DayOfWeek | undefined> {       
-        return await this._context.Collection(DayOfWeek).WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
+        return await this._context.Collection(DayOfWeek).WhereField("Id").IsEqualTo(id).Load("Time").FirstOrDefaultAsync();
     }
     
     public async GetAllAsync(): Promise<DayOfWeek[]> {        
@@ -80,17 +80,9 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
         return await this._context.Collection(DayOfWeek).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public override async DeleteAsync(obj: DayOfWeek): Promise<DayOfWeek> {
-        
-        if(!obj.Id || obj == undefined)
-            throw new InvalidEntityException(`Id is required to delete a ${DayOfWeek.name}`);
-
-        let curr = await this._context.Collection(DayOfWeek).Where({ Field : "Id", Value : obj.Id}).FirstOrDefaultAsync();
-        
-        if(!curr)
-            throw new EntityNotFoundException(`Has no one ${DayOfWeek.name} with Id #${obj.Id} in database`);
-
-        return this._context.Collection(DayOfWeek).DeleteAsync(curr);
+    public override async DeleteAsync(obj: DayOfWeek): Promise<DayOfWeek> 
+    { 
+        return this._context.Collection(DayOfWeek).DeleteAsync(obj);
     }
 
     
@@ -128,6 +120,9 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
 
         if(!obj.DayName)
             throw new InvalidEntityException(`The name of ${DayOfWeek.name} is required`);
+
+        if(obj.Day < Days.ALL || obj.Day > Days.SATURDAY)
+            throw new InvalidEntityException(`Do not exists the day ${obj.Day}`);
        
     }
 }

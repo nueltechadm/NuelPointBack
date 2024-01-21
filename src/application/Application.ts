@@ -45,6 +45,8 @@ import AbstractDBContext from '@data-contracts/AbstractDBContext';
 import AbstractControlContext from '@data-contracts/AbstractControlContext';
 import AbstractMultiPartRequestService from '@non-core-contracts/AbstractMultiPartRequestService';
 import FormidableMultiPartRequestService from '../services/FormidableMultiPartRequestService';
+import AbstractDayOfWeekService from '@src/core/abstractions/AbstractDayOfWeekService';
+import DayOfWeekService from '@src/services/DayOfWeekService';
 
 
 export default class App extends Application
@@ -75,6 +77,7 @@ export default class App extends Application
         appConfig.AddScoped(AbstractAccessService, AcessService);
         appConfig.AddScoped(AbstractAppointmentService, AppointmentService);
         appConfig.AddScoped(AbstractDatabaseService, DatabaseService);       
+        appConfig.AddScoped(AbstractDayOfWeekService, DayOfWeekService);       
 
         (async()=>{
 
