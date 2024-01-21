@@ -33,7 +33,7 @@ export default class JourneyService  extends AbstractJorneyService
     }
 
     public override async GetByIdAsync(id: number): Promise<Journey | undefined> {       
-        return await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
+        return await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).Load("Company").Load("DaysOfWeek").FirstOrDefaultAsync();
     }      
 
     public override async ExistsAsync(id: number): Promise<boolean> {

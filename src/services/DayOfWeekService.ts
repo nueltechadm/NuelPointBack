@@ -22,20 +22,25 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
         this._context = context;
     }
 
-    public override IsCompatible(obj: any): obj is DayOfWeek {        
+    public IsCompatible(obj: any): obj is DayOfWeek {        
         return Type.HasKeys<DayOfWeek>(obj, "DayName");  
     }
 
-    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+    public async SetClientDatabaseAsync(client: string): Promise<void> {       
         await this._context.SetDatabaseAsync(client);
     }
 
-    public override async CountAsync(): Promise<number> {
+    public async CountAsync(): Promise<number> {
         
         return await this._context.Collection(DayOfWeek).CountAsync();
     }
 
-    public override async GetByIdAsync(id: number): Promise<DayOfWeek | undefined> {       
+    public async GetByIdsAsync(ids: number[]): Promise<DayOfWeek[]> 
+    {
+        return await this._context.Collection(DayOfWeek).WhereField("Id").IsInsideIn(ids).ToListAsync();
+    }
+
+    public async GetByIdAsync(id: number): Promise<DayOfWeek | undefined> {       
         return await this._context.Collection(DayOfWeek).WhereField("Id").IsEqualTo(id).Load("Time").FirstOrDefaultAsync();
     }
     
@@ -44,19 +49,19 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
     }
 
 
-    public override async AddAsync(obj: DayOfWeek): Promise<DayOfWeek> {
+    public async AddAsync(obj: DayOfWeek): Promise<DayOfWeek> {
 
         this.ValidateObject(obj);      
 
         return this._context.Collection(DayOfWeek).AddObjectAndRelationsAsync(obj, []);
     }
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
+    public async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Collection(DayOfWeek).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async GetByAndLoadAsync<K extends keyof DayOfWeek>(key: K, value: DayOfWeek[K], load: (keyof DayOfWeek)[]): Promise<DayOfWeek[]> 
+    public async GetByAndLoadAsync<K extends keyof DayOfWeek>(key: K, value: DayOfWeek[K], load: (keyof DayOfWeek)[]): Promise<DayOfWeek[]> 
     {
        this._context.Collection(DayOfWeek).Where({Field : key, Value : value});
 
@@ -66,27 +71,27 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
        return await this._context.Collection(DayOfWeek).ToListAsync();
     } 
 
-    public override async UpdateAsync(obj: DayOfWeek): Promise<DayOfWeek> {
+    public async UpdateAsync(obj: DayOfWeek): Promise<DayOfWeek> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(DayOfWeek).UpdateAsync(obj);
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof DayOfWeek>(obj: DayOfWeek, relations: U[]): Promise<DayOfWeek> {
+    public async UpdateObjectAndRelationsAsync<U extends keyof DayOfWeek>(obj: DayOfWeek, relations: U[]): Promise<DayOfWeek> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(DayOfWeek).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public override async DeleteAsync(obj: DayOfWeek): Promise<DayOfWeek> 
+    public async DeleteAsync(obj: DayOfWeek): Promise<DayOfWeek> 
     { 
         return this._context.Collection(DayOfWeek).DeleteAsync(obj);
     }
 
     
-    public override async PaginatedFilterAsync(request : DayOfWeekPaginatedFilterRequest) : Promise<PaginatedFilterResult<DayOfWeek>> 
+    public async PaginatedFilterAsync(request : DayOfWeekPaginatedFilterRequest) : Promise<PaginatedFilterResult<DayOfWeek>> 
     {
         let offset = (request.Page - 1) * request.Quantity;  
 
@@ -113,7 +118,7 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
         return collection;
     }
 
-    public override ValidateObject(obj: DayOfWeek) : void
+    public ValidateObject(obj: DayOfWeek) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${DayOfWeek.name} type`);

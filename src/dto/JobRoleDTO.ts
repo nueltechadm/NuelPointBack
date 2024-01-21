@@ -5,3 +5,5 @@ export default class JobRoleDTO {
     Description: string = "";
     DepartamentId: number = 0;
 }
+
+
