@@ -55,7 +55,7 @@ export default class JobRoleController extends AbstractController
     }
 
 
-    @POST("all")
+    @GET("all")
     @SetDatabaseFromToken()
     public async GetAllAync() :Promise<ActionResult>
     {
