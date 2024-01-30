@@ -20,7 +20,7 @@ export default class Journey
     public Company : Company;
 
    @Column()
-   @ManyToMany(() => DayOfWeek)
+   @OneToMany(() => DayOfWeek)
    public DaysOfWeek : DayOfWeek[];
 
     constructor(description : string, company : Company)

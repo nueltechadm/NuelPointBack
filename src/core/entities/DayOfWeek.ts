@@ -1,5 +1,6 @@
 import { Column, DataType, PrimaryKey, DBTypes, Table, OneToMany, ManyToOne } from 'myorm_pg';
 import Time from './Time';
+import Journey from './Journey';
 
 @Table("dayofweek_tb")
 export default class DayOfWeek {
@@ -14,6 +15,10 @@ export default class DayOfWeek {
     
     @Column()    
     public DayName: string;  
+
+    @Column()
+    @ManyToOne(() => Journey)
+    public Journey : Journey;
     
     @Column()   
     public Time: Time; 
@@ -21,12 +26,13 @@ export default class DayOfWeek {
     @Column()
     public DayOff: boolean;
 
-    constructor(day: Days, name : string, time: Time) {
+    constructor(day: Days, name : string, time: Time, journey : Journey) {
         this.Id = -1;
         this.DayOff = false;
         this.DayName = name,
         this.Day = day;       
         this.Time = time;
+        this.Journey = journey;
     }
 
 }

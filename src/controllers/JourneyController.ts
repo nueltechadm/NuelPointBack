@@ -11,6 +11,8 @@ import AbstractCompanyService from "@src/core/abstractions/AbstractCompanyServic
 import Company from "@src/core/entities/Company";
 import AbstractDayOfWeekService from "@src/core/abstractions/AbstractDayOfWeekService";
 import DayOfWeek from "@src/core/entities/DayOfWeek";
+import AbstractTimeService from "@src/core/abstractions/AbstractTimeService";
+import Time from "@src/core/entities/Time";
 
 
 @UseBefore(IsLogged)
@@ -25,15 +27,21 @@ export default class JourneyController extends AbstractController {
     @Inject()
     private _companyService: AbstractCompanyService;
 
+    @Inject()
+    private _timeService: AbstractTimeService;
+
     constructor(
         journeyService: AbstractJourneyService, 
-        timeService: AbstractDayOfWeekService,
-        companyService: AbstractCompanyService) 
+        timeService: AbstractTimeService,
+        companyService: AbstractCompanyService, 
+        dayOfWeekService: AbstractDayOfWeekService
+        ) 
     {
         super();
         this._journeyService = journeyService;
-        this._dayOfWeekService = timeService,
+        this._timeService = timeService,
         this._companyService = companyService;
+        this._dayOfWeekService = dayOfWeekService;
     }
 
 
@@ -66,25 +74,32 @@ export default class JourneyController extends AbstractController {
     public async InsertAsync(@FromBody() dto: JourneyDTO) :  Promise<ActionResult>
     {
 
-        if(dto.DaysOfWeekIds.Count() == 0)
-            return this.BadRequest(`DaysOfWeekIds is required`);
+        if(dto.DaysOfWeek.Count() == 0)
+            return this.BadRequest(`DaysOfWeek is required`);
 
         let company = (await this._companyService.GetByAndLoadAsync("Id", dto.CompanyId, [])).FirstOrDefault();
 
         if(!company)
-            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);
-
-        let days = await this._dayOfWeekService.GetByIdsAsync(dto.DaysOfWeekIds);
-
-        if(days.Count() == 0)
-            return this.BadRequest(`No one ${DayOfWeek.name} has found`);
-
-        let notFound = dto.DaysOfWeekIds.FirstOrDefault(s => !days.Any(d => d.Id == s));
-        
-        if(notFound)
-            return this.BadRequest(`${DayOfWeek.name} with Id ${notFound} not exists`);
-
+            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);    
+            
+        let days : DayOfWeek[] = [];
         let journey = new Journey(dto.Description, company);
+
+        for(let d of dto.DaysOfWeek)
+        {
+            let time = await this._timeService.GetByIdAsync(d.TimeId);
+
+            if(!time)
+                return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
+
+            let day =  new DayOfWeek(d.Day, d.DayName, time, journey);
+            
+            day.Id = -1;
+
+            days.Add(day);
+        }
+
+        
         journey.DaysOfWeek = days;
 
         let result = await this._journeyService.AddAsync(journey);
@@ -99,8 +114,8 @@ export default class JourneyController extends AbstractController {
     @SetDatabaseFromToken()
     public async UpdateAsync(@FromBody() dto: JourneyDTO) : Promise<ActionResult>
     {
-        if(dto.DaysOfWeekIds.Count() == 0)
-            return this.BadRequest(`DaysOfWeekIds is required`);
+        if(dto.DaysOfWeek.Count() == 0)
+            return this.BadRequest(`DaysOfWeek is required`);
 
         let exists = (await this._journeyService.GetByAndLoadAsync("Id",dto.Id, ["Company", "DaysOfWeek"])).FirstOrDefault();
 
@@ -110,21 +125,31 @@ export default class JourneyController extends AbstractController {
         let company = (await this._companyService.GetByAndLoadAsync("Id", dto.CompanyId, [])).FirstOrDefault();
 
         if(!company)
-            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);
+            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);    
+            
+        let days : DayOfWeek[] = [];        
 
-        let days = await this._dayOfWeekService.GetByIdsAsync(dto.DaysOfWeekIds);
-
-        if(days.Count() == 0)
-            return this.BadRequest(`No one ${DayOfWeek.name} has found`);
-
-        let notFound = dto.DaysOfWeekIds.FirstOrDefault(s => !days.Any(d => d.Id == s));
-        
-        if(notFound)
-            return this.BadRequest(`${DayOfWeek.name} with Id ${notFound} not exists`);
-
-        exists.Company = company;
-        exists.DaysOfWeek = days;
         exists.Description = dto.Description;
+        exists.Company = company;
+
+        for(let d of dto.DaysOfWeek)
+        {
+            let time = await this._timeService.GetByIdAsync(d.TimeId);
+
+            if(!time)
+                return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
+
+            let day =  new DayOfWeek(d.Day, d.DayName, time, exists);
+            
+            if(!(await this._dayOfWeekService.ExistsAsync(d.Id)))
+                day.Id = -1;
+            else
+                day.Id = d.Id;
+
+            days.Add(day);
+        }
+        
+        exists.DaysOfWeek = days;
 
         await this._journeyService.UpdateObjectAndRelationsAsync(exists, ["Company", "DaysOfWeek"]);
 

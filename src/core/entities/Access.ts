@@ -37,7 +37,7 @@ export default class Access
 
 export enum PERFILTYPE
 {    
-    USER = "USER",
-    ADM = "ADM",
-    SUPER = "SUPER"
+    USER = 1,
+    ADM = 2,
+    SUPER = 3
 }
