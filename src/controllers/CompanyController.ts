@@ -40,7 +40,7 @@ export default class CompanyController extends AbstractController {
         
     }
 
-    @POST("all")     
+    @GET("all")     
     @SetDatabaseFromToken()
     public async GetAllAsync(): Promise<ActionResult> 
     {             

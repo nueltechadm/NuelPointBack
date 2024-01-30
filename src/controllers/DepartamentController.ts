@@ -36,7 +36,7 @@ export default class DepartamentController extends AbstractController {
         return this.OK(await this._departamentService.PaginatedFilterAsync(params));
     }
 
-    @POST("all")     
+    @GET("all")     
     @SetDatabaseFromToken()
     @ProducesResponse({ Status: 200, Description: "All departaments without jobroles relateds", JSON: JSON.stringify([Type.CreateTemplateFrom(Departament, false, ["JobRoles"])], null, 2)})
     public async GetAllAsync(): Promise<ActionResult> 
