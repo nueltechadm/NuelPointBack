@@ -99,8 +99,15 @@ export default class JobRoleService  extends AbstractJobRoleService
         let offset = (request.Page - 1) * request.Quantity;         
 
         let total = await this.BuildQuery(request).CountAsync();
+        
+        let query = this.BuildQuery(request);
+        
+        if(request.LoadRelations)
+        {
+           query.Load("Departament")
+        }
 
-        let jobs = await this.BuildQuery(request).Offset(offset).Limit(request.Quantity).ToListAsync();
+        let jobs = await query.OrderBy("Id").Offset(offset).Limit(request.Quantity).ToListAsync();
         
         let result = new PaginatedFilterResult<JobRole>();
         result.Page = request.Page;
