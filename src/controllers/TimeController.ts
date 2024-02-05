@@ -1,6 +1,6 @@
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, RequestJson } from "web_api_base";
 import { IsLogged } from '@filters/AuthFilter';
-import AbstractTimeService from "@contracts/AbstractTimeService";
+import AbstractTimeService, { TimePaginatedFilterRequest } from "@contracts/AbstractTimeService";
 import Time from "@entities/Time";
 import AbstractController from "./AbstractController";
 import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
@@ -21,7 +21,7 @@ export default class TimeController extends AbstractController {
 
     @POST("list")     
     @SetDatabaseFromToken()
-    public async PaginatedFilterAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    public async PaginatedFilterAsync(@FromBody()params : TimePaginatedFilterRequest): Promise<ActionResult> 
     {             
         return this.OK(await this._service.PaginatedFilterAsync(params));
     }

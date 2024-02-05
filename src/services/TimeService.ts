@@ -2,11 +2,13 @@ import { Inject } from 'web_api_base';
 import Type from "@utils/Type";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
 import Time from "@entities/Time";
-import AbstractTimeService from "@contracts/AbstractTimeService";
+import AbstractTimeService, { TimePaginatedFilterRequest } from "@contracts/AbstractTimeService";
 import AbstractDBContext from '@data-contracts/AbstractDBContext';
 import User from '@entities/User';
 import { PaginatedFilterRequest, PaginatedFilterResult } from '@contracts/AbstractService';
 import DayOfWeek from '@src/core/entities/DayOfWeek';
+import AbstractSet from 'myorm_core/lib/objects/abstract/AbastractSet';
+import { Operation } from 'myorm_core/lib/objects/interfaces/IStatement';
 
 
 
@@ -81,6 +83,15 @@ export default class TimeService extends AbstractTimeService {
         return this._context.Collection(Time).DeleteAsync(obj);
     }
 
+    protected BuildQuery(params : TimePaginatedFilterRequest) : AbstractSet<Time>
+    {
+        if(params.Description)
+            this._context.Collection(Time).Where({Field: "Description", Kind : Operation.CONSTAINS, Value: params.Description});
+        
+
+        return this._context.Collection(Time);
+    }
+
 
     public async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Time>> 
     {
@@ -88,7 +99,7 @@ export default class TimeService extends AbstractTimeService {
 
         let total = await this._context.Collection(Time).CountAsync();
 
-        let times = await this._context.Collection(Time).OrderBy("Id").Offset(offset).Limit(request.Quantity).ToListAsync();
+        let times = await this.BuildQuery(request).Limit(request.Quantity).Offset(offset).ToListAsync(); 
 
         let result = new PaginatedFilterResult<Time>();
         result.Page = request.Page;

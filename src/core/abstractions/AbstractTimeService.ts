@@ -12,3 +12,27 @@ export default abstract class AbstractTimeService extends AbstractService<Time, 
 }
 
 
+export /*sealed*/ class TimePaginatedFilterRequest extends PaginatedFilterRequest
+{
+    Description? : string = "";
+   
+
+    constructor()
+    {
+        super();
+    }
+    
+}
+
+
+export /*sealed*/ class CompanyPaginatedFilterResponse extends PaginatedFilterResult<Time>
+{
+    constructor(times : Time[], quantity : number, total : number, page : number)
+    {
+        super();
+        this.Page = page;
+        this.Quantity = quantity;
+        this.Total = total;
+        this.Result = times;
+    }
+}
