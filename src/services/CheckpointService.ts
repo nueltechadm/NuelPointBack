@@ -22,7 +22,7 @@ export default class CheckpointService  extends AbstractCheckpointService
         this._context = context;
     }
 
-    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+    public async SetClientDatabaseAsync(client: string): Promise<void> {       
         await this._context.SetDatabaseAsync(client);
     }
 
@@ -30,12 +30,12 @@ export default class CheckpointService  extends AbstractCheckpointService
         return await this._context.Collection(Checkpoint).CountAsync();
     }
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
+    public async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Collection(Checkpoint).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async GetFolderAndFileName(checkpoint: Checkpoint): Promise<{ Folder: string; File: string; }> {
+    public async GetFolderAndFileName(checkpoint: Checkpoint): Promise<{ Folder: string; File: string; }> {
        
         if(!this.IsCompatible(checkpoint))
             throw new InvalidEntityException(`This object is not of ${Checkpoint.name} type`);
@@ -70,16 +70,16 @@ export default class CheckpointService  extends AbstractCheckpointService
         return Promise.resolve({ Folder : folder, File : file});
     }
     
-    public override IsCompatible(obj: any): obj is Checkpoint {
+    public IsCompatible(obj: any): obj is Checkpoint {
         
         return ("User" in obj || "UserId" in obj) && "X" in obj && "Y" in obj;  
     }
    
-    public override async GetByIdAsync(id: number): Promise<Checkpoint | undefined> {       
+    public async GetByIdAsync(id: number): Promise<Checkpoint | undefined> {       
         return await this._context.Collection(Checkpoint).WhereField("Id").IsEqualTo(id).LoadRelationOn("User").FirstOrDefaultAsync();
     }
     
-    public override async AddAsync(obj: Checkpoint): Promise<Checkpoint> {        
+    public async AddAsync(obj: Checkpoint): Promise<Checkpoint> {        
 
         this.ValidateObject(obj);
 
@@ -88,14 +88,14 @@ export default class CheckpointService  extends AbstractCheckpointService
 
         return this._context.Collection(Checkpoint).AddAsync(obj);
     }
-    public override async UpdateAsync(obj: Checkpoint): Promise<Checkpoint> {
+    public async UpdateAsync(obj: Checkpoint): Promise<Checkpoint> {
 
         this.ValidateObject(obj);
         
         return await this._context.Collection(Checkpoint).UpdateAsync(obj);
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof Checkpoint>(obj: Checkpoint, relations: U[]): Promise<Checkpoint> {
+    public async UpdateObjectAndRelationsAsync<U extends keyof Checkpoint>(obj: Checkpoint, relations: U[]): Promise<Checkpoint> {
 
         this.ValidateObject(obj);
 
@@ -103,7 +103,7 @@ export default class CheckpointService  extends AbstractCheckpointService
     }
 
 
-    public override async GetByAndLoadAsync<K extends keyof Checkpoint>(key: K, value: Checkpoint[K], load: (keyof Checkpoint)[]): Promise<Checkpoint[]> 
+    public async GetByAndLoadAsync<K extends keyof Checkpoint>(key: K, value: Checkpoint[K], load: (keyof Checkpoint)[]): Promise<Checkpoint[]> 
     {
        this._context.Collection(Checkpoint).Where({Field : key, Value : value});
 
@@ -114,11 +114,11 @@ export default class CheckpointService  extends AbstractCheckpointService
     } 
 
 
-    public override async DeleteAsync(obj: Checkpoint): Promise<Checkpoint> {
+    public async DeleteAsync(obj: Checkpoint): Promise<Checkpoint> {
         return this._context.Collection(Checkpoint).DeleteAsync(obj);
     }
 
-    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Checkpoint>> 
+    public async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Checkpoint>> 
     {
         let offset = (request.Page - 1) * request.Quantity;  
 
@@ -136,7 +136,7 @@ export default class CheckpointService  extends AbstractCheckpointService
     }
    
 
-    public override async GetByRangeAndEmployer(userId: number, begin: Date, end?: Date | undefined): Promise<Checkpoint[]> {
+    public async GetByRangeAndEmployer(userId: number, begin: Date, end?: Date | undefined): Promise<Checkpoint[]> {
 
         let user = await this._context.Collection(User).WhereField("Id").IsEqualTo(userId).FirstOrDefaultAsync();
 
@@ -160,7 +160,7 @@ export default class CheckpointService  extends AbstractCheckpointService
         .ToListAsync();
     }
 
-    public override ValidateObject(obj: Checkpoint) : void
+    public ValidateObject(obj: Checkpoint) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Checkpoint.name} type`);

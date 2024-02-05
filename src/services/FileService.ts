@@ -32,7 +32,7 @@ export default class FileService extends AbstractFileService
         });
     }
     
-    public override FileExistsAsync(file: string): Promise<boolean> {
+    public FileExistsAsync(file: string): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => 
         {           
             try{
@@ -46,7 +46,7 @@ export default class FileService extends AbstractFileService
         });
     }
 
-    public override DirectoryExistsAsync(path: string): Promise<boolean> {
+    public DirectoryExistsAsync(path: string): Promise<boolean> {
         return new Promise<boolean>(async (resolve, reject) => 
         {            
             try{
@@ -60,7 +60,7 @@ export default class FileService extends AbstractFileService
         });
     }
 
-    public override GetAllFilesAsync(origin: string): Promise<string[]> {
+    public GetAllFilesAsync(origin: string): Promise<string[]> {
         
         return new Promise<string[]>(async (resolve, reject) => 
         {
@@ -80,7 +80,7 @@ export default class FileService extends AbstractFileService
         });
     }
 
-    public override GetAllFordersAsync(origin: string): Promise<string[]> {
+    public GetAllFordersAsync(origin: string): Promise<string[]> {
 
         return new Promise<string[]>(async (resolve, reject) => 
         {
@@ -100,7 +100,7 @@ export default class FileService extends AbstractFileService
         });
     }
 
-    public override CopyAsync(origin: string, dest: string): Promise<void> {
+    public CopyAsync(origin: string, dest: string): Promise<void> {
      
         return new Promise<void>(async (resolve, reject)=>
         {
@@ -121,7 +121,7 @@ export default class FileService extends AbstractFileService
         
     }      
 
-    public override DeleteAsync(file: string): Promise<void> {
+    public DeleteAsync(file: string): Promise<void> {
      
         return new Promise<void>(async (resolve, reject)=>
         {
@@ -142,7 +142,7 @@ export default class FileService extends AbstractFileService
         
     }      
 
-    public override async GetStorageDirectoryAsync(): Promise<string> 
+    public async GetStorageDirectoryAsync(): Promise<string> 
     {
        let dir = Application.Configurations.DEBUG ? 
        Path.join(Application.Configurations.RootPath, "dist", "storage") :

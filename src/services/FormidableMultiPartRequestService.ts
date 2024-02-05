@@ -7,7 +7,7 @@ import AbstractMultiPartRequestService, { IRequestPart, PartType } from './abstr
 export default class FormidableMultiPartRequestService extends AbstractMultiPartRequestService {
     
     
-    public override GetPartsFromRequestAsync(request: any): Promise<IRequestPart[]> {
+    public GetPartsFromRequestAsync(request: any): Promise<IRequestPart[]> {
         let form = new formidable.IncomingForm();
 
         return new Promise<IRequestPart[]>((resolve, reject) => {

@@ -28,25 +28,25 @@ export default class UserService  extends AbstractUserService
         this._context = context;
     }
 
-    public override IsCompatible(obj: any): obj is User {
+    public IsCompatible(obj: any): obj is User {
         return Type.HasKeys<User>(obj, "Name");
     }
 
-    public override async SetClientDatabaseAsync(client: string): Promise<void> {    
+    public async SetClientDatabaseAsync(client: string): Promise<void> {    
         await this._context.SetDatabaseAsync(client);
     }
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
+    public async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Collection(User).Where({Field: "Id", Value : id}).CountAsync()) > 0;
     }
 
-    public override async CountAsync(): Promise<number> {
+    public async CountAsync(): Promise<number> {
         
         return await this._context.Collection(User).CountAsync();
     }
 
-    public override async GetByIdAsync(id: number): Promise<User| undefined> {
+    public async GetByIdAsync(id: number): Promise<User| undefined> {
         
         return await this._context.Collection(User).Where(
                                         {
@@ -61,12 +61,12 @@ export default class UserService  extends AbstractUserService
                                         .FirstOrDefaultAsync();
         
     }
-    public override async GetByNameAsync(name: string): Promise<User[]> {
+    public async GetByNameAsync(name: string): Promise<User[]> {
 
         return await this._context.Collection(User).WhereField("Name").Constains(name).Load("Company").ToListAsync() ?? [];
     }
 
-    public override async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<Access | undefined> {
+    public async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<Access | undefined> {
 
        let access = await this._context.From(User).InnerJoin(Access)
                                     .On(User, "Access", Access, "User")
@@ -84,7 +84,7 @@ export default class UserService  extends AbstractUserService
      
     }
 
-    public override async GetByAndLoadAsync<K extends keyof User>(key: K, value: User[K], load: (keyof User)[]): Promise<User[]> 
+    public async GetByAndLoadAsync<K extends keyof User>(key: K, value: User[K], load: (keyof User)[]): Promise<User[]> 
     {
        this._context.Collection(User).Where({Field : key, Value : value});
 
@@ -95,7 +95,7 @@ export default class UserService  extends AbstractUserService
     } 
 
    
-    public override async AddAsync(obj: User): Promise<User> 
+    public async AddAsync(obj: User): Promise<User> 
     { 
         if(!obj.Access)
             throw new InvalidEntityException(`The ${Access.name} of the ${User.name} is required`);
@@ -114,12 +114,12 @@ export default class UserService  extends AbstractUserService
         return await this._context.Collection(User).AddAsync(obj)!;        
     }
 
-    public override async UpdateAsync(obj: User): Promise<User> 
+    public async UpdateAsync(obj: User): Promise<User> 
     {     
         return await this._context.Collection(User).UpdateAsync(obj);        
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof User>(obj: User, relations: U[]): Promise<User> 
+    public async UpdateObjectAndRelationsAsync<U extends keyof User>(obj: User, relations: U[]): Promise<User> 
     {
         let curr = (await this.GetByAndLoadAsync("Id", obj.Id, relations)).FirstOrDefault();
 
@@ -138,7 +138,7 @@ export default class UserService  extends AbstractUserService
     }
 
 
-    public override async DeleteAsync(obj: User): Promise<User> {
+    public async DeleteAsync(obj: User): Promise<User> {
 
        return await this._context.Collection(User).DeleteAsync(obj)!;
     }

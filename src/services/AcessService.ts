@@ -19,27 +19,27 @@ export default class AcessService extends AbstractAccessService {
         this._context = context;
     }
 
-    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+    public async SetClientDatabaseAsync(client: string): Promise<void> {       
         await this._context.SetDatabaseAsync(client);
     }
 
-    public override IsCompatible(obj: any): obj is Access {
+    public IsCompatible(obj: any): obj is Access {
         return Type.HasKeys<Access>(obj, "Username", "User");
     }
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
+    public async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Collection(Access).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
   
     
-    public override async CountAsync(): Promise<number> {
+    public async CountAsync(): Promise<number> {
 
         return await this._context.Collection(Access).CountAsync();
     }
     
 
-    public override async GetByAndLoadAsync<K extends keyof Access>(key: K, value: Access[K], load: K[]): Promise<Access[]> 
+    public async GetByAndLoadAsync<K extends keyof Access>(key: K, value: Access[K], load: K[]): Promise<Access[]> 
     {
        this._context.Collection(Access).Where({Field : key, Value : value});
 
@@ -50,39 +50,39 @@ export default class AcessService extends AbstractAccessService {
     } 
 
     
-    public override async GetByIdAsync(id: number): Promise<Access | undefined> {
+    public async GetByIdAsync(id: number): Promise<Access | undefined> {
         return await this._context.Collection(Access)
         .WhereField("Id")
         .IsEqualTo(id) 
         .LoadRelationOn("User")
         .FirstOrDefaultAsync();
     }
-    public override async AddAsync(obj: Access): Promise<Access> {
+    public async AddAsync(obj: Access): Promise<Access> {
 
         this.ValidateObject(obj);
 
         return this._context.Collection(Access).AddAsync(obj);
     }
 
-    public override async UpdateAsync(obj: Access): Promise<Access> {
+    public async UpdateAsync(obj: Access): Promise<Access> {
 
         this.ValidateObject(obj);
 
         return this._context.Collection(Access).UpdateAsync(obj);
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof Access>(obj: Access, relations: U[]): Promise<Access> {
+    public async UpdateObjectAndRelationsAsync<U extends keyof Access>(obj: Access, relations: U[]): Promise<Access> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Access).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public override async DeleteAsync(obj: Access): Promise<Access> {
+    public async DeleteAsync(obj: Access): Promise<Access> {
         return this._context.Collection(Access).DeleteAsync(obj);
     }
     
-    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Access>> 
+    public async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Access>> 
     {
         let offset = (request.Page - 1) * request.Quantity; 
 
@@ -99,7 +99,7 @@ export default class AcessService extends AbstractAccessService {
         return result;
     }
 
-    public override ValidateObject(obj: Access): void {
+    public ValidateObject(obj: Access): void {
 
         if (!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Access.name} type`);

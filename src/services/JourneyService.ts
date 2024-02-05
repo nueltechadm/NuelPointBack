@@ -19,50 +19,50 @@ export default class JourneyService  extends AbstractJorneyService
         this._context = context;
     }
 
-    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+    public async SetClientDatabaseAsync(client: string): Promise<void> {       
         await this._context.SetDatabaseAsync(client);
     }
 
-    public override IsCompatible(obj: any): obj is Journey {     
+    public IsCompatible(obj: any): obj is Journey {     
         return Type.HasKeys<Journey>(obj, "Description");
     }    
 
-    public override async CountAsync(): Promise<number> {
+    public async CountAsync(): Promise<number> {
         
         return await this._context.Collection(Journey).CountAsync();
     }
 
-    public override async GetByIdAsync(id: number): Promise<Journey | undefined> {       
+    public async GetByIdAsync(id: number): Promise<Journey | undefined> {       
         return await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).Load("Company").Load("DaysOfWeek").FirstOrDefaultAsync();
     }      
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
+    public async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async AddAsync(obj: Journey): Promise<Journey> {
+    public async AddAsync(obj: Journey): Promise<Journey> {
 
         this.ValidateObject(obj);
 
         return this._context.Collection(Journey).AddAsync(obj);
     }
 
-    public override async UpdateAsync(obj: Journey): Promise<Journey> {
+    public async UpdateAsync(obj: Journey): Promise<Journey> {
 
         this.ValidateObject(obj);
         
         return await this._context.Collection(Journey).UpdateAsync(obj);
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof Journey>(obj: Journey, relations: U[]): Promise<Journey> {
+    public async UpdateObjectAndRelationsAsync<U extends keyof Journey>(obj: Journey, relations: U[]): Promise<Journey> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Journey).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public override async GetByAndLoadAsync<K extends keyof Journey>(key: K, value: Journey[K], load: (keyof Journey)[]): Promise<Journey[]> 
+    public async GetByAndLoadAsync<K extends keyof Journey>(key: K, value: Journey[K], load: (keyof Journey)[]): Promise<Journey[]> 
     {
        this._context.Collection(Journey).Where({Field : key, Value : value});
 
@@ -73,12 +73,12 @@ export default class JourneyService  extends AbstractJorneyService
     } 
 
     
-    public override async DeleteAsync(obj: Journey): Promise<Journey> {
+    public async DeleteAsync(obj: Journey): Promise<Journey> {
         return this._context.Collection(Journey).DeleteAsync(obj);
     }
 
 
-    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Journey>> 
+    public async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Journey>> 
     {
         let offset = (request.Page - 1) * request.Quantity;  
 
@@ -96,7 +96,7 @@ export default class JourneyService  extends AbstractJorneyService
     }
 
 
-    public override ValidateObject(obj : Journey) : void
+    public ValidateObject(obj : Journey) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Journey.name} type`);

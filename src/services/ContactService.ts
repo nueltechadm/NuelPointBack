@@ -22,20 +22,20 @@ export default class ContactService  extends AbstractContactService
         this._context = context;
     }
 
-    public override IsCompatible(obj: any): obj is Contact {        
+    public IsCompatible(obj: any): obj is Contact {        
         return Type.HasKeys<Contact>(obj, "Contact");  
     }
 
-    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+    public async SetClientDatabaseAsync(client: string): Promise<void> {       
         await this._context.SetDatabaseAsync(client);
     }
 
-    public override async CountAsync(): Promise<number> {
+    public async CountAsync(): Promise<number> {
         
         return await this._context.Collection(Contact).CountAsync();
     }
 
-    public override async GetByIdAsync(id: number): Promise<Contact | undefined> {       
+    public async GetByIdAsync(id: number): Promise<Contact | undefined> {       
         return await this._context.Collection(Contact).WhereField("Id").IsEqualTo(id).FirstOrDefaultAsync();
     }
     
@@ -44,19 +44,19 @@ export default class ContactService  extends AbstractContactService
     }
 
 
-    public override async AddAsync(obj: Contact): Promise<Contact> {
+    public async AddAsync(obj: Contact): Promise<Contact> {
 
         this.ValidateObject(obj);      
 
         return this._context.Collection(Contact).AddObjectAndRelationsAsync(obj, []);
     }
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
+    public async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Collection(Contact).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async GetByAndLoadAsync<K extends keyof Contact>(key: K, value: Contact[K], load: (keyof Contact)[]): Promise<Contact[]> 
+    public async GetByAndLoadAsync<K extends keyof Contact>(key: K, value: Contact[K], load: (keyof Contact)[]): Promise<Contact[]> 
     {
        this._context.Collection(Contact).Where({Field : key, Value : value});
 
@@ -66,21 +66,21 @@ export default class ContactService  extends AbstractContactService
        return await this._context.Collection(Contact).ToListAsync();
     } 
 
-    public override async UpdateAsync(obj: Contact): Promise<Contact> {
+    public async UpdateAsync(obj: Contact): Promise<Contact> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Contact).UpdateAsync(obj);
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof Contact>(obj: Contact, relations: U[]): Promise<Contact> {
+    public async UpdateObjectAndRelationsAsync<U extends keyof Contact>(obj: Contact, relations: U[]): Promise<Contact> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Contact).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public override async DeleteAsync(obj: Contact): Promise<Contact> {
+    public async DeleteAsync(obj: Contact): Promise<Contact> {
         
         if(!obj.Id || obj == undefined)
             throw new InvalidEntityException(`Id is required to delete a ${Contact.name}`);
@@ -94,7 +94,7 @@ export default class ContactService  extends AbstractContactService
     }
 
     
-    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Contact>> 
+    public async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Contact>> 
     {
         let offset = (request.Page - 1) * request.Quantity;  
 
@@ -120,7 +120,7 @@ export default class ContactService  extends AbstractContactService
         return collection;
     }
 
-    public override ValidateObject(obj: Contact) : void
+    public ValidateObject(obj: Contact) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${Contact.name} type`);

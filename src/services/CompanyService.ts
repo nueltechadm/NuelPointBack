@@ -21,7 +21,7 @@ export default class CompanyService  extends AbstractCompanyService
         this._context = context;
     }
 
-    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+    public async SetClientDatabaseAsync(client: string): Promise<void> {       
        await this._context.SetDatabaseAsync(client);
     }
 
@@ -29,11 +29,11 @@ export default class CompanyService  extends AbstractCompanyService
         return await this._context.Collection(Company).CountAsync();
     }
 
-    public override IsCompatible(obj: any): obj is Company {
+    public IsCompatible(obj: any): obj is Company {
         return obj.constructor == Company && Type.HasKeys<Company>(obj, "Name", "Description", "Document");
     }
 
-    public override async GetByIdAsync(id: number): Promise<Company | undefined> {       
+    public async GetByIdAsync(id: number): Promise<Company | undefined> {       
         return await this._context.Collection(Company)
         .WhereField("Id")
         .IsEqualTo(id)        
@@ -45,7 +45,7 @@ export default class CompanyService  extends AbstractCompanyService
     }   
     
 
-    public override async PaginatedFilterAsync(request : CompanyPaginatedFilterRequest) : Promise<CompanyPaginatedFilterResponse>  
+    public async PaginatedFilterAsync(request : CompanyPaginatedFilterRequest) : Promise<CompanyPaginatedFilterResponse>  
     {
         let offset = (request.Page - 1) * request.Quantity; 
 
@@ -74,7 +74,7 @@ export default class CompanyService  extends AbstractCompanyService
    
     
 
-    public override async AddAsync(obj: Company): Promise<Company> {
+    public async AddAsync(obj: Company): Promise<Company> {
 
         obj.Id = -1;  
 
@@ -84,21 +84,21 @@ export default class CompanyService  extends AbstractCompanyService
     }
 
 
-    public override async UpdateAsync(obj: Company): Promise<Company> {
+    public async UpdateAsync(obj: Company): Promise<Company> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Company).UpdateAsync(obj);
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof Company>(obj: Company, relations: U[]): Promise<Company> {
+    public async UpdateObjectAndRelationsAsync<U extends keyof Company>(obj: Company, relations: U[]): Promise<Company> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Company).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public override async GetByAndLoadAsync<K extends keyof Company>(key: K, value: Company[K], load: (keyof Company)[]): Promise<Company[]> 
+    public async GetByAndLoadAsync<K extends keyof Company>(key: K, value: Company[K], load: (keyof Company)[]): Promise<Company[]> 
     {
        this._context.Collection(Company).Where({Field : key, Value : value});
 
@@ -108,23 +108,23 @@ export default class CompanyService  extends AbstractCompanyService
        return await this._context.Collection(Company).ToListAsync();
     } 
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
+    public async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Collection(Company).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async DeleteAsync(obj: Company): Promise<Company> {
+    public async DeleteAsync(obj: Company): Promise<Company> {
         return this._context.Collection(Company).DeleteAsync(obj);
     }
 
 
      
 
-    public override async GetByNameAsync(name: string): Promise<Company[]> {        
+    public async GetByNameAsync(name: string): Promise<Company[]> {        
         return await this._context.Collection(Company).Where({Field: "Name", Kind: Operation.CONSTAINS,  Value : name.Trim()}).ToListAsync();
     }
 
-    public override ValidateObject(obj : Company) : void
+    public ValidateObject(obj : Company) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${Company.name} type`);

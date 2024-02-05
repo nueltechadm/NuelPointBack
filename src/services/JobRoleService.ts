@@ -21,36 +21,36 @@ export default class JobRoleService  extends AbstractJobRoleService
         this._context = context;
     }
 
-    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+    public async SetClientDatabaseAsync(client: string): Promise<void> {       
         await this._context.SetDatabaseAsync(client);
     }
 
-    public override IsCompatible(obj: any): obj is JobRole {        
+    public IsCompatible(obj: any): obj is JobRole {        
         return Type.HasKeys<JobRole>(obj, "Description");  
     }
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
+    public async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Collection(JobRole).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async CountAsync(): Promise<number> {
+    public async CountAsync(): Promise<number> {
         
         return await this._context.Collection(JobRole).CountAsync();
     }
 
-    public override async GetByIdAsync(id: number): Promise<JobRole | undefined> {       
+    public async GetByIdAsync(id: number): Promise<JobRole | undefined> {       
         return await this._context.Collection(JobRole).WhereField("Id").IsEqualTo(id).LoadRelationOn("Users").FirstOrDefaultAsync();
     }
     
-    public override async AddAsync(obj: JobRole): Promise<JobRole> {
+    public async AddAsync(obj: JobRole): Promise<JobRole> {
 
         this.ValidateObject(obj);        
 
         return this._context.Collection(JobRole).AddObjectAndRelationsAsync(obj, ["Departament"]);
     }
 
-    public override async GetByAndLoadAsync<K extends keyof JobRole>(key: K, value: JobRole[K], load: (keyof JobRole)[]): Promise<JobRole[]> 
+    public async GetByAndLoadAsync<K extends keyof JobRole>(key: K, value: JobRole[K], load: (keyof JobRole)[]): Promise<JobRole[]> 
     {
        this._context.Collection(JobRole).Where({Field : key, Value : value});
 
@@ -60,14 +60,14 @@ export default class JobRoleService  extends AbstractJobRoleService
        return await this._context.Collection(JobRole).ToListAsync();
     } 
 
-    public override async UpdateAsync(obj: JobRole): Promise<JobRole> {
+    public async UpdateAsync(obj: JobRole): Promise<JobRole> {
 
         this.ValidateObject(obj);       
 
         return await this._context.Collection(JobRole).UpdateAsync(obj);
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof JobRole>(obj: JobRole, relations: U[]): Promise<JobRole> {
+    public async UpdateObjectAndRelationsAsync<U extends keyof JobRole>(obj: JobRole, relations: U[]): Promise<JobRole> {
 
         this.ValidateObject(obj);
 
@@ -75,7 +75,7 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
 
 
-    public override async DeleteAsync(obj: JobRole): Promise<JobRole> {
+    public async DeleteAsync(obj: JobRole): Promise<JobRole> {
         
         if(!obj.Id || obj == undefined)
             throw new InvalidEntityException(`Id is required to delete a ${JobRole.name}`);
@@ -94,7 +94,7 @@ export default class JobRoleService  extends AbstractJobRoleService
     }
 
 
-    public override async PaginatedFilterAsync(request : JobRolePaginatedFilteRequest) : Promise<PaginatedFilterResult<JobRole>> 
+    public async PaginatedFilterAsync(request : JobRolePaginatedFilteRequest) : Promise<PaginatedFilterResult<JobRole>> 
     {
         let offset = (request.Page - 1) * request.Quantity;         
 
@@ -125,7 +125,7 @@ export default class JobRoleService  extends AbstractJobRoleService
         return collection.Select(JobRole);
     }
 
-    public override ValidateObject(obj: JobRole) : void
+    public ValidateObject(obj: JobRole) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${JobRole.name} type`);        

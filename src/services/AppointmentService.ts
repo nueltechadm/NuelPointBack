@@ -86,7 +86,7 @@ export default class AppointmentService extends AbstractAppointmentService {
         return result;
     }
     
-    public override async GetByAndLoadAsync<K extends keyof Appointment>(key: K, value: Appointment[K], load: (keyof Appointment)[]): Promise<Appointment[]> 
+    public async GetByAndLoadAsync<K extends keyof Appointment>(key: K, value: Appointment[K], load: (keyof Appointment)[]): Promise<Appointment[]> 
     {
        this._context.Collection(Appointment).Where({Field : key, Value : value});
 
@@ -97,7 +97,7 @@ export default class AppointmentService extends AbstractAppointmentService {
     } 
 
 
-    public override async GetCurrentDayByUser(user: User): Promise<Appointment | undefined> {
+    public async GetCurrentDayByUser(user: User): Promise<Appointment | undefined> {
         
         return await this._context.Collection(Appointment)
             .Where({
@@ -114,7 +114,7 @@ export default class AppointmentService extends AbstractAppointmentService {
             .FirstOrDefaultAsync();
     }
 
-    public override async GetByUserAndDates(user : User, start: Date, end: Date): Promise<Appointment[]> {
+    public async GetByUserAndDates(user : User, start: Date, end: Date): Promise<Appointment[]> {
        
 
         return await this._context.Collection(Appointment)
@@ -138,7 +138,7 @@ export default class AppointmentService extends AbstractAppointmentService {
             .ToListAsync();
     }
 
-    public override ValidateObject(obj: Appointment): void {
+    public ValidateObject(obj: Appointment): void {
         if (!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Appointment.name} type`);
 

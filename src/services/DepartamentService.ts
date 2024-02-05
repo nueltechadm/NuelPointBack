@@ -30,7 +30,7 @@ export default class DepartamentService  extends AbstractDepartamentService
         await this._context.SetDatabaseAsync(client);
     }
 
-    public override async CountAsync(): Promise<number> {
+    public async CountAsync(): Promise<number> {
         
         return await this._context.Collection(Departament).CountAsync();
     }
@@ -44,19 +44,19 @@ export default class DepartamentService  extends AbstractDepartamentService
     }
 
 
-    public override async AddAsync(obj: Departament): Promise<Departament> {
+    public async AddAsync(obj: Departament): Promise<Departament> {
 
         this.ValidateObject(obj);      
 
         return this._context.Collection(Departament).AddObjectAndRelationsAsync(obj, []);
     }
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
+    public async ExistsAsync(id: number): Promise<boolean> {
         
         return (await this._context.Collection(Departament).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async GetByAndLoadAsync<K extends keyof Departament>(key: K, value: Departament[K], load: (keyof Departament)[]): Promise<Departament[]> 
+    public async GetByAndLoadAsync<K extends keyof Departament>(key: K, value: Departament[K], load: (keyof Departament)[]): Promise<Departament[]> 
     {
        this._context.Collection(Departament).Where({Field : key, Value : value});
 
@@ -66,21 +66,21 @@ export default class DepartamentService  extends AbstractDepartamentService
        return await this._context.Collection(Departament).ToListAsync();
     } 
 
-    public override async UpdateAsync(obj: Departament): Promise<Departament> {
+    public async UpdateAsync(obj: Departament): Promise<Departament> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Departament).UpdateAsync(obj);
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof Departament>(obj: Departament, relations: U[]): Promise<Departament> {
+    public async UpdateObjectAndRelationsAsync<U extends keyof Departament>(obj: Departament, relations: U[]): Promise<Departament> {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Departament).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public override async DeleteAsync(obj: Departament): Promise<Departament> {
+    public async DeleteAsync(obj: Departament): Promise<Departament> {
         
         if(!obj.Id || obj == undefined)
             throw new InvalidEntityException(`Id is required to delete a ${Departament.name}`);
@@ -94,7 +94,7 @@ export default class DepartamentService  extends AbstractDepartamentService
     }
 
     
-    public override async PaginatedFilterAsync(request : DepartamentPaginatedRequest) : Promise<PaginatedFilterResult<Departament>> 
+    public async PaginatedFilterAsync(request : DepartamentPaginatedRequest) : Promise<PaginatedFilterResult<Departament>> 
     {
         let offset = (request.Page - 1) * request.Quantity;  
 
@@ -121,7 +121,7 @@ export default class DepartamentService  extends AbstractDepartamentService
         return collection;
     }
 
-    public override ValidateObject(obj: Departament) : void
+    public ValidateObject(obj: Departament) : void
     {
         if(!this.IsCompatible(obj))
             throw new InvalidEntityException(`The object is not of ${Departament.name} type`);
