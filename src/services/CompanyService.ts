@@ -35,8 +35,7 @@ export default class CompanyService  extends AbstractCompanyService
 
     public async GetByIdAsync(id: number): Promise<Company | undefined> {       
         return await this._context.Collection(Company)
-        .WhereField("Id")
-        .IsEqualTo(id)        
+        .Where({Field:"Id", Value:id})
         .LoadRelationOn("Address")
         .LoadRelationOn("Accesses")
         .LoadRelationOn("Contacts")
@@ -110,7 +109,7 @@ export default class CompanyService  extends AbstractCompanyService
 
     public async ExistsAsync(id: number): Promise<boolean> {
         
-        return (await this._context.Collection(Company).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+        return (await this._context.Collection(Company).Where({Field : "Id", Value : id}).CountAsync()) > 0;
     }
 
     public async DeleteAsync(obj: Company): Promise<Company> {
