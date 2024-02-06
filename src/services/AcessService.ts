@@ -27,9 +27,11 @@ export default class AcessService extends AbstractAccessService {
         return Type.HasKeys<Access>(obj, "Username", "User");
     }
 
+
     public async ExistsAsync(id: number): Promise<boolean> {
-        
-        return (await this._context.Collection(Access).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+         
+        return (await this._context.Collection(Access).Where({Field: "Id", Value : id}).CountAsync()) > 0;
+
     }
   
     
@@ -49,14 +51,15 @@ export default class AcessService extends AbstractAccessService {
        return await this._context.Collection(Access).ToListAsync();
     } 
 
-    
     public async GetByIdAsync(id: number): Promise<Access | undefined> {
+
+
         return await this._context.Collection(Access)
-        .WhereField("Id")
-        .IsEqualTo(id) 
-        .LoadRelationOn("User")
-        .FirstOrDefaultAsync();
+                                  .Where({Field:"Id", Value: id})
+                                  .LoadRelationOn("User")
+                                  .FirstOrDefaultAsync();
     }
+
     public async AddAsync(obj: Access): Promise<Access> {
 
         this.ValidateObject(obj);

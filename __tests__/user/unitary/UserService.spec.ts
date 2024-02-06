@@ -120,7 +120,7 @@ describe("UserService", ()=>
             
             let service = new UserService(context);
     
-            let user = Mock.CreateInstance(User);   
+            let user = Mock.CreateInstance(User, []);   
             user.Access = Type.CreateInstance(Access); 
             user.Access.Perfil = PERFILTYPE.SUPER;
     
@@ -145,7 +145,7 @@ describe("UserService", ()=>
             
             let service = new UserService(context);
     
-            let user = Mock.CreateInstance(User);     
+            let user = Mock.CreateInstance(User, []);     
             user.Access = Type.CreateInstance(Access); 
             user.Access.Perfil = PERFILTYPE.ADM;
             user.Company = Type.CreateInstance(Company);

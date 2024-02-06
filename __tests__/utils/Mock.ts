@@ -2,14 +2,14 @@ import 'ts_linq_base';
 export default class Mock
 {    
     
-    public static CreateInstance<T extends object>(cTor : new (...args : any[]) => T) : T & IChangeble<T>
+    public static CreateInstance<T extends object>(cTor : new (...args : any[]) => T, args : any[]) : T & IChangeble<T>
     {
-        return (Builder.MakeChangeable(cTor) as any) as T & IChangeble<T>;     
+        return (Builder.MakeChangeable(cTor, args) as any) as T & IChangeble<T>;     
     }     
 
     public static CreateIntanceFromAbstraction<T extends object>() : T & IChangeble<T>
     {
-        return (Builder.MakeChangeable(Object) as any) as T & IChangeble<T>;       
+        return (Builder.MakeChangeable(Object, []) as any) as T & IChangeble<T>;       
     }
 
     public static Cast<T extends object>(o : T) :  T & IChangeble<T>
@@ -24,9 +24,9 @@ export class Builder
 {   
     public _counter : {[key : string] : number} = {};
     
-    public static MakeChangeable<T extends object>(cTor : new (...args : any[]) => T)
+    public static MakeChangeable<T extends object>(cTor : new (...args : any[]) => T, args: any[])
     {
-        let instance = Reflect.construct(cTor, []);
+        let instance = Reflect.construct(cTor, args);
 
         let instanceAsAny = instance as any;
 
