@@ -101,7 +101,6 @@ export default class UserController extends AbstractController
     @POST("insert")
     @SetDatabaseFromToken()
     @UserController.ProducesType(200, 'The just created user', User) 
-    @UserController.ProducesMessage(400, 'Error message', {Message : 'The company of the user is required'}) 
     @RequestJson(JSON.stringify(Type.CreateTemplateFrom(User, false, ["Access"], []), null, 2)) 
     @Description(`Utilize esse metodo para criad um novo ${User.name}`)   
     public async InsertAsync(@FromBody()user : User) : Promise<ActionResult>

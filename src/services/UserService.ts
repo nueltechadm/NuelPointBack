@@ -17,7 +17,10 @@ import { IJoinSelectable, IJoiningQuery, Operation } from "myorm_core";
 
 
 export default class UserService  extends AbstractUserService
-{      
+{
+    UnpaginatedFilter(name: string, jobrole?: JobRole | undefined, department?: Departament | undefined, company?: Company | undefined): Promise<User | undefined> {
+        throw new Error("Method not implemented.");
+    }      
     
     @Inject()
     private _context : AbstractDBContext;
@@ -66,6 +69,7 @@ export default class UserService  extends AbstractUserService
         return await this._context.Collection(User).WhereField("Name").Constains(name).Load("Company").ToListAsync() ?? [];
     }
 
+
     public async GetByUserNameAndPasswordAsync(username: string, password : string): Promise<Access | undefined> {
 
        let access = await this._context.From(User).InnerJoin(Access)
@@ -104,10 +108,10 @@ export default class UserService  extends AbstractUserService
  
         obj.Access!.Password = MD5(obj.Access!.Password);  
 
-        if(!obj.Company && !obj.IsSuperUser())
+        if(!obj.Company && obj.IsSuperUser())
             throw new InvalidEntityException(`The ${Company.name} of the ${User.name} is required`);
 
-        if(!obj.JobRole && !obj.IsSuperUser())
+        if(!obj.JobRole && obj.IsSuperUser())
             throw new InvalidEntityException(`The ${JobRole.name} of the ${User.name} is required`); 
         
 
@@ -143,8 +147,6 @@ export default class UserService  extends AbstractUserService
        return await this._context.Collection(User).DeleteAsync(obj)!;
     }
     
-
-
 
     public override async PaginatedFilterAsync(request : UserPaginatedFilterRequest) : Promise<PaginatedFilterResult<User>> 
     {

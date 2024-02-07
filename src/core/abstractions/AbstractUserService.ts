@@ -1,6 +1,9 @@
 import Access from "@entities/Access";
 import User from "@entities/User";
 import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "./AbstractService";
+import JobRole from "../entities/JobRole";
+import Departament from "../entities/Departament";
+import Company from "../entities/Company";
 
 
 
@@ -11,7 +14,8 @@ export default abstract class AbstractUserService extends AbstractService<User, 
     abstract GetByUserNameAndPasswordAsync(username : string, password : string) : Promise<Access | undefined>;
     
    
-}                               
+}    
+
 
 export /*sealed */ class UserPaginatedFilterRequest extends PaginatedFilterRequest
 {
