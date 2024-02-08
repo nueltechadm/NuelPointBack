@@ -1,5 +1,5 @@
 import User from "@entities/User";
-import AbstractUserService, { UserPaginatedFilterRequest } from "@contracts/AbstractUserService";
+import AbstractUserService, { UserPaginatedFilterRequest, UserUnPaginatedFilterRequest, UserUnPaginatedFilterResult } from "@contracts/AbstractUserService";
 import {MD5} from '@utils/Cryptography';
 import ObjectNotFoundExcpetion from "../exceptions/ObjectNotFoundExcpetion";
 import Type from "@utils/Type";
@@ -145,6 +145,39 @@ export default class UserService  extends AbstractUserService
     public async DeleteAsync(obj: User): Promise<User> {
 
        return await this._context.Collection(User).DeleteAsync(obj)!;
+    }
+
+    public async UnPaginatedFilterAsync(request : UserUnPaginatedFilterRequest) : Promise<UserUnPaginatedFilterResult<User>> 
+    {
+       
+        let query = this._context.From(User)
+                                 .LeftJoin(Company)
+                                 .On(User, "Company", Company, "Id")
+                                 .LeftJoin(JobRole)
+                                 .On(User, "JobRole", JobRole, "Id")
+                                 .LeftJoin(Departament)
+                                 .On(JobRole, "Departament", Departament, "Id");
+        
+        if(request.Name)
+            query.Where(User, {Field: "Name", Kind: Operation.CONSTAINS, Value: request.Name});
+
+        if(request.CompanyId !== undefined && request.CompanyId > 0)
+            query.Where(Company, {Field: "Id", Value: request.CompanyId});
+
+        if(request.JobRoleId !== undefined && request.JobRoleId > 0)
+            query.Where(JobRole, {Field: "Id", Value: request.JobRoleId});
+
+        if(request.DepartamentId !== undefined && request.DepartamentId > 0)
+            query.Where(Departament, {Field: "Id", Value: request.DepartamentId});
+
+
+        let users = await query.Select(User).ToListAsync();
+
+        let result = new UserUnPaginatedFilterResult<User>();
+        result.Quantity = users.Count();
+        result.Result = users;
+
+        return result;
     }
     
 
