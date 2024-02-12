@@ -45,6 +45,7 @@ export default class JourneyService  extends AbstractJorneyService
             if(t && t.Time){
                 d.Time = t?.Time;
                 (d as any)["TimeId"] = d.Time.Id;
+                Type.Delete(d, "Time");
             }
         
            
