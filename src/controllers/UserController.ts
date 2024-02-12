@@ -1,6 +1,6 @@
 
 import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ProducesResponse, ActionResult, RequestJson, Description } from "web_api_base";
-import AbstractUserService, { UserPaginatedFilterRequest } from "@contracts/AbstractUserService";
+import AbstractUserService, { UserPaginatedFilterRequest, UserUnPaginatedFilterRequest } from "@contracts/AbstractUserService";
 import User from "@entities/User";
 import {IsLogged} from '@filters/AuthFilter';
 import Type from "@utils/Type";
@@ -54,7 +54,18 @@ export default class UserController extends AbstractController
         this._accessService = accessService;
     }    
 
-    
+    @POST("Filter")
+    @SetDatabaseFromToken()
+    @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
+    @Description(`Utilize esse metodo para realizar consulta de ${User.name}`)   
+    public async UnPaginatedFilterAsync(@FromBody()params : UserUnPaginatedFilterRequest) : Promise<ActionResult>
+    {       
+       let unpaginatedResult =  await this._userService.UnPaginatedFilterAsync(params);
+
+       unpaginatedResult.Result.forEach(s => this.RemovePassword(s));
+
+       return this.OK(unpaginatedResult);
+    }    
 
     @POST("list")
     @SetDatabaseFromToken()
@@ -101,7 +112,6 @@ export default class UserController extends AbstractController
     @POST("insert")
     @SetDatabaseFromToken()
     @UserController.ProducesType(200, 'The just created user', User) 
-    @UserController.ProducesMessage(400, 'Error message', {Message : 'The company of the user is required'}) 
     @RequestJson(JSON.stringify(Type.CreateTemplateFrom(User, false, ["Access"], []), null, 2)) 
     @Description(`Utilize esse metodo para criad um novo ${User.name}`)   
     public async InsertAsync(@FromBody()user : User) : Promise<ActionResult>

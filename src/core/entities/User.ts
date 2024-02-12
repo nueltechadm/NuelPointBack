@@ -21,6 +21,9 @@ export default class User
     public Name : string;
 
     @Column()
+    public Document? : string;
+
+    @Column()
     @DataType(DBTypes.DATE)
     public Birthdate : Date;
 
@@ -61,6 +64,7 @@ export default class User
         this.Id = -1;
         this.Active = true;
         this.Name = name;
+        this.Document = undefined;
         this.Birthdate = new Date();
         this.AdmisionDate = new Date();
         this.DemissionDate = undefined;               
