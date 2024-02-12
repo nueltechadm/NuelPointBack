@@ -6,6 +6,8 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import AbstractDBContext from "@data-contracts/AbstractDBContext";
 import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
 import Departament from "@entities/Departament";
+import Time from "@src/core/entities/Time";
+import DayOfWeek from "@src/core/entities/DayOfWeek";
 
 export default class JourneyService  extends AbstractJorneyService
 {
@@ -33,7 +35,18 @@ export default class JourneyService  extends AbstractJorneyService
     }
 
     public async GetByIdAsync(id: number): Promise<Journey | undefined> {       
-        return await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).Load("Company").Load("DaysOfWeek").FirstOrDefaultAsync();
+        let j = await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).Load("Company").Load("DaysOfWeek").FirstOrDefaultAsync();
+
+        
+        for(let d of j?.DaysOfWeek ?? [])
+        {
+            let t = await this._context.Collection<DayOfWeek>(DayOfWeek).Where({Field: "Id", Value : d.Id}).Load("Time").FirstOrDefaultAsync();
+            
+            if(t && t.Time)
+                d.Time = t?.Time;
+        }
+
+        return j;
     }      
 
     public async ExistsAsync(id: number): Promise<boolean> {
