@@ -13,7 +13,7 @@ import AbstractTimeService from "@contracts/AbstractTimeService";
 import Checkpoint from "@entities/Checkpoint";
 import AppointmentDTO from "../dto/AppointmentDTO";
 import AbstractMultiPartRequestService, { PartType } from "@non-core-contracts/AbstractMultiPartRequestService";
-
+import fs from 'fs';
 
 
 
@@ -68,9 +68,10 @@ export default class AppointamentController extends AbstractController
     
     @POST("insert")    
     @SetDatabaseFromToken()
+    @AppointamentController.ReceiveType(AppointmentDTO)
     @AppointamentController.ProducesType(200, 'The just created Appointment object', AppointmentDTO)
     @AppointamentController.ProducesMessage(400, 'Error message', {Message : "The user with Id #${userId} not exists"})
-    public async InsertAsync() : Promise<ActionResult> 
+    public async InsertAsync(@FromBody()dto : AppointmentDTO) : Promise<ActionResult> 
     {  
         
         let user = await this._userService.GetByIdAsync(this.Request.APIAUTH.UserId);
@@ -78,27 +79,6 @@ export default class AppointamentController extends AbstractController
         if(!user)
             return this.BadRequest({Message : `The user with Id #${this.Request.APIAUTH.UserId} not exists`});         
         
-        let parts = await this._multiPartService.GetPartsFromRequestAsync(this.Request);        
-
-        if(
-            parts.Any() && 
-            parts.Any(s => s.Name == "Appointment" && s.Type == PartType.JSON) &&
-            parts.Any(s => s.Name == "picture" && s.Type == PartType.FILE)
-        )
-            return this.BadRequest({Message : `Appointament field and picture are required`});
-        
-            
-        let dto : AppointmentDTO = new  AppointmentDTO();
-        let filePart = parts.First(s => s.Type == PartType.FILE);       
-        
-        try
-        { 
-            dto = parts.First(s => s.Name == "Appointament").Content.To<AppointmentDTO>();
-
-        }catch
-        { 
-            return this.BadRequest(`The appointament field is not of type ${AppointmentDTO.name}`);
-        }  
 
         let currentDayOfUser = await this._appointamentService.GetCurrentDayByUser(user);
 
@@ -109,11 +89,12 @@ export default class AppointamentController extends AbstractController
 
         let image = await this._fileService.ComputeNextFileNameAsync(checkpoint);        
 
-        await this._fileService.CopyAsync(filePart.Content, image);
+        
+        const imageBuffer = Buffer.from(dto.File, 'base64');
 
-        await this._fileService.DeleteAsync(filePart.Content);
+        fs.writeFileSync(image, imageBuffer);  
 
-        checkpoint.Picture = `${image}${filePart.Filename!.substring(filePart.Filename!.lastIndexOf('.'))}`;
+        checkpoint.Picture = image;
  
         currentDayOfUser.Checkpoints.push(checkpoint);
 
