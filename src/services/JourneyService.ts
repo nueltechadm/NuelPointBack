@@ -42,8 +42,12 @@ export default class JourneyService  extends AbstractJorneyService
         {
             let t = await this._context.Collection<DayOfWeek>(DayOfWeek).Where({Field: "Id", Value : d.Id}).Load("Time").FirstOrDefaultAsync();
             
-            if(t && t.Time)
+            if(t && t.Time){
                 d.Time = t?.Time;
+                (d as any)["TimeId"] = d.Time.Id;
+            }
+        
+           
         }
 
         return j;
