@@ -22,6 +22,9 @@ function findBaseUrl(file)
 
 function getFiles (folder)
 {
+    if(folder.indexOf('storage') > -1)
+        return [];
+    
     let r = [];
 
     let t = fs.readdirSync(folder).map(s => p.join(folder, s));

@@ -2,13 +2,13 @@ import {Application, ControllerBase, IHTTPRequestContext} from 'web_api_base';
 import {Decode, DecodeResult} from '@utils/JWT';
 import Authorization from '@utils/Authorization';
 
-export function IsLogged(context : IHTTPRequestContext) : void
+export async function IsLogged(context : IHTTPRequestContext) : Promise<void>
 {   
 
     if(Application.Configurations.DEBUG && context.Request.url.indexOf("/login/") != 0){
         context.Request.APIAUTH = new Authorization("development", "development", 1);      
         console.debug(`No auth in DEBUG mode: ${context.Request.url}`);
-        return context.Next();
+        return await context.Next();
     }
     
     let token = context.Request.headers["token"];   
@@ -42,7 +42,7 @@ export function IsLogged(context : IHTTPRequestContext) : void
     }
 
 
-    context.Next();
+    await context.Next();
 }
 
 

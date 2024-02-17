@@ -1,9 +1,10 @@
 import { Application, IHTTPRequestContext } from "web_api_base";
 
-export default function DatabasesAuthFilter(context: IHTTPRequestContext) {
+export default async function DatabasesAuthFilter(context: IHTTPRequestContext) : Promise<void> 
+{
     
     if(Application.Configurations.DEBUG)
-        return context.Next();
+        return await context.Next();
 
     let token = "HRG587T8R8D5V2H4K4L4#SJREHFD993HADRINAOSJAGDKGFLEUYYTSNAKKJA6D8F48AD";
 
@@ -14,5 +15,5 @@ export default function DatabasesAuthFilter(context: IHTTPRequestContext) {
         context.Response.json({ Message: "Access denied" });
     }
     else
-        context.Next();
+        await context.Next();
 }

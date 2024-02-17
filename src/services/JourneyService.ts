@@ -34,24 +34,16 @@ export default class JourneyService  extends AbstractJorneyService
         return await this._context.Collection(Journey).CountAsync();
     }
 
-    public async GetByIdAsync(id: number): Promise<Journey | undefined> {       
-        let j = await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).Load("Company").Load("DaysOfWeek").FirstOrDefaultAsync();
+    public async GetByIdAsync(id: number): Promise<Journey | undefined> 
+    {       
+        let jouney = await this._context.Collection(Journey).WhereField("Id").IsEqualTo(id).Load("Company").Load("DaysOfWeek").FirstOrDefaultAsync();
 
-        
-        for(let d of j?.DaysOfWeek ?? [])
-        {
-            let t = await this._context.Collection<DayOfWeek>(DayOfWeek).Where({Field: "Id", Value : d.Id}).Load("Time").FirstOrDefaultAsync();
-            
-            if(t && t.Time){
-                d.Time = t?.Time;
-                (d as any)["TimeId"] = d.Time.Id;
-                Type.Delete(d, "Time");
-            }
-        
-           
-        }
+        if(!jouney)
+            return undefined;
 
-        return j;
+        await this._context.Collection(DayOfWeek).ReloadCachedRealitionsAsync(jouney!.DaysOfWeek, ["Time"]);
+
+        return jouney;        
     }      
 
     public async ExistsAsync(id: number): Promise<boolean> {

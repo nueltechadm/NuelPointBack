@@ -43,8 +43,6 @@ import EntityNotFoundException from '../exceptions/EntityNotFoundException';
 import { ApplicationExceptionHandler } from 'web_api_base/dist/interfaces/IApplication';
 import AbstractDBContext from '@data-contracts/AbstractDBContext';
 import AbstractControlContext from '@data-contracts/AbstractControlContext';
-import AbstractMultiPartRequestService from '@non-core-contracts/AbstractMultiPartRequestService';
-import FormidableMultiPartRequestService from '../services/FormidableMultiPartRequestService';
 import AbstractDayOfWeekService from '@src/core/abstractions/AbstractDayOfWeekService';
 import DayOfWeekService from '@src/services/DayOfWeekService';
 
@@ -64,8 +62,7 @@ export default class App extends Application
         this.ApplicationThreadExeptionHandler = this.ApplicationThreadExeptionEvent;
 
         appConfig.AddScoped(AbstractDBContext, DBContext);
-        appConfig.AddScoped(AbstractControlContext, ControlContext);          
-        appConfig.AddScoped(AbstractMultiPartRequestService, FormidableMultiPartRequestService); 
+        appConfig.AddScoped(AbstractControlContext, ControlContext);      
         appConfig.AddScoped(AbstractUserService, UserService);
         appConfig.AddScoped(AbstractDepartamentService, DepartamentService);
         appConfig.AddScoped(AbstractJobRoleService, JobRoleService);       

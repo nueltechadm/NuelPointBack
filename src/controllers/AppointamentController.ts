@@ -12,7 +12,6 @@ import AbstractCompanyService from "@contracts/AbstractCompanyService";
 import AbstractTimeService from "@contracts/AbstractTimeService";
 import Checkpoint from "@entities/Checkpoint";
 import AppointmentDTO from "../dto/AppointmentDTO";
-import AbstractMultiPartRequestService, { PartType } from "@non-core-contracts/AbstractMultiPartRequestService";
 import fs from 'fs';
 
 
@@ -42,8 +41,6 @@ export default class AppointamentController extends AbstractController
 
 
 
-    @Inject()
-    private _multiPartService : AbstractMultiPartRequestService;
 
     constructor(
         checkpoinService : AbstractCheckpointService, 
@@ -51,8 +48,7 @@ export default class AppointamentController extends AbstractController
         userService : AbstractUserService, 
         timeService : AbstractTimeService, 
         companyService : AbstractCompanyService,
-        appointamentService : AbstractAppointmentService,
-        multiPartService : AbstractMultiPartRequestService
+        appointamentService : AbstractAppointmentService
         )
     {
         super();                    
@@ -62,7 +58,7 @@ export default class AppointamentController extends AbstractController
         this._timeService = timeService;
         this._fileService = fileService;
         this._appointamentService = appointamentService;
-        this._multiPartService = multiPartService;
+        
     }   
     
     

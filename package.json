@@ -6,25 +6,23 @@
   "scripts": {
     "test": "jest",
     "start": "node ./dist/Index",
-    "restore": "npm install && npm install ts_linq_base myorm_core myorm_pg --save && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
-    "build": "npm install ts_linq_base myorm_core myorm_pg --save && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
+    "restore": "npm install && npm install ts_linq_base@latest myorm_core@latest myorm_pg@latest --save && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
+    "build": "npm install ts_linq_base@latest web_api_base@latest myorm_core@latest myorm_pg@latest --save && tsc -p . && node ./bin/paths.js && node ./bin/config.js",
     "compile": "tsc -p . && node ./bin/paths.js && node ./bin/config.js",
-    "orm": "npm install ts_linq_base myorm_core myorm_pg --save "
+    "orm": "npm install ts_linq_base@latest myorm_core myorm_pg@latest --save "
   },
   "author": "adriano.marino1992@gmail.com",
   "license": "ISC",
   "dependencies": {
     "crypto-js": "^4.1.1",
-    "formidable": "^2.1.2",
     "jsonwebtoken": "^9.0.0",
-    "myorm_core": "^5.0.0",
-    "myorm_pg": "^7.0.0",
+    "myorm_core": "^6.0.0",
+    "myorm_pg": "^8.0.1",
     "ts_linq_base": "^1.1.0",
-    "web_api_base": "^4.0.8"
+    "web_api_base": "^5.1.1"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.1.1",
-    "@types/formidable": "^2.0.6",
     "@types/jest": "^29.5.11",
     "@types/jsonwebtoken": "^9.0.2",
     "jest": "^29.7.0",
