@@ -5,10 +5,13 @@ import Path from 'path';
 import AbstractFileService from "./abstractions/AbstractFileService";
 import { Application, ApplicationConfiguration, Exception } from 'web_api_base';
 import Checkpoint from '@entities/Checkpoint';
+import FileException from '@src/exceptions/FileException';
+import FileCastException from '@src/exceptions/FileCastException';
 
 
 export default class FileService extends AbstractFileService
 {
+    
       
 
     public override CreateDirectoryAsync(path: string): Promise<void> {
@@ -27,7 +30,7 @@ export default class FileService extends AbstractFileService
 
             }catch(err)
             {
-               return reject(err);
+                return reject(new FileException((err as Error).message));
             }
         });
     }
@@ -41,7 +44,7 @@ export default class FileService extends AbstractFileService
 
             }catch(err)
             {
-                return  reject(err);
+                return reject(new FileException((err as Error).message));
             }
         });
     }
@@ -55,9 +58,33 @@ export default class FileService extends AbstractFileService
 
             }catch(err)
             {
-                return  reject(err);
+                return reject(new FileException((err as Error).message));
             }
         });
+    }
+
+    public SaveImageFromBase64Async(path: string, base64: string): Promise<string> {
+        
+        return new Promise<string>((resolve, reject) => {
+
+            try{
+
+                let bytes = Buffer.from(base64, 'base64');
+
+                File.writeFile(path, bytes, 'utf-8', (err) => 
+                {
+                    if(err)
+                        return reject(new FileCastException(err.message));
+
+                    return resolve(path);
+                })
+
+            }catch(e)
+            {
+                return reject(new FileException((e as Error).message));
+            }
+        });
+        
     }
 
     public GetAllFilesAsync(origin: string): Promise<string[]> {
@@ -75,7 +102,7 @@ export default class FileService extends AbstractFileService
 
             }catch(err)
             {
-                return  reject(err);
+                return reject(new FileException((err as Error).message));
             }
         });
     }
@@ -95,7 +122,7 @@ export default class FileService extends AbstractFileService
 
             }catch(err)
             {
-                return  reject(err);
+                return reject(new FileException((err as Error).message));
             }
         });
     }
@@ -115,7 +142,7 @@ export default class FileService extends AbstractFileService
 
             }catch(err)
             {
-                reject(err);
+                return reject(new FileException((err as Error).message));
             }
         });
         
@@ -136,7 +163,7 @@ export default class FileService extends AbstractFileService
 
             }catch(err)
             {
-                reject(err);
+                return reject(new FileException((err as Error).message));
             }
         });
         

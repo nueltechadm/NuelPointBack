@@ -13,6 +13,7 @@ import AbstractTimeService from "@contracts/AbstractTimeService";
 import Checkpoint from "@entities/Checkpoint";
 import AppointmentDTO from "../dto/AppointmentDTO";
 import fs from 'fs';
+import FileCastException from "@src/exceptions/FileCastException";
 
 
 
@@ -85,10 +86,15 @@ export default class AppointamentController extends AbstractController
 
         let image = await this._fileService.ComputeNextFileNameAsync(checkpoint);        
 
-        
-        const imageBuffer = Buffer.from(dto.File, 'base64');
+        try{
 
-        fs.writeFileSync(image, imageBuffer);  
+            await this._fileService.SaveImageFromBase64Async(image, dto.File);
+            
+        }catch(e)
+        {
+            if(e instanceof FileCastException)
+                return this.BadRequest('Invalid base64 image'); 
+        }
 
         checkpoint.Picture = image;
  

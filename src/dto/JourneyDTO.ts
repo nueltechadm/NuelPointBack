@@ -7,3 +7,5 @@ export default class JourneyDTO {
     CompanyId: number = 0;    
     DaysOfWeek: DayOfWeekDTO[] = [new DayOfWeekDTO()];
 }
+
+

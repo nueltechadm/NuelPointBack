@@ -14,6 +14,7 @@ export default abstract class AbstractFileService
     public abstract GetStorageDirectoryAsync() : Promise<string>;  
     public abstract ComputeDirectoryAsync(checkpoint : Checkpoint) : Promise<string>;     
     public abstract ComputeNextFileNameAsync(checkpoint : Checkpoint) : Promise<string>;     
+    public abstract SaveImageFromBase64Async(path : string, base64 : string) : Promise<string>;     
    
 }
 
