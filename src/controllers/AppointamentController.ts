@@ -14,6 +14,7 @@ import Checkpoint from "@entities/Checkpoint";
 import AppointmentDTO from "../dto/AppointmentDTO";
 import fs from 'fs';
 import FileCastException from "@src/exceptions/FileCastException";
+import User from "@src/core/entities/User";
 
 
 
@@ -74,14 +75,14 @@ export default class AppointamentController extends AbstractController
         let user = await this._userService.GetByIdAsync(this.Request.APIAUTH.UserId);
 
         if(!user)
-            return this.BadRequest({Message : `The user with Id #${this.Request.APIAUTH.UserId} not exists`});         
-               
+            return this.BadRequest({Message : `The user with Id #${this.Request.APIAUTH.UserId} not exists`});   
+       
 
         let currentDayOfUser = await this._appointamentService.GetCurrentDayByUserAsync(user);
 
         if(!currentDayOfUser)
-            currentDayOfUser = new Appointment(user);
-
+            currentDayOfUser = new Appointment(user);       
+        
         let checkpoint = new Checkpoint(user, dto.X, dto.Y, user.Company!, currentDayOfUser);
 
         let image = await this._fileService.ComputeNextFileNameAsync(checkpoint);        
@@ -112,30 +113,32 @@ export default class AppointamentController extends AbstractController
     @SetDatabaseFromToken()
     public async GetAppointaments(@FromQuery()userId: number, @FromQuery()init : Date, @FromQuery()end : Date) : Promise<ActionResult> 
     {
-       let appointaments : Appointment[] = [];
-
-       if(userId > 0)
-       {
-            let user = await this._userService.GetByAndLoadAsync("Id",  userId, []);
+       let appointaments : Appointment[] = [];      
+      
+       let user = (await this._userService.GetByAndLoadAsync("Id",  userId, ["Journey"])).FirstOrDefault();
             
-            if(!user)
-                return this.BadRequest(`User with Id ${userId} not exists`);
+        if(!user)
+            return this.BadRequest(`User with Id ${userId} not exists`);
 
-            appointaments.AddRange(await this._appointamentService.GetByDatesAsync(init, end));
-       }
-       else
-            appointaments.AddRange(await this._appointamentService.GetByDatesAsync(init, end));
+        appointaments.AddRange(await this._appointamentService.GetByDatesAsync(init, end));
+        
+        let journey = user.Journey;
+
+        if(!journey)
+            return this.BadRequest(`User not have a journey`);        
 
         let result = {} as any;
         result["Appointaments"] = [];
 
         for(let u of appointaments.GroupBy(s => s.User.Name))
-        {
+        {            
             for(let d of u.Values.GroupBy(s => s.Date).OrderBy(s => s.Key))
-            {
-                result["Appointaments"].push({
-                    User : u.Key,
+            { 
+                let dayOfWeek = journey.DaysOfWeek.First(s => s.Day == (d.Key as Date).getDay());
+
+                result["Appointaments"].push({                    
                     Date : d.Key,
+                    DayOfWeek: dayOfWeek,
                     Points : d.Values.SelectMany(s => s.Checkpoints)
                 });
             }
