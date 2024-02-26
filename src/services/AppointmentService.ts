@@ -6,6 +6,7 @@ import AbstractAppointmentService  from "@contracts/AbstractAppointmentService";
 import User from "@entities/User";
 import AbstractDBContext from "@data-contracts/AbstractDBContext";
 import { PaginatedFilterResult, PaginatedFilterRequest } from '@contracts/AbstractService';
+import Checkpoint from '@src/core/entities/Checkpoint';
 
 
 export default class AppointmentService extends AbstractAppointmentService {
@@ -97,7 +98,7 @@ export default class AppointmentService extends AbstractAppointmentService {
     } 
 
 
-    public async GetCurrentDayByUser(user: User): Promise<Appointment | undefined> {
+    public async GetCurrentDayByUserAsync(user: User): Promise<Appointment | undefined> {
         
         return await this._context.Collection(Appointment)
             .Where({
@@ -114,10 +115,33 @@ export default class AppointmentService extends AbstractAppointmentService {
             .FirstOrDefaultAsync();
     }
 
-    public async GetByUserAndDates(user : User, start: Date, end: Date): Promise<Appointment[]> {
+    public async GetByDatesAsync(start: Date, end: Date): Promise<Appointment[]> {
+       
+        let list = await this._context.Collection(Appointment)
+            .Where({
+                Field: "Date",
+                Kind: Operation.GREATHEROREQUALS,
+                Value: start
+            })
+            .And({
+                Field: "Date",
+                Kind: Operation.SMALLEROREQUALS,
+                Value: end 
+            })
+            .Load("User")
+            .Load("Checkpoints")
+            .OrderDescendingBy("Date")
+            .ToListAsync();
+
+        await this._context.Collection(Checkpoint).ReloadCachedRealitionsAsync(list.SelectMany(s => s.Checkpoints), ["Time"]);
+
+        return list;
+    }
+
+    public async GetByUserAndDatesAsync(user : User, start: Date, end: Date): Promise<Appointment[]> {
        
 
-        return await this._context.Collection(Appointment)
+        let list = await this._context.Collection(Appointment)
             .Where({
                 Field: "User",
                 Value: user
@@ -136,9 +160,16 @@ export default class AppointmentService extends AbstractAppointmentService {
             .Load("Checkpoints")
             .OrderDescendingBy("Date")
             .ToListAsync();
+
+        await this._context.Collection(Checkpoint).ReloadCachedRealitionsAsync(list.SelectMany(s => s.Checkpoints), ["Time"]);
+
+        return list;
     }
 
+    
+
     public ValidateObject(obj: Appointment): void {
+
         if (!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Appointment.name} type`);
 

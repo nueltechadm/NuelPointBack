@@ -6,6 +6,7 @@ import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "
 export default abstract class AbstractAppointmentService extends AbstractService<Appointment, PaginatedFilterRequest, PaginatedFilterResult<Appointment>>
 {
     abstract GetByIdAsync(id: number): Promise<Appointment | undefined>;
-    abstract GetCurrentDayByUser(user : User): Promise<Appointment | undefined>;
-    abstract GetByUserAndDates(user : User, start : Date, end : Date): Promise<Appointment[]>;
+    abstract GetCurrentDayByUserAsync(user : User): Promise<Appointment | undefined>;
+    abstract GetByUserAndDatesAsync(user : User, start : Date, end : Date): Promise<Appointment[]>;
+    abstract GetByDatesAsync(start : Date, end : Date): Promise<Appointment[]>;
 }

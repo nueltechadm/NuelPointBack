@@ -63,7 +63,7 @@ export default class JourneyController extends AbstractController {
         if (!journey)
             return this.NotFound({ Message: `${Journey.name} not found`});        
 
-        return this.OK(journey);
+        return this.OK(JourneyDTO.Cast(journey));
     }
 
 

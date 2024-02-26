@@ -75,9 +75,9 @@ export default class AppointamentController extends AbstractController
 
         if(!user)
             return this.BadRequest({Message : `The user with Id #${this.Request.APIAUTH.UserId} not exists`});         
-        
+               
 
-        let currentDayOfUser = await this._appointamentService.GetCurrentDayByUser(user);
+        let currentDayOfUser = await this._appointamentService.GetCurrentDayByUserAsync(user);
 
         if(!currentDayOfUser)
             currentDayOfUser = new Appointment(user);
@@ -108,7 +108,41 @@ export default class AppointamentController extends AbstractController
         return this.OK(Type.RemoveAllRelationedObject(checkpoint));
     }
 
+    @GET("get-appointaments")
+    @SetDatabaseFromToken()
+    public async GetAppointaments(@FromQuery()userId: number, @FromQuery()init : Date, @FromQuery()end : Date) : Promise<ActionResult> 
+    {
+       let appointaments : Appointment[] = [];
 
+       if(userId > 0)
+       {
+            let user = await this._userService.GetByAndLoadAsync("Id",  userId, []);
+            
+            if(!user)
+                return this.BadRequest(`User with Id ${userId} not exists`);
+
+            appointaments.AddRange(await this._appointamentService.GetByDatesAsync(init, end));
+       }
+       else
+            appointaments.AddRange(await this._appointamentService.GetByDatesAsync(init, end));
+
+        let result = {} as any;
+        result["Appointaments"] = [];
+
+        for(let u of appointaments.GroupBy(s => s.User.Name))
+        {
+            for(let d of u.Values.GroupBy(s => s.Date).OrderBy(s => s.Key))
+            {
+                result["Appointaments"].push({
+                    User : u.Key,
+                    Date : d.Key,
+                    Points : d.Values.SelectMany(s => s.Checkpoints)
+                });
+            }
+        }
+
+        return this.OK(result);
+    }
 
     @PUT("update")    
     @SetDatabaseFromToken()
@@ -157,7 +191,7 @@ export default class AppointamentController extends AbstractController
         if(!user)
             return this.NotFound(`The user with Id #${userId} not exists`);
 
-        let appointaments = await this._appointamentService.GetByUserAndDates(user, start, end);  
+        let appointaments = await this._appointamentService.GetByUserAndDatesAsync(user, start, end);  
         
         if(!appointaments.Any())
             return this.NotFound({Message: `No one appointament found to user with Id #${userId} between ${start.toDateString()} and ${end.toDateString()}`});
@@ -180,7 +214,7 @@ export default class AppointamentController extends AbstractController
         if(!user)
             return this.NotFound(`The user with Id #${userId} not exists`);
 
-        let appointament = await this._appointamentService.GetCurrentDayByUser(user);  
+        let appointament = await this._appointamentService.GetCurrentDayByUserAsync(user);  
         
         if(!appointament)
             return this.NotFound(`No one day is started by user with Id #${userId}`);
