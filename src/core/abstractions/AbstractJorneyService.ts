@@ -6,4 +6,8 @@ export default abstract class AbstractJorneyService extends AbstractService<Jour
     abstract GetByIdAsync(id : number) : Promise<Journey | undefined>;    
 }
 
-
+export /*sealed */ class JourneyPaginatedFilterRequest extends PaginatedFilterRequest
+{
+    public CompanyId : number = -1;
+    public LoadRelations : boolean = false;
+}

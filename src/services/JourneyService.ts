@@ -1,4 +1,4 @@
-import AbstractJorneyService from "@contracts/AbstractJorneyService";
+import AbstractJorneyService, { JourneyPaginatedFilterRequest } from "@contracts/AbstractJorneyService";
 import {Inject} from'web_api_base';
 import Journey from "@entities/Journey";
 import Type from "@utils/Type";
@@ -6,6 +6,8 @@ import InvalidEntityException from "../exceptions/InvalidEntityException";
 import AbstractDBContext from "@data-contracts/AbstractDBContext";
 import { PaginatedFilterRequest, PaginatedFilterResult } from "@contracts/AbstractService";
 import Departament from "@entities/Departament";
+import { IJoinSelectable } from "myorm_core";
+import Company from "@src/core/entities/Company";
 import Time from "@src/core/entities/Time";
 import DayOfWeek from "@src/core/entities/DayOfWeek";
 
@@ -88,13 +90,20 @@ export default class JourneyService  extends AbstractJorneyService
     }
 
 
-    public async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Journey>> 
+    public async PaginatedFilterAsync(request : JourneyPaginatedFilterRequest) : Promise<PaginatedFilterResult<Journey>> 
     {
         let offset = (request.Page - 1) * request.Quantity;  
 
-        let total = await this._context.Collection(Journey).CountAsync();
+        let total = await this.BuildQuery(request).CountAsync();
+        
+        let query = this.BuildQuery(request);
+        
+        if(request.LoadRelations)
+        {
+            query.Load("Company");
+        }
 
-        let journeis = await this._context.Collection(Journey).OrderBy("Description").Offset(offset).Limit(request.Quantity).ToListAsync();
+        let journeis = await query.OrderBy("Description").Offset(offset).Limit(request.Quantity).ToListAsync();
 
         let result = new PaginatedFilterResult<Journey>();
         result.Page = request.Page;
@@ -104,6 +113,20 @@ export default class JourneyService  extends AbstractJorneyService
 
         return result;
     }
+
+    private BuildQuery(request : JourneyPaginatedFilterRequest)  : IJoinSelectable<Journey>
+    {
+        let query = this._context.From(Journey)
+                                 .LeftJoin(Company)
+                                 .On(Journey, "Company", Company, "Id");
+        
+
+        if(request.CompanyId > 0)
+            query.Where(Company, {Field: "Id", Value: request.CompanyId});
+
+
+        return query.Select(Journey);
+    } 
 
 
     public ValidateObject(obj : Journey) : void

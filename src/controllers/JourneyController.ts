@@ -3,7 +3,7 @@ import { IsLogged } from '@filters/AuthFilter';
 import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
 import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
-import AbstractJourneyService from "@contracts/AbstractJorneyService";
+import AbstractJourneyService, { JourneyPaginatedFilterRequest } from "@contracts/AbstractJorneyService";
 import Journey from "@entities/Journey";
 import { PaginatedFilterRequest } from "@contracts/AbstractService";
 import JourneyDTO from "@src/dto/JourneyDTO";
@@ -47,7 +47,7 @@ export default class JourneyController extends AbstractController {
 
     @POST("list")     
     @SetDatabaseFromToken()
-    public async PaginatedFilterAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    public async PaginatedFilterAsync(@FromBody()params : JourneyPaginatedFilterRequest): Promise<ActionResult> 
     {             
         return this.OK(await this._journeyService.PaginatedFilterAsync(params));
     }
