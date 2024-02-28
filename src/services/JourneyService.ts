@@ -109,8 +109,8 @@ export default class JourneyService  extends AbstractJorneyService
     public ValidateObject(obj : Journey) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`This object is not of ${Journey.name} type`);
-        
+            {throw new InvalidEntityException(`This object is not of ${Journey.name} type`);}
+
                
     }
 }

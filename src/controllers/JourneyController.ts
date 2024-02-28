@@ -87,18 +87,34 @@ export default class JourneyController extends AbstractController {
 
         for(let d of dto.DaysOfWeek)
         {
-            let time = await this._timeService.GetByIdAsync(d.TimeId);
+            if(d.DayOff)
+            {
+              
+                let day =  new DayOfWeek(d.Day, d.DayName, journey);
 
-            if(!time)
-                return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
+                day.DayOff = true;
+                day.Id = -1;
+    
+                days.Add(day);
 
-            let day =  new DayOfWeek(d.Day, d.DayName, time, journey);
-            
-            day.Id = -1;
 
-            days.Add(day);
+            }
+            else
+            {
+
+                let time = await this._timeService.GetByIdAsync(d.TimeId);
+
+                if(!time)
+                    return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
+    
+                let day =  new DayOfWeek(d.Day, d.DayName,journey,time);
+                
+                day.Id = -1;
+    
+                days.Add(day);
+            }
+          
         }
-
         
         journey.DaysOfWeek = days;
 
@@ -134,19 +150,32 @@ export default class JourneyController extends AbstractController {
 
         for(let d of dto.DaysOfWeek)
         {
-            let time = await this._timeService.GetByIdAsync(d.TimeId);
+            if(d.DayOff)
+            {
+              
+                let day =  new DayOfWeek(d.Day, d.DayName, exists);
 
-            if(!time)
-                return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
-
-            let day =  new DayOfWeek(d.Day, d.DayName, time, exists);
-            
-            if(!(await this._dayOfWeekService.ExistsAsync(d.Id)))
+                day.DayOff = true;
                 day.Id = -1;
-            else
-                day.Id = d.Id;
+    
+                days.Add(day);
 
-            days.Add(day);
+
+            }
+            else
+            {
+
+                let time = await this._timeService.GetByIdAsync(d.TimeId);
+
+                if(!time)
+                    return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
+    
+                let day =  new DayOfWeek(d.Day, d.DayName,exists,time);
+                
+                day.Id = -1;
+    
+                days.Add(day);
+            }
         }
         
         exists.DaysOfWeek = days;
