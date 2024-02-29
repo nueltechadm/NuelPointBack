@@ -1,5 +1,5 @@
 
-import { POST, Inject, FromBody, RunBefore, GET, ActionResult } from "web_api_base";
+import { POST, Inject, FromBody, RunBefore, GET, ActionResult, Description } from "web_api_base";
 import AbstractUserService from "@contracts/AbstractUserService";
 import {Generate} from '@utils/JWT';
 import { IsLogged } from "@filters/AuthFilter";
@@ -29,6 +29,7 @@ export default class LoginController extends AbstractController
 
 
     @POST("login")   
+    @Description(`Utilize esse metodo para realizar login`) 
     public async LoginAsync(@FromBody()user : LoginDTO) : Promise<ActionResult>
     {   
         let db = await this._databaseService.GetDabaseAsync(user.Link);
@@ -59,7 +60,8 @@ export default class LoginController extends AbstractController
 
 
     
-    @GET("validateToken")  
+    @GET("validateToken")
+    @Description(`Utilize esse metodo para válidar um Token`)  
     @RunBefore(IsLogged)  
     public async ValidateTokenAsync() : Promise<ActionResult>
     {        

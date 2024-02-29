@@ -1,5 +1,5 @@
 
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, Description } from "web_api_base";
 import AbstractJobRoleService, { JobRolePaginatedFilteRequest } from "@contracts/AbstractJobRoleService";
 import JobRole from "@entities/JobRole";
 import {IsLogged} from '@filters/AuthFilter';
@@ -49,6 +49,8 @@ export default class JobRoleController extends AbstractController
 
     @POST("list")     
     @SetDatabaseFromToken()
+    @JobRoleController.ProducesType(200 , "Uma lista de funções",JobRole)
+    @Description(`Utilize esse metodo para visualizar uma lista de funções recuperadas pelo filtro`) 
     public async PaginatedFilterAsync(@FromBody()params : JobRolePaginatedFilteRequest): Promise<ActionResult> 
     {             
         return this.OK(await this._jobRoleService.PaginatedFilterAsync(params));
@@ -57,6 +59,8 @@ export default class JobRoleController extends AbstractController
 
     @GET("all")
     @SetDatabaseFromToken()
+    @JobRoleController.ProducesType(200 , "Todas funções registradas no banco de dados",JobRole)
+    @Description(`Utilize esse metodo para visualizar uma lista de todas funções registradas no banco de dados`) 
     public async GetAllAync() :Promise<ActionResult>
     {
         return this.OK(await this._jobRoleService.GetAllAsync());
@@ -66,6 +70,9 @@ export default class JobRoleController extends AbstractController
     
     @GET("getById")  
     @SetDatabaseFromToken()
+    @JobRoleController.ProducesType(200 , "A função com o Id fornecido",JobRole)
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', {Message : "Função não encontrada"})
+    @Description(`Utilize esse metodo para visualizar uma função especifica pelo Id`) 
     public async GetByIdAsync(@FromQuery()id : number) : Promise<ActionResult>
     { 
        let job = (await this._jobRoleService.GetByAndLoadAsync("Id", id, ["Departament"])).FirstOrDefault();
@@ -80,6 +87,8 @@ export default class JobRoleController extends AbstractController
     
     @POST("insert")     
     @SetDatabaseFromToken()
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', {Message : "Função criada", Id : 1})
+    @Description(`Utilize esse metodo para imserir uma nova função no banco de dados`) 
     public async InsertAsync(@FromBody()dto : JobRoleDTO) : Promise<ActionResult>
     { 
         let departament = (await this._departamentService.GetByAndLoadAsync("Id", dto.DepartamentId, [])).FirstOrDefault();
@@ -97,6 +106,10 @@ export default class JobRoleController extends AbstractController
     
     @POST("update")     
     @SetDatabaseFromToken()
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Função atualizada'})
+    @JobRoleController.ProducesMessage(400, 'Mensagem de erro', {Message : 'Mensagem descrevendo o erro'})  
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Função não encontrada'})
+    @Description(`Utilize esse metodo para atualizar uma função do banco de dados`) 
     public async UpdateAsync(@FromBody()dto : JobRoleDTO) : Promise<ActionResult>
     {
         let departament = (await this._departamentService.GetByAndLoadAsync("Id", dto.DepartamentId, [])).FirstOrDefault();
@@ -121,6 +134,9 @@ export default class JobRoleController extends AbstractController
 
     @PUT("add/user")       
     @SetDatabaseFromToken()
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Função atualizada'})
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Função não encontrada'})
+    @Description(`Utilize esse metodo para adicionar um usuário a uma função`) 
     public async AddUserAsync(@FromQuery()jobRoleId : number, @FromQuery()userId : number) : Promise<ActionResult>
     {  
         let job = (await this._jobRoleService.GetByAndLoadAsync("Id", jobRoleId, ["Users"])).FirstOrDefault();
@@ -147,6 +163,9 @@ export default class JobRoleController extends AbstractController
 
     @PUT("remove/user")       
     @SetDatabaseFromToken()
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Função atualizada'})
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Função não encontrada'})
+    @Description(`Utilize esse metodo para remover um usuário de uma função`) 
     public async RemoveUserAsync(@FromQuery()jobRoleId : number, @FromQuery()userId : number) : Promise<ActionResult>
     {  
         let job = (await this._jobRoleService.GetByAndLoadAsync("Id", jobRoleId, ["Users"])).FirstOrDefault();
@@ -175,7 +194,10 @@ export default class JobRoleController extends AbstractController
 
 
     @DELETE("delete")     
-    @SetDatabaseFromToken()    
+    @SetDatabaseFromToken()  
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Função deletada'})  
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Função não encontrada'}) 
+    @Description(`Utilize esse metodo para remover uma função do banco de dados`)  
     public async DeleteAsync(@FromQuery()id : number) : Promise<ActionResult>
     {  
         if(!id)
