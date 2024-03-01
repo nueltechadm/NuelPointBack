@@ -1,9 +1,9 @@
-import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult } from "web_api_base";
+import { POST, PUT, DELETE, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, Description } from "web_api_base";
 import { IsLogged } from '@filters/AuthFilter';
 import Type from "@utils/Type";
 import AbstractController from "./AbstractController";
 import SetDatabaseFromToken from "@decorators/SetDatabaseFromToken";
-import AbstractJourneyService from "@contracts/AbstractJorneyService";
+import AbstractJourneyService, { JourneyPaginatedFilterRequest } from "@contracts/AbstractJorneyService";
 import Journey from "@entities/Journey";
 import { PaginatedFilterRequest } from "@contracts/AbstractService";
 import JourneyDTO from "@src/dto/JourneyDTO";
@@ -47,7 +47,9 @@ export default class JourneyController extends AbstractController {
 
     @POST("list")     
     @SetDatabaseFromToken()
-    public async PaginatedFilterAsync(@FromBody()params : PaginatedFilterRequest): Promise<ActionResult> 
+    @JourneyController.ProducesType(200 , "Uma lista de jornadas",Journey)
+    @Description(`Utilize esse metodo para visualizar uma lista de jornadas recuperados pelo filtro`) 
+    public async PaginatedFilterAsync(@FromBody()params : JourneyPaginatedFilterRequest): Promise<ActionResult> 
     {             
         return this.OK(await this._journeyService.PaginatedFilterAsync(params));
     }
@@ -56,6 +58,9 @@ export default class JourneyController extends AbstractController {
 
     @GET("getById")
     @SetDatabaseFromToken()
+    @JourneyController.ProducesType(200 , "A jornada com o Id fornecido",Journey)
+    @JourneyController.ProducesMessage(404, 'Mensagem de erro', {Message : "Jornada não encontrada"})
+    @Description(`Utilize esse metodo para visualizar uma jornada especifica pelo Id`) 
     public async GetByIdAsync(@FromQuery() id: number) :  Promise<ActionResult>
     {        
         let journey = await this._journeyService.GetByIdAsync(id);
@@ -71,6 +76,8 @@ export default class JourneyController extends AbstractController {
 
     @POST("insert")
     @SetDatabaseFromToken()
+    @JourneyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : "Jornada criada", Id : 1})
+    @Description(`Utilize esse metodo para adicionar uma jornada ao banco de dados`) 
     public async InsertAsync(@FromBody() dto: JourneyDTO) :  Promise<ActionResult>
     {
 
@@ -87,18 +94,34 @@ export default class JourneyController extends AbstractController {
 
         for(let d of dto.DaysOfWeek)
         {
-            let time = await this._timeService.GetByIdAsync(d.TimeId);
+            if(d.DayOff)
+            {
+              
+                let day =  new DayOfWeek(d.Day, d.DayName, journey);
 
-            if(!time)
-                return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
+                day.DayOff = true;
+                day.Id = -1;
+    
+                days.Add(day);
 
-            let day =  new DayOfWeek(d.Day, d.DayName, time, journey);
-            
-            day.Id = -1;
 
-            days.Add(day);
+            }
+            else
+            {
+
+                let time = await this._timeService.GetByIdAsync(d.TimeId);
+
+                if(!time)
+                    return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
+    
+                let day =  new DayOfWeek(d.Day, d.DayName,journey,time);
+                
+                day.Id = -1;
+    
+                days.Add(day);
+            }
+          
         }
-
         
         journey.DaysOfWeek = days;
 
@@ -112,6 +135,10 @@ export default class JourneyController extends AbstractController {
 
     @PUT("update")
     @SetDatabaseFromToken()
+    @JourneyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Jornada atualizada'})
+    @JourneyController.ProducesMessage(400, 'Mensagem de erro', {Message : 'Mensagem descrevendo o erro'})  
+    @JourneyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Jornada não encontrada'})
+    @Description(`Utilize esse metodo para atualizar uma jornada do banco de dados`) 
     public async UpdateAsync(@FromBody() dto: JourneyDTO) : Promise<ActionResult>
     {
         if(dto.DaysOfWeek.Count() == 0)
@@ -134,19 +161,32 @@ export default class JourneyController extends AbstractController {
 
         for(let d of dto.DaysOfWeek)
         {
-            let time = await this._timeService.GetByIdAsync(d.TimeId);
+            if(d.DayOff)
+            {
+              
+                let day =  new DayOfWeek(d.Day, d.DayName, exists);
 
-            if(!time)
-                return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
-
-            let day =  new DayOfWeek(d.Day, d.DayName, time, exists);
-            
-            if(!(await this._dayOfWeekService.ExistsAsync(d.Id)))
+                day.DayOff = true;
                 day.Id = -1;
-            else
-                day.Id = d.Id;
+    
+                days.Add(day);
 
-            days.Add(day);
+
+            }
+            else
+            {
+
+                let time = await this._timeService.GetByIdAsync(d.TimeId);
+
+                if(!time)
+                    return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
+    
+                let day =  new DayOfWeek(d.Day, d.DayName,exists,time);
+                
+                day.Id = -1;
+    
+                days.Add(day);
+            }
         }
         
         exists.DaysOfWeek = days;
@@ -160,6 +200,9 @@ export default class JourneyController extends AbstractController {
 
     @DELETE("delete")
     @SetDatabaseFromToken()
+    @JourneyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Jornada deletada'})  
+    @JourneyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Jornada não encontrada'})
+    @Description(`Utilize esse metodo para remover uma jornada do banco de dados`) 
     public async DeleteAsync(@FromQuery() id: number) : Promise<ActionResult>
     {        
 

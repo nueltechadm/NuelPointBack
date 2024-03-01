@@ -1,4 +1,4 @@
-import { POST, PUT, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, RequestJson } from "web_api_base";
+import { POST, PUT, GET, Inject, FromBody, FromQuery, UseBefore, Validate, ActionResult, RequestJson, Description } from "web_api_base";
 import {IsLogged} from '@filters/AuthFilter';
 import AbstractCheckpointService from "@contracts/AbstractCheckpointService";
 import AbstractFileService from "@non-core-contracts/AbstractFileService";
@@ -67,8 +67,9 @@ export default class AppointamentController extends AbstractController
     @POST("insert")    
     @SetDatabaseFromToken()
     @AppointamentController.ReceiveType(AppointmentDTO)
-    @AppointamentController.ProducesType(200, 'The just created Appointment object', AppointmentDTO)
-    @AppointamentController.ProducesMessage(400, 'Error message', {Message : "The user with Id #${userId} not exists"})
+    @AppointamentController.ProducesType(200, 'O Apontamento recém-criado', AppointmentDTO)
+    @AppointamentController.ProducesMessage(400, 'Mensagem de erro', {Message : "O usuário com Id ${userId} não existe"})
+    @Description(`Utilize esse metodo para inserir um apontamento`)
     public async InsertAsync(@FromBody()dto : AppointmentDTO) : Promise<ActionResult> 
     {  
         
@@ -110,7 +111,9 @@ export default class AppointamentController extends AbstractController
     }
 
     @GET("get-appointaments")
+    @AppointamentController.ProducesType(200, 'Lista de todos apontamentos registrados', AppointmentDTO)
     @SetDatabaseFromToken()
+    @Description(`Utilize esse metodo visualizar uma lista apontamentos`)
     public async GetAppointaments(@FromQuery()userId: number, @FromQuery()init : Date, @FromQuery()end : Date) : Promise<ActionResult> 
     {
        let appointaments : Appointment[] = [];      
@@ -150,8 +153,9 @@ export default class AppointamentController extends AbstractController
     @PUT("update")    
     @SetDatabaseFromToken()
     @RequestJson(JSON.stringify(Type.Delete(Type.CreateInstance(Appointment), 'Checkpoints')))
-    @AppointamentController.ProducesMessage(200, 'Success message', {Message : 'Appointament updated'})
-    @AppointamentController.ProducesMessage(400, 'Error message', {Message : 'Appointament with Id #${appointamentId} not exists'})
+    @AppointamentController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Apontamento Atualizado'})
+    @AppointamentController.ProducesMessage(400, 'Mensgem de erro', {Message : 'Apontamento com Id #${appointamentId} não existe'})
+    @Description(`Utilize esse metodo atualizar um apontamento`)
     public async UpdateAsync(@FromBody() appointament: Appointment) : Promise<ActionResult> 
     {
         if(appointament.Id <= 0)
@@ -165,8 +169,9 @@ export default class AppointamentController extends AbstractController
     @PUT("update/checkpoints")    
     @SetDatabaseFromToken()
     @AppointamentController.ReceiveType(Checkpoint, true)
-    @AppointamentController.ProducesMessage(200, 'Success message', {Message : 'Appointament updated'})
-    @AppointamentController.ProducesMessage(400, 'Error message', {Message : 'Appointament with Id #${appointamentId} not exists'})
+    @AppointamentController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Apontamento atualizado'})
+    @AppointamentController.ProducesMessage(400, 'Mensagem de erro', {Message : 'Apontamento com Id #${appointamentId} não existe'})
+    @Description(`Utilize esse metodo para atualizar um ponto de um apontamento`)
     public async UpdateCheckpoinsAsync(@FromBody() checkpoints: Checkpoint[], @FromQuery() appointamentId : number) : Promise<ActionResult> 
     {       
 
@@ -185,8 +190,9 @@ export default class AppointamentController extends AbstractController
     
     @GET("search")    
     @SetDatabaseFromToken()
-    @AppointamentController.ProducesMessage(200, 'Success message', {Message : 'Appointament updated'})
-    @AppointamentController.ProducesMessage(400, 'Error message', {Message : 'The user with Id #${userId} not exists'})    
+    @AppointamentController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Apontamento atualizado'})
+    @AppointamentController.ProducesMessage(400, 'Mensagem de erro', {Message : 'O usuário com Id #${userId} não existe'})  
+    @Description(`Utilize esse metodo para visualizar um apontamento especifico`)  
     public async GetByUserAndDatesAsync(@FromQuery() userId: number, @FromQuery() start : Date, @FromQuery() end : Date) : Promise<ActionResult>
     {
         let user = await this._userService.GetByIdAsync(userId);
@@ -207,8 +213,9 @@ export default class AppointamentController extends AbstractController
 
     @GET("getDay")    
     @SetDatabaseFromToken()
-    @AppointamentController.ProducesMessage(200, 'Success message', {Message : 'Appointament updated'})
-    @AppointamentController.ProducesMessage(400, 'Error message', {Message : 'No one day is started by user with Id #${userId}'})  
+    @AppointamentController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Apontamento atualizado'})
+    @AppointamentController.ProducesMessage(400, 'Mensagem de erro', {Message : 'Nenhum dia é iniciado pelo usuário com Id #${userId}'})
+    @Description(`Utilize esse metodo para visualizar um apontamento de um dia especifico`)   
     public async GetCurrentDayByUserAsync(@FromQuery() userId : number) : Promise<ActionResult>
     {
 

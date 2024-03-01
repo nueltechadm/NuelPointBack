@@ -21,12 +21,12 @@ export default class DayOfWeek {
     public Journey : Journey;
     
     @Column()   
-    public Time: Time; 
+    public Time?: Time; 
 
     @Column()
     public DayOff: boolean;
 
-    constructor(day: Days, name : string, time: Time, journey : Journey) {
+    constructor(day: Days, name : string, journey : Journey, time?: Time) {
         this.Id = -1;
         this.DayOff = false;
         this.DayName = name,

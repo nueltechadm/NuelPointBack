@@ -31,7 +31,7 @@ export default class JobRoleService  extends AbstractJobRoleService
 
     public async ExistsAsync(id: number): Promise<boolean> {
         
-        return (await this._context.Collection(JobRole).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
+        return (await this._context.Collection(JobRole).Where({Field:"Id" , Value : id}).CountAsync()) > 0;
     }
 
     public async CountAsync(): Promise<number> {

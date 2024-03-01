@@ -56,7 +56,7 @@ export default class UserController extends AbstractController
 
     @POST("Filter")
     @SetDatabaseFromToken()
-    @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
+    @ProducesResponse({ Status : 200, Description : "Lista de todos os usuários recuperados pelo filtro", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
     @Description(`Utilize esse metodo para realizar consulta de ${User.name}`)   
     public async UnPaginatedFilterAsync(@FromBody()params : UserUnPaginatedFilterRequest) : Promise<ActionResult>
     {       
@@ -69,7 +69,7 @@ export default class UserController extends AbstractController
 
     @POST("list")
     @SetDatabaseFromToken()
-    @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
+    @ProducesResponse({ Status : 200, Description : "Lista de todos os usuários deste banco de dados", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
     @Description(`Utilize esse metodo para realizar consulta de ${User.name}`)   
     public async PaginatedFilterAsync(@FromBody()params : UserPaginatedFilterRequest) : Promise<ActionResult>
     {       
@@ -84,8 +84,8 @@ export default class UserController extends AbstractController
     
     @GET("getById")   
     @SetDatabaseFromToken() 
-    @UserController.ProducesType(200,  "A completed loaded user", User)
-    @UserController.ProducesMessage(400, "Invalid userId", {Message : "Invalid userId"}) 
+    @UserController.ProducesType(200,  "O usuário com o Id fornecido", User)
+    @UserController.ProducesMessage(400, " userId Inválido", {Message : "userId Inválido"}) 
     @Description(`Utilize esse metodo para obter um ${User.name} por id e carregar as demais relações`)   
     public async GetByIdAsync(@FromQuery()id : number) : Promise<ActionResult>
     { 
@@ -100,7 +100,7 @@ export default class UserController extends AbstractController
     
     @POST("perfils")
     @SetDatabaseFromToken()
-    @ProducesResponse({ Status : 200, Description : "List of all user of this database", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
+    @ProducesResponse({ Status : 200, Description : "Lista de todos os perfis disponiveis deste banco de dados", JSON : JSON.stringify([Type.CreateInstance(User)], null, 2)}) 
     @Description(`Utilize esse metodo obter todos os tipos de perfis disponiveis`)   
     public async GetPerfils() : Promise<ActionResult>
     {       
@@ -111,7 +111,7 @@ export default class UserController extends AbstractController
     
     @POST("insert")
     @SetDatabaseFromToken()
-    @UserController.ProducesType(200, 'The just created user', User) 
+    @UserController.ProducesType(200, 'O usuário recém-criado', User) 
     @RequestJson(JSON.stringify(Type.CreateTemplateFrom(User, false, ["Access"], []), null, 2)) 
     @Description(`Utilize esse metodo para criad um novo ${User.name}`)   
     public async InsertAsync(@FromBody()user : User) : Promise<ActionResult>
@@ -125,7 +125,9 @@ export default class UserController extends AbstractController
 
 
     @PUT("contact")  
-    @SetDatabaseFromToken()   
+    @SetDatabaseFromToken() 
+    @UserController.ProducesMessage(200, "Mensagem de sucesso", {Message : "Contato do usuário atualizado"})  
+    @UserController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Usuário não encontrada'}) 
     @Description(`Utilize esse metodo para adicionar ou editar um ${Contact.name} de um ${User.name}`)       
     public async UpdateContact(@FromQuery()userId : number, @FromBody()contact : Contact) : Promise<ActionResult>
     {        
@@ -144,7 +146,9 @@ export default class UserController extends AbstractController
     }
 
     @PUT("delete/contact")  
-    @SetDatabaseFromToken()    
+    @SetDatabaseFromToken()
+    @UserController.ProducesMessage(200, "Mensagem de sucesso", {Message : "Contato do usuário atualizado"})  
+    @UserController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Usuário não encontrada'}) 
     @Description(`Utilize esse metodo para remover um ${Contact.name} de um ${User.name}`)   
     public async DeleteContact(@FromQuery()userId : number, @FromQuery()contactId : number) : Promise<ActionResult>
     {        
@@ -165,7 +169,9 @@ export default class UserController extends AbstractController
     
     
     @PUT("access")  
-    @SetDatabaseFromToken()       
+    @SetDatabaseFromToken()
+    @UserController.ProducesMessage(200, "Mensagem de sucesso", {Message : "Acesso do usuário atualizado"})
+    @UserController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Usuário não encontrada'})        
     @Description(`Utilize esse metodo para atualizar o ${Access.name} de um ${User.name}`)   
     public async UpdateAccess(@FromQuery()userId : number, @FromBody()access : Access) : Promise<ActionResult>
     {        
@@ -190,6 +196,8 @@ export default class UserController extends AbstractController
     
     @PUT("journey")  
     @SetDatabaseFromToken() 
+    @UserController.ProducesMessage(200, "Mensagem de sucesso", {Message : "Jornada do usuário atualizado"})
+    @UserController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Usuário não encontrada'})  
     @Description(`Utilize esse metodo para atualizar a ${Journey.name} de um ${User.name}`) 
     public async UpdateJouney(@FromQuery()userId : number, @FromQuery()journeyId : number) : Promise<ActionResult>
     {        
@@ -215,7 +223,9 @@ export default class UserController extends AbstractController
 
     
     @PUT("company")  
-    @SetDatabaseFromToken()   
+    @SetDatabaseFromToken()  
+    @UserController.ProducesMessage(200, "Mensagem de sucesso", {Message : "Empresa do usuário atualizado"})
+    @UserController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Usuário não encontrada'})   
     @Description(`Utilize esse metodo para atualizar a ${Company.name} de um ${User.name}`)     
     public async UpdateCompany(@FromQuery()userId : number, @FromQuery()companyId : number) : Promise<ActionResult>
     {        
@@ -240,7 +250,9 @@ export default class UserController extends AbstractController
 
 
     @PUT("jobRole")  
-    @SetDatabaseFromToken()      
+    @SetDatabaseFromToken() 
+    @UserController.ProducesMessage(200, "Mensagem de sucesso", {Message : "Função do usuário atualizado"})
+    @UserController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Usuário não encontrada'})       
     @Description(`Utilize esse metodo para atualizar a ${JobRole.name} de um ${User.name}`)  
     public async UpdatejobRole(@FromQuery()userId : number, @FromQuery()jobRoleId : number) : Promise<ActionResult>
     {        
@@ -266,9 +278,9 @@ export default class UserController extends AbstractController
     
     @PUT("update")  
     @SetDatabaseFromToken() 
-    @UserController.ProducesType(200, "The just updated user", User)   
-    @UserController.ProducesMessage(400, "A message telling what is missing", {Message : "The ID must be greater than 0"})
-    @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "User not found"})  
+    @UserController.ProducesType(200, "O usuário recém-atualizado", User)   
+    @UserController.ProducesMessage(400, "Uma mensagem dizendo o que esta faltando", {Message : "O Id precisa ser maior que 0"})
+    @UserController.ProducesMessage(404, "Mensagem de erro", {Message : "Usuário não encontrado"})  
     @Description(`Utilize esse metodo para atualizar apenas dados do ${User.name}. Nenhuma das relações será atualizada`)
     public async UpdateAsync(@FromBody()user : User) : Promise<ActionResult>
     {        
@@ -289,9 +301,9 @@ export default class UserController extends AbstractController
 
     @DELETE("delete")   
     @SetDatabaseFromToken() 
-    @UserController.ProducesType(200, "The just deleted user", User)   
-    @UserController.ProducesMessage(400, "A message telling what is missing", {Message : "The ID must be greater than 0"})
-    @UserController.ProducesMessage(404, "A message telling what is missing", {Message : "User not found"}) 
+    @UserController.ProducesType(200, "O Usuário recém-deletado", User)   
+    @UserController.ProducesMessage(400, "Mensagem de erro", {Message : "O Id preisa ser maior que 0"})
+    @UserController.ProducesMessage(404, "Mensagem de erro", {Message : "Usuário não encontrado"}) 
     public async DeleteAsync(@FromQuery()id : number) : Promise<ActionResult>
     {  
         if(!id)

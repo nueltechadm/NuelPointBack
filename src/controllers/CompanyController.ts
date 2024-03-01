@@ -9,6 +9,7 @@ import Contact from "@entities/Contact";
 import AbstractDepartamentService from "@contracts/AbstractDepartamentService";
 import Address from "@entities/Address";
 import AbstractUserService from "@contracts/AbstractUserService";
+import User from "@src/core/entities/User";
 
 
 
@@ -42,6 +43,8 @@ export default class CompanyController extends AbstractController {
 
     @GET("all")     
     @SetDatabaseFromToken()
+    @CompanyController.ProducesType(200, 'Lista de todas as empresas recuperadas registradas no banco de dados' , CompanyPaginatedFilterResponse)  
+    @Description(`Utilize esse metodo para visualizar uma lista de todas empresas registradas no banco de dados`) 
     public async GetAllAsync(): Promise<ActionResult> 
     {             
         return this.OK((await this._companyService.GetAllAsync()));
@@ -51,7 +54,8 @@ export default class CompanyController extends AbstractController {
     @POST("filter")    
     @SetDatabaseFromToken()
     @CompanyController.ReceiveType(CompanyPaginatedFilterRequest)
-    @CompanyController.ProducesType(200, 'List of all comapanies retrived by filters' , CompanyPaginatedFilterResponse)    
+    @CompanyController.ProducesType(200, 'Lista de todas as empresas recuperadas pelos filtros' , CompanyPaginatedFilterResponse)
+    @Description(`Utilize esse metodo para visualizar uma lista de todas empresas recuperadas pelo filtro`)     
     public async PaginatedFilterAsync(@FromBody()params : CompanyPaginatedFilterRequest) : Promise<ActionResult>
     {  
         return this.OK(await this._companyService.PaginatedFilterAsync(params));
@@ -60,8 +64,9 @@ export default class CompanyController extends AbstractController {
 
     @GET("getById")    
     @SetDatabaseFromToken()
-    @CompanyController.ProducesType(200, 'The company with provided id' , Company)   
-    @CompanyController.ProducesMessage(404, 'Error message', {Message : "Company not found"})
+    @CompanyController.ProducesType(200, 'A empresa com o Id fornecido' , Company)   
+    @CompanyController.ProducesMessage(404, 'Mensagem de erro', {Message : "Empresa não encontrada"})
+    @Description(`Utilize esse metodo para visualizar uma empresa especifica pelo Id`) 
     public async GetByIdAsync(@FromQuery() id: number) : Promise<ActionResult>
     {
         let company = await this._companyService.GetByIdAsync(id);
@@ -76,8 +81,9 @@ export default class CompanyController extends AbstractController {
     @POST("insert")    
     @SetDatabaseFromToken()
     @RequestJson(CompanyController.CreateTemplateToInsertAndUpdate())
-    @CompanyController.ProducesMessage(200, 'Success message', {Message : "Company created", Id : 1})
-    @CompanyController.ProducesMessage(400, 'Error message', {Message : 'Message describing the error'})    
+    @CompanyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : "Empresa criada", Id : 1})
+    @CompanyController.ProducesMessage(400, 'Mensagem de erro', {Message : 'Mensagem descrevendo o erro'}) 
+    @Description(`Utilize esse metodo para inserir uma empresa ao banco de dados`)    
     public async InsertAsync(@FromBody() company: Company) : Promise<ActionResult>
     { 
         let exists = await this._companyService.GetByNameAsync(company.Name);
@@ -94,9 +100,10 @@ export default class CompanyController extends AbstractController {
     @PUT("update")    
     @SetDatabaseFromToken()
     @RequestJson(CompanyController.CreateTemplateToInsertAndUpdate())
-    @CompanyController.ProducesMessage(200, 'Success message', {Message : 'Company updated'})
-    @CompanyController.ProducesMessage(400, 'Error message', {Message : 'Message describing the error'})  
-    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})
+    @CompanyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Empresa atualizada'})
+    @CompanyController.ProducesMessage(400, 'Mensagem de erro', {Message : 'Mensagem descrevendo o erro'})  
+    @CompanyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Empresa não encontrada'})
+    @Description(`Utilize esse metodo para atualizar uma empresa do banco de dados`) 
     public async UpdateAsync(@FromBody() company: Company) : Promise<ActionResult> 
     {        
         if(!company.Id)
@@ -121,6 +128,8 @@ export default class CompanyController extends AbstractController {
     
     @PUT("contact")  
     @SetDatabaseFromToken()   
+    @CompanyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Contatos da empresa atualizados'})
+    @CompanyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Empresa não encontrada'})
     @Description(`Utilize esse metodo para adicionar ou editar um ${Contact.name} de um ${Company.name}`)       
     public async UpdateContact(@FromQuery()companyId : number, @FromBody()contact : Contact) : Promise<ActionResult>
     {        
@@ -139,7 +148,9 @@ export default class CompanyController extends AbstractController {
     }
 
     @PUT("delete/contact")  
-    @SetDatabaseFromToken()    
+    @SetDatabaseFromToken()  
+    @CompanyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Contato da empresa deletado'})  
+    @CompanyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Empresa não encontrada'})  
     @Description(`Utilize esse metodo para remover um ${Contact.name} de um ${Company.name}`)   
     public async DeleteContact(@FromQuery()companyId : number, @FromQuery()contactId : number) : Promise<ActionResult>
     {        
@@ -161,8 +172,9 @@ export default class CompanyController extends AbstractController {
 
     @PUT("activate")    
     @SetDatabaseFromToken()    
-    @CompanyController.ProducesMessage(200, 'Success message', {Message : 'Company activated'})     
-    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})  
+    @CompanyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Empresa ativada'})     
+    @CompanyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Empresa não encontrada'}) 
+    @Description(`Utilize esse metodo para atualizar o estado atual da empresa para ativado`)  
     public async ActiveAsync(@FromQuery() id: number) : Promise<ActionResult>
     {      
         let active = (await this._companyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
@@ -181,8 +193,9 @@ export default class CompanyController extends AbstractController {
     
     @PUT("desactivate")    
     @SetDatabaseFromToken()    
-    @CompanyController.ProducesMessage(200, 'Success message', {Message : 'Company desactivated'})     
-    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})  
+    @CompanyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Empresa desativada'})     
+    @CompanyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Empresa não encontrada'}) 
+    @Description(`Utilize esse metodo para atualizar o estado atual da empresa para desativado`)  
     public async DesactiveAsync(@FromQuery() id: number) : Promise<ActionResult>
     {      
         let desactive = (await this._companyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
@@ -201,6 +214,9 @@ export default class CompanyController extends AbstractController {
     
     @PUT("add/user")       
     @SetDatabaseFromToken()
+    @CompanyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Empresa atualizada'}) 
+    @CompanyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Empresa não encontrada'})  
+    @Description(`Utilize esse metodo para adicionar um ${User.name} em uma ${Company.name}`)  
     public async AddUserAsync(@FromQuery()companyId : number, @FromQuery()userId : number) : Promise<ActionResult>
     {  
         let company = (await this._companyService.GetByAndLoadAsync("Id", companyId, ["Users"])).FirstOrDefault();
@@ -227,8 +243,9 @@ export default class CompanyController extends AbstractController {
 
     @DELETE("delete")    
     @SetDatabaseFromToken()    
-    @CompanyController.ProducesMessage(200, 'Success message', {Message : 'Company deleted'})     
-    @CompanyController.ProducesMessage(404, 'Error message', {Message : 'Company not found'})  
+    @CompanyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Empresa deletada'})     
+    @CompanyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Empresa não encontrada'})
+    @Description(`Utilize esse metodo para remover uma ${Company.name}`)    
     public async DeleteAsync(@FromQuery() id: number) : Promise<ActionResult>
     {      
         let del = (await this._companyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();

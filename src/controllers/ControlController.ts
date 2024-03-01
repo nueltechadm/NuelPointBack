@@ -1,4 +1,4 @@
-import { Inject, GET, ControllerBase, FromQuery, UseBefore, ActionResult, Validate } from "web_api_base";
+import { Inject, GET, ControllerBase, FromQuery, UseBefore, ActionResult, Validate, Description } from "web_api_base";
 import { DababaseStatus } from "@entities/Database";
 import AbstractDatabaseService from "@non-core-contracts/AbstractDatabaseService";
 import   DatabasesAuthFilter from "@filters/DatabasesAuthFilter";
@@ -18,6 +18,7 @@ export default class ControlController extends ControllerBase {
     
 
     @GET("init")
+    @Description(`Utilize esse metodo para criar a base de dados`)
     public async CreateDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
     {
         let exist = await this._service.CheckIfDatabaseExists(name);
@@ -54,6 +55,7 @@ export default class ControlController extends ControllerBase {
 
 
     @GET("check")
+    @Description(`Utilize esse metodo para o estado da base de dados`)
     public async CheckDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
     {
 
@@ -70,6 +72,7 @@ export default class ControlController extends ControllerBase {
     }
 
     @GET("force-update")
+    @Description(`Utilize esse metodo para forçar a atualização da base de dados`)
     public async ForceUpdateDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
     {
         let db = await this._service.GetDabaseAsync(name);
@@ -92,6 +95,7 @@ export default class ControlController extends ControllerBase {
 
 
     @GET("update")
+    @Description(`Utilize esse metodo para atualizar a base de dados`)
     public async UpdateDatabaseAsync(@FromQuery() name: string) : Promise<ActionResult>
     {
         let db = await this._service.GetDabaseAsync(name);

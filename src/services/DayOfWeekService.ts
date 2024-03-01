@@ -51,7 +51,7 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
 
     public async AddAsync(obj: DayOfWeek): Promise<DayOfWeek> {
 
-        this.ValidateObject(obj);      
+        this.ValidateObject(obj); 
 
         return this._context.Collection(DayOfWeek).AddObjectAndRelationsAsync(obj, []);
     }
@@ -128,6 +128,9 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
 
         if(obj.Day < Days.ALL || obj.Day > Days.SATURDAY)
             throw new InvalidEntityException(`Do not exists the day ${obj.Day}`);
+
+        if(obj.Time !== undefined && obj.DayOff && obj.Time.Id > 0)
+            throw new InvalidEntityException("time in days off are not alowed");
        
     }
 }
