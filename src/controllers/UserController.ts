@@ -116,6 +116,8 @@ export default class UserController extends AbstractController
     @Description(`Utilize esse metodo para criad um novo ${User.name}`)   
     public async InsertAsync(@FromBody()user : User) : Promise<ActionResult>
     {         
+        user.Directory = this.Request.APIAUTH.Link;
+        
         await this._userService.AddAsync(user);
 
         return this.OK({Message : 'User created', Id : user.Id});

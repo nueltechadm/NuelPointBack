@@ -42,6 +42,11 @@ export default class Database {
         this.Status = DababaseStatus.CREATING;
         this.Observation = ""
     }
+
+    public IsValid() : boolean
+    {
+        return this.Status == DababaseStatus.CREATED || this.Status == DababaseStatus.UPDATED;
+    }
 }
 
 export enum DababaseStatus {

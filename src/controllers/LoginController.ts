@@ -34,22 +34,22 @@ export default class LoginController extends AbstractController
         let db = await this._databaseService.GetDabaseAsync(user.Link);
 
         if(!db)
-            return this.NotFound();
+            return this.BadRequest("Company not found");
     
-        if(db.Status != DababaseStatus.CREATED)
-            return this.Unauthorized({ Message : "Access denied", Database : db});
+        if(!db.IsValid())
+            return this.BadRequest({ Message : "Database unavailable"});
 
         await this._userService.SetClientDatabaseAsync(new Authorization(user.Username, user.Link, -1).GetClientDatabase());        
            
         let access =  await this._userService.GetByUserNameAndPasswordAsync(user.Username, user.Password);
 
         if(!access)
-           return this.Unauthorized({ Message : "Invalid username or password"});
+           return this.BadRequest({ Message : "Invalid username or password"});
 
         delete (access as any).Password;        
 
         if(!access.User)        
-            return this.Unauthorized({ Message : "Invalid access, no one user is referenced"});  
+            return this.BadRequest({ Message : "Invalid access, no one user is referenced"});  
 
         let token = Generate(new Authorization(access.Username, user.Link, access.User.Id), 1);
 

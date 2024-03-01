@@ -42,13 +42,16 @@ export default class Checkpoint
 
     @Column()
     @ManyToOne(() => Company)
-    public Company : Company;
+    public Company? : Company;
 
     @Column()
     @ManyToOne(() => Time)
     public Time? : Time;
+
+    @Column()
+    public Link : string;
     
-    constructor(user : User, x : number, y : number, company : Company, appointament : Appointment, time? : Time)
+    constructor(user : User, x : number, y : number,  appointament : Appointment, company? : Company, time? : Time)
     {
         this.Id = -1;
         this.Date = new Date();
@@ -61,6 +64,7 @@ export default class Checkpoint
         this.Time = time;
         this.Observation = "";
         this.CheckpointType = CheckpointType.NORMAL;
+        this.Link = "";
     }
 }
 

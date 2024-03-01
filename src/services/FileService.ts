@@ -171,9 +171,7 @@ export default class FileService extends AbstractFileService
 
     public async GetStorageDirectoryAsync(): Promise<string> 
     {
-       let dir = Application.Configurations.DEBUG ? 
-       Path.join(Application.Configurations.RootPath, "dist", "storage") :
-       Path.join(Application.Configurations.RootPath, "storage");
+       let dir = Path.join(Application.Configurations.RootPath, "storage");
 
        if(!await this.DirectoryExistsAsync(dir))
             await this.CreateDirectoryAsync(dir);
@@ -187,15 +185,10 @@ export default class FileService extends AbstractFileService
        
         if(!checkpoint.User)
             throw new Exception("User is required to compute the checkpoint directory");
-
-        if(!checkpoint.User.Company)
-            throw new Exception("User's company is required to compute the checkpoint directory");
-
-        let company = checkpoint.User.Company?.Id;
-        let user = checkpoint.User.Id;
+        
         let date = checkpoint.Date;
         let dateStr = `_${date.getFullYear()}_${date.getMonth()}_${date.getDate()}`;
-        let path = Path.join(await this.GetStorageDirectoryAsync(), `_${company}`, `_${user}`, dateStr);
+        let path = Path.join(await this.GetStorageDirectoryAsync(), `_${checkpoint.Link.toLowerCase()}`, `_${checkpoint.User.Directory}_`, dateStr);
 
         await this.CreateDirectoryAsync(path);
 

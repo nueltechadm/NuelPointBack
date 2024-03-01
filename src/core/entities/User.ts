@@ -21,6 +21,9 @@ export default class User
     public Name : string;
 
     @Column()
+    public Directory : string;
+
+    @Column()
     public Document? : string;
 
     @Column()
@@ -73,7 +76,8 @@ export default class User
         this.Journey = undefined;
         this.Access = access;
         this.Contacts = [];
-        this.Address = undefined;        
+        this.Address = undefined;    
+        this.Directory = "";    
     }
 
     public IsSuperUser() : boolean

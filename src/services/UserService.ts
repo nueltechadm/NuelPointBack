@@ -112,10 +112,15 @@ export default class UserService  extends AbstractUserService
             throw new InvalidEntityException(`The ${Company.name} of the ${User.name} is required`);
 
         if(!obj.JobRole && obj.IsSuperUser())
-            throw new InvalidEntityException(`The ${JobRole.name} of the ${User.name} is required`); 
-        
+            throw new InvalidEntityException(`The ${JobRole.name} of the ${User.name} is required`);         
 
-        return await this._context.Collection(User).AddAsync(obj)!;        
+        await this._context.Collection(User).AddAsync(obj)!;     
+        
+        obj.Directory = MD5(obj.Directory + obj.Id);
+
+        let result = await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, [])!;   
+        
+        return obj;
     }
 
     public async UpdateAsync(obj: User): Promise<User> 
