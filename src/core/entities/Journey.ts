@@ -1,7 +1,8 @@
-import {Table, Column, DataType, PrimaryKey, DBTypes, OneToMany, ManyToMany, ManyToOne} from 'myorm_pg'; 
+import { Table, Column, DataType, PrimaryKey, DBTypes, OneToMany, ManyToMany, ManyToOne } from 'myorm_pg';
 import Company from './Company';
 import DayOfWeek from './DayOfWeek';
 import Time from './Time';
+import User from './User';
 
 
 @Table("journey_tb")
@@ -10,25 +11,30 @@ export default class Journey
     @Column()
     @PrimaryKey()
     @DataType(DBTypes.SERIAL)
-    public Id : number;   
+    public Id: number;
 
     @Column()
-    public Description : string;   
+    public Description: string;
 
     @Column()
     @ManyToOne(() => Company)
-    public Company : Company;
+    public Company: Company;
 
-   @Column()
-   @OneToMany(() => DayOfWeek)
-   public DaysOfWeek : DayOfWeek[];
+    @Column()
+    @OneToMany(() => DayOfWeek)
+    public DaysOfWeek: DayOfWeek[];
 
-    constructor(description : string, company : Company)
+    @Column()
+    @OneToMany(() => User)
+    public Users: User[];
+
+    constructor(description: string, company: Company)
     {
-        this.Id = -1;      
-        this.Description = description;       
+        this.Id = -1;
+        this.Description = description;
         this.Company = company;
         this.DaysOfWeek = [];
+        this.Users = [];
     }
 }
 

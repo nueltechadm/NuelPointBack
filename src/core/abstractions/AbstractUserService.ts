@@ -10,6 +10,7 @@ import Company from "../entities/Company";
 export default abstract class AbstractUserService extends AbstractService<User, UserPaginatedFilterRequest, PaginatedFilterResult<User>>
 {
     abstract GetByIdAsync(id : number) : Promise<User | undefined>;
+    abstract GetByIdsAsync(ids : number[]) : Promise<User[]>;
     abstract GetByNameAsync(name : string) : Promise<User[]>;
     abstract GetByUserNameAndPasswordAsync(username : string, password : string) : Promise<Access | undefined>;
     abstract UnPaginatedFilterAsync(request : UserUnPaginatedFilterRequest) : Promise<UserUnPaginatedFilterResult<User>>;

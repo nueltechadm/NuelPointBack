@@ -1,5 +1,5 @@
 import {Application, ControllerBase, IHTTPRequestContext} from 'web_api_base';
-import {Decode, DecodeResult} from '@utils/JWT';
+import {DecodeToken, DecodeResult} from '@utils/JWT';
 import Authorization from '@utils/Authorization';
 
 export async function IsLogged(context : IHTTPRequestContext) : Promise<void>
@@ -13,7 +13,7 @@ export async function IsLogged(context : IHTTPRequestContext) : Promise<void>
     
     let token = context.Request.headers["token"];   
 
-    let decodeResult = Decode(token);    
+    let decodeResult = DecodeToken(token);    
 
     if(decodeResult.Result == DecodeResult.INVALID || decodeResult.Token == undefined)
     {

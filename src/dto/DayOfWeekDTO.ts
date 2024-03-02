@@ -8,7 +8,7 @@ export default class DayOfWeekDTO {
     public TimeId: number = -1;
     public DayOff: boolean = false;
 
-    public static Cast(dayOfWeek : DayOfWeek) : DayOfWeekDTO
+    public static CastToDTO(dayOfWeek : DayOfWeek) : DayOfWeekDTO
     {
         let dto = new DayOfWeekDTO();
 
@@ -22,6 +22,6 @@ export default class DayOfWeekDTO {
         dto.Id = dayOfWeek.Id;
         dto.DayName = dayOfWeek.DayName;
         
-        return new DayOfWeekDTO();
+        return dto;
     }
 }

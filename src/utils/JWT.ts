@@ -4,7 +4,7 @@ import Authorization from './Authorization';
 const private_key = "adrianoonairda";
 
 
-export function Generate(authorization : Authorization, duration : number) : string
+export function GenerateToken(authorization : Authorization, duration : number) : string
 {
     if(duration <= 0 || duration >= 24)
         duration = 24;
@@ -16,7 +16,7 @@ export function Generate(authorization : Authorization, duration : number) : str
 
 
 
-export function Decode(token : string) : { Token : any, Result : DecodeResult }
+export function DecodeToken(token : string) : { Token : any, Result : DecodeResult }
 {
     let decoded : any;
 

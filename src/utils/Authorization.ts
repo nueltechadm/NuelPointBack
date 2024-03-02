@@ -1,5 +1,5 @@
 import TokenDecodeException from '../exceptions/TokenDecodeException';
-import { Generate } from './JWT';
+import { GenerateToken } from './JWT';
 
 export default class Authorization {
 
@@ -19,7 +19,7 @@ export default class Authorization {
     }
 
     public static GenerateToken(auth: Authorization, duration: number): string {
-        return Generate(auth, duration);
+        return GenerateToken(auth, duration);
     }
 
     public static Parse(payload: any): Authorization {

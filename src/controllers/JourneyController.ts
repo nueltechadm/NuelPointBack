@@ -13,16 +13,21 @@ import AbstractDayOfWeekService from "@src/core/abstractions/AbstractDayOfWeekSe
 import DayOfWeek from "@src/core/entities/DayOfWeek";
 import AbstractTimeService from "@src/core/abstractions/AbstractTimeService";
 import Time from "@src/core/entities/Time";
+import AbstractUserService from "@src/core/abstractions/AbstractUserService";
 
 
 @UseBefore(IsLogged)
 @Validate()
-export default class JourneyController extends AbstractController {
+export default class JourneyController extends AbstractController
+{
     @Inject()
     private _journeyService: AbstractJourneyService;
 
     @Inject()
     private _dayOfWeekService: AbstractDayOfWeekService;
+
+    @Inject()
+    private _userService: AbstractUserService;
 
     @Inject()
     private _companyService: AbstractCompanyService;
@@ -31,26 +36,28 @@ export default class JourneyController extends AbstractController {
     private _timeService: AbstractTimeService;
 
     constructor(
-        journeyService: AbstractJourneyService, 
+        journeyService: AbstractJourneyService,
         timeService: AbstractTimeService,
-        companyService: AbstractCompanyService, 
-        dayOfWeekService: AbstractDayOfWeekService
-        ) 
+        companyService: AbstractCompanyService,
+        dayOfWeekService: AbstractDayOfWeekService, 
+        userService : AbstractUserService
+    ) 
     {
         super();
         this._journeyService = journeyService;
-        this._timeService = timeService,
+        this._timeService = timeService;
         this._companyService = companyService;
         this._dayOfWeekService = dayOfWeekService;
+        this._userService = userService;
     }
 
 
-    @POST("list")     
+    @POST("list")
     @SetDatabaseFromToken()
-    @JourneyController.ProducesType(200 , "Uma lista de jornadas",Journey)
-    @Description(`Utilize esse metodo para visualizar uma lista de jornadas recuperados pelo filtro`) 
-    public async PaginatedFilterAsync(@FromBody()params : JourneyPaginatedFilterRequest): Promise<ActionResult> 
-    {             
+    @JourneyController.ProducesType(200, "Uma lista de jornadas", Journey)
+    @Description(`Utilize esse metodo para visualizar uma lista de jornadas recuperados pelo filtro`)
+    public async PaginatedFilterAsync(@FromBody() params: JourneyPaginatedFilterRequest): Promise<ActionResult> 
+    {
         return this.OK(await this._journeyService.PaginatedFilterAsync(params));
     }
 
@@ -58,17 +65,17 @@ export default class JourneyController extends AbstractController {
 
     @GET("getById")
     @SetDatabaseFromToken()
-    @JourneyController.ProducesType(200 , "A jornada com o Id fornecido",Journey)
-    @JourneyController.ProducesMessage(404, 'Mensagem de erro', {Message : "Jornada não encontrada"})
-    @Description(`Utilize esse metodo para visualizar uma jornada especifica pelo Id`) 
-    public async GetByIdAsync(@FromQuery() id: number) :  Promise<ActionResult>
-    {        
+    @JourneyController.ProducesType(200, "A jornada com o Id fornecido", Journey)
+    @JourneyController.ProducesMessage(404, 'Mensagem de erro', { Message: "Jornada não encontrada" })
+    @Description(`Utilize esse metodo para visualizar uma jornada especifica pelo Id`)
+    public async GetByIdAsync(@FromQuery() id: number): Promise<ActionResult>
+    {
         let journey = await this._journeyService.GetByIdAsync(id);
 
         if (!journey)
-            return this.NotFound({ Message: `${Journey.name} not found`});        
+            return this.NotFound({ Message: `${Journey.name} not found` });
 
-        return this.OK(JourneyDTO.Cast(journey));
+        return this.OK(journey);
     }
 
 
@@ -76,32 +83,32 @@ export default class JourneyController extends AbstractController {
 
     @POST("insert")
     @SetDatabaseFromToken()
-    @JourneyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : "Jornada criada", Id : 1})
-    @Description(`Utilize esse metodo para adicionar uma jornada ao banco de dados`) 
-    public async InsertAsync(@FromBody() dto: JourneyDTO) :  Promise<ActionResult>
+    @JourneyController.ProducesMessage(200, 'Mensagem de sucesso', { Message: "Jornada criada", Id: 1 })
+    @Description(`Utilize esse metodo para adicionar uma jornada ao banco de dados`)
+    public async InsertAsync(@FromBody() dto: JourneyDTO): Promise<ActionResult>
     {
 
-        if(dto.DaysOfWeek.Count() == 0)
+        if (dto.DaysOfWeek.Count() == 0)
             return this.BadRequest(`DaysOfWeek is required`);
 
         let company = (await this._companyService.GetByAndLoadAsync("Id", dto.CompanyId, [])).FirstOrDefault();
 
-        if(!company)
-            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);    
-            
-        let days : DayOfWeek[] = [];
+        if (!company)
+            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);
+       
+        let days: DayOfWeek[] = [];
         let journey = new Journey(dto.Description, company);
 
-        for(let d of dto.DaysOfWeek)
+        for (let d of dto.DaysOfWeek)
         {
-            if(d.DayOff)
+            if (d.DayOff)
             {
-              
-                let day =  new DayOfWeek(d.Day, d.DayName, journey);
+
+                let day = new DayOfWeek(d.Day, d.DayName, journey);
 
                 day.DayOff = true;
                 day.Id = -1;
-    
+
                 days.Add(day);
 
 
@@ -111,23 +118,28 @@ export default class JourneyController extends AbstractController {
 
                 let time = await this._timeService.GetByIdAsync(d.TimeId);
 
-                if(!time)
-                    return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
-    
-                let day =  new DayOfWeek(d.Day, d.DayName,journey,time);
-                
+                if (!time)
+                    return this.BadRequest({ Message: `${Time.name} with Id ${d.TimeId} not exists` });
+
+                let day = new DayOfWeek(d.Day, d.DayName, journey, time);
+
                 day.Id = -1;
-    
+
                 days.Add(day);
             }
-          
+
         }
-        
+
         journey.DaysOfWeek = days;
 
-        let result = await this._journeyService.AddAsync(journey);
+        if(dto.UsersIds && dto.UsersIds.Any())
+        {
+            journey.Users = await this._userService.GetByIdsAsync(dto.UsersIds);
+        }
 
-        return this.OK({Message : `${Journey.name} created`, Id : result.Id});
+        await this._journeyService.AddAsync(journey);        
+
+        return this.OK({ Message: `Jornada criada com sucesso`, Id: journey.Id });
     }
 
 
@@ -135,40 +147,40 @@ export default class JourneyController extends AbstractController {
 
     @PUT("update")
     @SetDatabaseFromToken()
-    @JourneyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Jornada atualizada'})
-    @JourneyController.ProducesMessage(400, 'Mensagem de erro', {Message : 'Mensagem descrevendo o erro'})  
-    @JourneyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Jornada não encontrada'})
-    @Description(`Utilize esse metodo para atualizar uma jornada do banco de dados`) 
-    public async UpdateAsync(@FromBody() dto: JourneyDTO) : Promise<ActionResult>
+    @JourneyController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Jornada atualizada' })
+    @JourneyController.ProducesMessage(400, 'Mensagem de erro', { Message: 'Mensagem descrevendo o erro' })
+    @JourneyController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Jornada não encontrada' })
+    @Description(`Utilize esse metodo para atualizar uma jornada do banco de dados`)
+    public async UpdateAsync(@FromBody() dto: JourneyDTO): Promise<ActionResult>
     {
-        if(dto.DaysOfWeek.Count() == 0)
+        if (dto.DaysOfWeek.Count() == 0)
             return this.BadRequest(`DaysOfWeek is required`);
 
-        let exists = (await this._journeyService.GetByAndLoadAsync("Id",dto.Id, ["Company", "DaysOfWeek"])).FirstOrDefault();
+        let exists = (await this._journeyService.GetByAndLoadAsync("Id", dto.Id, ["Company", "DaysOfWeek"])).FirstOrDefault();
 
-        if(!exists)
+        if (!exists)
             return this.BadRequest(`${Journey.name} with Id ${dto.Id} not exists`);
 
         let company = (await this._companyService.GetByAndLoadAsync("Id", dto.CompanyId, [])).FirstOrDefault();
 
-        if(!company)
-            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);    
-            
-        let days : DayOfWeek[] = [];        
+        if (!company)
+            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);
+
+        let days: DayOfWeek[] = [];
 
         exists.Description = dto.Description;
         exists.Company = company;
 
-        for(let d of dto.DaysOfWeek)
+        for (let d of dto.DaysOfWeek)
         {
-            if(d.DayOff)
+            if (d.DayOff)
             {
-              
-                let day =  new DayOfWeek(d.Day, d.DayName, exists);
+
+                let day = new DayOfWeek(d.Day, d.DayName, exists);
 
                 day.DayOff = true;
                 day.Id = -1;
-    
+
                 days.Add(day);
 
 
@@ -178,48 +190,50 @@ export default class JourneyController extends AbstractController {
 
                 let time = await this._timeService.GetByIdAsync(d.TimeId);
 
-                if(!time)
-                    return this.BadRequest({Message : `${Time.name} with Id ${d.TimeId} not exists`});
-    
-                let day =  new DayOfWeek(d.Day, d.DayName,exists,time);
-                
+                if (!time)
+                    return this.BadRequest({ Message: `${Time.name} with Id ${d.TimeId} not exists` });
+
+                let day = new DayOfWeek(d.Day, d.DayName, exists, time);
+
                 day.Id = -1;
-    
+
                 days.Add(day);
             }
         }
-        
+
         exists.DaysOfWeek = days;
 
         await this._journeyService.UpdateObjectAndRelationsAsync(exists, ["Company", "DaysOfWeek"]);
 
-        return this.OK({Message : `${Journey.name} updated`});
+        return this.OK({ Message: `${Journey.name} updated` });
     }
 
 
 
     @DELETE("delete")
     @SetDatabaseFromToken()
-    @JourneyController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Jornada deletada'})  
-    @JourneyController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Jornada não encontrada'})
-    @Description(`Utilize esse metodo para remover uma jornada do banco de dados`) 
-    public async DeleteAsync(@FromQuery() id: number) : Promise<ActionResult>
-    {        
+    @JourneyController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Jornada deletada' })
+    @JourneyController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Jornada não encontrada' })
+    @Description(`Utilize esse metodo para remover uma jornada do banco de dados`)
+    public async DeleteAsync(@FromQuery() id: number): Promise<ActionResult>
+    {
 
         let del = (await this._journeyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
 
         if (!del)
-            return this.NotFound({ Message: `${Journey.name} not found`});
+            return this.NotFound({ Message: `${Journey.name} not found` });
 
         await this._journeyService.DeleteAsync(del);
 
-        return this.OK({Message: `${Journey.name} deleted`});
+        return this.OK({ Message: `${Journey.name} deleted` });
     }
+
 
 
     @GET("getJson")
     @SetDatabaseFromToken()
-    public GetJson() {
+    public GetJson()
+    {
         return this.OK(Type.CreateTemplateFrom<Journey>(Journey));
     }
 

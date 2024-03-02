@@ -18,9 +18,7 @@ import { IJoinSelectable, IJoiningQuery, Operation } from "myorm_core";
 
 export default class UserService  extends AbstractUserService
 {
-    UnpaginatedFilter(name: string, jobrole?: JobRole | undefined, department?: Departament | undefined, company?: Company | undefined): Promise<User | undefined> {
-        throw new Error("Method not implemented.");
-    }      
+           
     
     @Inject()
     private _context : AbstractDBContext;
@@ -48,6 +46,15 @@ export default class UserService  extends AbstractUserService
         
         return await this._context.Collection(User).CountAsync();
     }
+
+    public async GetByIdsAsync(ids: number[]): Promise<User[]>
+    {
+        return await this._context.Collection(User)
+                                  .WhereField("Id")
+                                  .IsInsideIn(ids)                                    
+                                  .Load("Journey")                                     
+                                  .ToListAsync();
+    } 
 
     public async GetByIdAsync(id: number): Promise<User| undefined> {
         
@@ -179,7 +186,16 @@ export default class UserService  extends AbstractUserService
             query.Where(Departament, {Field: "Id", Value: request.DepartamentId});
 
 
-        let users = await query.Select(User).ToListAsync();
+        let users = await query.Select(User)
+                               .Load("Access")
+                               .Load("Company")                                        
+                               .Load("Contacts")   
+                               .Load("JobRole")
+                               .Load("Journey")
+                               .ToListAsync();                    
+
+        
+        await this._context.Collection(JobRole).ReloadCachedRealitionsAsync(users.Where(s => s.JobRole != undefined).Select(s => s.JobRole!), ["Departament"]);
 
         let result = new UserUnPaginatedFilterResult<User>();
         result.Quantity = users.Count();
@@ -199,7 +215,11 @@ export default class UserService  extends AbstractUserService
 
         if(request.LoadRelations)
         {
-            query.Load("Company").Load("JobRole");
+            query.Load("Access")
+            .Load("Company")                                        
+            .Load("Contacts")   
+            .Load("JobRole")
+            .Load("Journey");
         }
 
         let users = await query.OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
