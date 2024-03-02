@@ -103,22 +103,25 @@ export default class UserService  extends AbstractUserService
     { 
         if(!obj.Access)
             throw new InvalidEntityException(`The ${Access.name} of the ${User.name} is required`);
+
+        if(!obj.Access.Password)
+            throw new InvalidEntityException(`The password of the ${User.name} is required`);
         
         obj.Access.Id = -1;   
  
         obj.Access!.Password = MD5(obj.Access!.Password);  
 
-        if(!obj.Company && obj.IsSuperUser())
+        if(!obj.Company && !obj.IsSuperUser())
             throw new InvalidEntityException(`The ${Company.name} of the ${User.name} is required`);
 
-        if(!obj.JobRole && obj.IsSuperUser())
+        if(!obj.JobRole && !obj.IsSuperUser())
             throw new InvalidEntityException(`The ${JobRole.name} of the ${User.name} is required`);         
 
         await this._context.Collection(User).AddAsync(obj)!;     
         
         obj.Directory = MD5(obj.Directory + obj.Id);
 
-        let result = await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, [])!;   
+        await this._context.Collection(User).UpdateObjectAndRelationsAsync(obj, [])!;   
         
         return obj;
     }

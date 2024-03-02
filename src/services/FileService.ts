@@ -184,7 +184,7 @@ export default class FileService extends AbstractFileService
     public async ComputeDirectoryAsync(checkpoint: Checkpoint): Promise<string> {
        
         if(!checkpoint.User)
-            throw new Exception("User is required to compute the checkpoint directory");
+            throw new Exception("O usuário é necessario para calcular o caminho do ponto");
         
         let date = checkpoint.Date;
         let dateStr = `_${date.getFullYear()}_${date.getMonth()}_${date.getDate()}`;

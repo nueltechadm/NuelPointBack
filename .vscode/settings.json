@@ -1,0 +1,14 @@
+{
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "editor.fontSize": 13,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "redhat.telemetry.enabled": false,   
+    "[typescript]":
+    {
+        "editor.bracketPairColorization.enabled": true,
+        "editor.autoClosingBrackets": "languageDefined"               
+    },
+    "typescript.format.placeOpenBraceOnNewLineForControlBlocks": true,
+    "typescript.format.placeOpenBraceOnNewLineForFunctions": true,   
+
+}

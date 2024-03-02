@@ -17,7 +17,7 @@
     "crypto-js": "^4.1.1",
     "jsonwebtoken": "^9.0.0",
     "myorm_core": "^6.0.0",
-    "myorm_pg": "^8.0.2",
+    "myorm_pg": "^8.0.4",
     "ts_linq_base": "^1.1.1",
     "web_api_base": "^5.1.1"
   },
@@ -25,6 +25,7 @@
     "@types/crypto-js": "^4.1.1",
     "@types/jest": "^29.5.11",
     "@types/jsonwebtoken": "^9.0.2",
+    "@types/node": "^20.11.24",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.1"
   }
