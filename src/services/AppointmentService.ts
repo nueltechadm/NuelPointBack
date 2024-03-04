@@ -171,10 +171,10 @@ export default class AppointmentService extends AbstractAppointmentService {
     public ValidateObject(obj: Appointment): void {
 
         if (!this.IsCompatible(obj))
-            throw new InvalidEntityException(`This object is not of ${Appointment.name} type`);
+            throw new InvalidEntityException(`Este objeto não é do tipo ${Appointment.name}`);
 
         if (!obj.User)
-            throw new InvalidEntityException(`User of Appointment is required`);        
+            throw new InvalidEntityException(`Usuário do apontamento é obrigatório`);        
     }
 
 }

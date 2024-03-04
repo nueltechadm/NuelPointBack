@@ -126,16 +126,16 @@ export default class CompanyService  extends AbstractCompanyService
     public ValidateObject(obj : Company) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`The object is not of ${Company.name} type`);
+            throw new InvalidEntityException(`O objeto não é do tipo ${Company.name}`);
 
         if(!obj.Name)
-            throw new InvalidEntityException(`The name of ${Company.name} is required`); 
+            throw new InvalidEntityException(`O nome ${Company.name} é obrigatório`); 
         
         if(!obj.Description)
-            throw new InvalidEntityException(`The description of ${Company.name} is required`);
+            throw new InvalidEntityException(`A descrição da ${Company.name} é obrigatória`);
     
         if(!obj.Document)
-            throw new InvalidEntityException(`The document of ${Company.name} is required`);
+            throw new InvalidEntityException(`O documento da ${Company.name} é obrigatório`);
     } 
 
     public async GetAllAsync(): Promise<Company[]>

@@ -141,7 +141,7 @@ export default class CheckpointService  extends AbstractCheckpointService
         let user = await this._context.Collection(User).WhereField("Id").IsEqualTo(userId).FirstOrDefaultAsync();
 
         if(!user)
-            throw new EntityNotFoundException(`Has no one employer with id: #${userId} in the database`);
+            throw new EntityNotFoundException(`Não tem funcionario com Id: #${userId} no banco de dados`);
 
        return await this._context.Collection(Checkpoint)
        .Where({
@@ -163,16 +163,16 @@ export default class CheckpointService  extends AbstractCheckpointService
     public ValidateObject(obj: Checkpoint) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`This object is not of ${Checkpoint.name} type`);
+            throw new InvalidEntityException(`Este objeto não é do tipo ${Checkpoint.name}`);
 
         if(!obj.User)
-            throw new InvalidEntityException(`User of checkpoint is required`);
+            throw new InvalidEntityException(`Usuário do ponto é necessário`);
 
         if(!obj.X)
-            throw new InvalidEntityException(`X point of checkpoint is required`);
+            throw new InvalidEntityException(`Cordenada X do ponto é necessária`);
 
         if(!obj.Y)
-            throw new InvalidEntityException(`Y point of checkpoint is required`);   
+            throw new InvalidEntityException(`Cordenada Y do ponto é necessária`);   
     }
 
 }

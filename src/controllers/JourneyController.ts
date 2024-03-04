@@ -73,7 +73,7 @@ export default class JourneyController extends AbstractController
         let journey = await this._journeyService.GetByIdAsync(id);
 
         if (!journey)
-            return this.NotFound({ Message: `${Journey.name} not found` });
+            return this.NotFound({ Message: `${Journey.name} não encontrada` });
 
         return this.OK(journey);
     }
@@ -89,12 +89,12 @@ export default class JourneyController extends AbstractController
     {
 
         if (dto.DaysOfWeek.Count() == 0)
-            return this.BadRequest(`DaysOfWeek is required`);
+            return this.BadRequest(`DaysOfWeek é obrigatório`);
 
         let company = (await this._companyService.GetByAndLoadAsync("Id", dto.CompanyId, [])).FirstOrDefault();
 
         if (!company)
-            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);
+            return this.BadRequest(`${Company.name} com Id ${dto.CompanyId} não existe`);
        
         let days: DayOfWeek[] = [];
         let journey = new Journey(dto.Description, company);
@@ -119,7 +119,7 @@ export default class JourneyController extends AbstractController
                 let time = await this._timeService.GetByIdAsync(d.TimeId);
 
                 if (!time)
-                    return this.BadRequest({ Message: `${Time.name} with Id ${d.TimeId} not exists` });
+                    return this.BadRequest({ Message: `${Time.name} com Id ${d.TimeId} não existe` });
 
                 let day = new DayOfWeek(d.Day, d.DayName, journey, time);
 
@@ -154,17 +154,17 @@ export default class JourneyController extends AbstractController
     public async UpdateAsync(@FromBody() dto: JourneyDTO): Promise<ActionResult>
     {
         if (dto.DaysOfWeek.Count() == 0)
-            return this.BadRequest(`DaysOfWeek is required`);
+            return this.BadRequest(`DaysOfWeek é obrigatório`);
 
         let exists = (await this._journeyService.GetByAndLoadAsync("Id", dto.Id, ["Company", "DaysOfWeek"])).FirstOrDefault();
 
         if (!exists)
-            return this.BadRequest(`${Journey.name} with Id ${dto.Id} not exists`);
+            return this.BadRequest(`${Journey.name} com Id ${dto.Id} não existe`);
 
         let company = (await this._companyService.GetByAndLoadAsync("Id", dto.CompanyId, [])).FirstOrDefault();
 
         if (!company)
-            return this.BadRequest(`${Company.name} with Id ${dto.CompanyId} not exists`);
+            return this.BadRequest(`${Company.name} com Id ${dto.CompanyId} não existe`);
 
         let days: DayOfWeek[] = [];
 
@@ -191,7 +191,7 @@ export default class JourneyController extends AbstractController
                 let time = await this._timeService.GetByIdAsync(d.TimeId);
 
                 if (!time)
-                    return this.BadRequest({ Message: `${Time.name} with Id ${d.TimeId} not exists` });
+                    return this.BadRequest({ Message: `${Time.name} com Id ${d.TimeId} não existe` });
 
                 let day = new DayOfWeek(d.Day, d.DayName, exists, time);
 
@@ -205,7 +205,7 @@ export default class JourneyController extends AbstractController
 
         await this._journeyService.UpdateObjectAndRelationsAsync(exists, ["Company", "DaysOfWeek"]);
 
-        return this.OK({ Message: `${Journey.name} updated` });
+        return this.OK({ Message: `${Journey.name} atualizada` });
     }
 
 
@@ -221,11 +221,11 @@ export default class JourneyController extends AbstractController
         let del = (await this._journeyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
 
         if (!del)
-            return this.NotFound({ Message: `${Journey.name} not found` });
+            return this.NotFound({ Message: `${Journey.name} não encontrada` });
 
         await this._journeyService.DeleteAsync(del);
 
-        return this.OK({ Message: `${Journey.name} deleted` });
+        return this.OK({ Message: `${Journey.name} deletada` });
     }
 
 

@@ -39,7 +39,7 @@ export default class DepartamentController extends AbstractController {
 
     @GET("all")     
     @SetDatabaseFromToken()
-    @ProducesResponse({ Status: 200, Description: "Todos os departamentos sem funções relacionadas", JSON: JSON.stringify([Type.CreateTemplateFrom(Departament, false, ["JobRoles"])], null, 2)})
+    @ProducesResponse({ Status: 200, Description: "Todos os departamentos sem cargos relacionados", JSON: JSON.stringify([Type.CreateTemplateFrom(Departament, false, ["JobRoles"])], null, 2)})
     @Description(`Utilize esse metodo para visualizar todos os departamentos registrados no banco de dados`) 
     public async GetAllAsync(): Promise<ActionResult> 
     {             
@@ -56,7 +56,7 @@ export default class DepartamentController extends AbstractController {
         let departament = (await this._departamentService.GetByAndLoadAsync("Id", id, ["JobRoles"])).FirstOrDefault();
 
         if (!departament)
-            return this.NotFound({ Message: "departament not found" });
+            return this.NotFound({ Message: "Departamento não encontrado" });
 
         return this.OK(Type.RemoveFieldsRecursive(departament));
     }
@@ -74,11 +74,11 @@ export default class DepartamentController extends AbstractController {
         let fromDB = await this._departamentService.GetByAndLoadAsync("Description", departament.Description.Trim(), []);
 
         if(fromDB.Any(s => s.Id != departament.Id))
-            return this.BadRequest(`Departament ${departament.Description} already exists on database`);
+            return this.BadRequest(`Departamento ${departament.Description} já existe no banco de dados`);
 
         await this._departamentService.AddAsync(departament);
 
-        return this.OK({Message : 'Departament added', id : departament.Id});
+        return this.OK({Message : 'Departamento adicionado', id : departament.Id});
     }
 
 
@@ -94,23 +94,23 @@ export default class DepartamentController extends AbstractController {
         let exists = await this._departamentService.GetByAndLoadAsync("Id", departament.Id, []);
 
         if(!exists.Any())
-            return this.NotFound(`Departament ${departament.Description} not exists on database`);     
+            return this.NotFound(`Departamento ${departament.Description} não existe no banco de dados`);     
 
         let fromDB = await this._departamentService.GetByAndLoadAsync("Description", departament.Description.Trim(), []);
 
         if(fromDB.Any(s => s.Id != departament.Id))
-            return this.BadRequest(`Departament ${departament.Description} already exists on database`);
+            return this.BadRequest(`Departamento ${departament.Description} já existe no banco de dados`);
 
         await this._departamentService.UpdateAsync(departament);
 
-        return this.OK({Message : 'Departament updated'});
+        return this.OK({Message : 'Departamento atualizado'});
     }
 
 
 
     @DELETE("delete")
     @DepartamentController.ProducesMessage(200, 'Mensagem de sucesso', {Message : 'Departamento deletado'})
-    @DepartamentController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Departamento não encontrada'})
+    @DepartamentController.ProducesMessage(404, 'Mensagem de erro', {Message : 'Departamento não encontrado'})
     @Description(`Utilize esse metodo para deletar um departamento do banco de dados`) 
     @SetDatabaseFromToken()
     public async DeleteAsync(@FromQuery() id: number) : Promise<ActionResult>
@@ -118,7 +118,7 @@ export default class DepartamentController extends AbstractController {
         let exists = await this._departamentService.GetByAndLoadAsync("Id", id, []);
 
         if(!exists.Any())
-            return this.NotFound({ Message: "departament not found" });
+            return this.NotFound({ Message: "Departamento não encontrado" });
 
         return this.OK(await this._departamentService.DeleteAsync(exists.First()));
     }

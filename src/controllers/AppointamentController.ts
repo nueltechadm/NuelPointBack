@@ -91,7 +91,7 @@ export default class AppointamentController extends AbstractController
         } catch (e)
         {
             if (e instanceof FileCastException)
-                return this.BadRequest('Invalid base64 image');
+                return this.BadRequest('imagem base64 inválida');
         }
 
         checkpoint.Picture = image;
@@ -122,14 +122,14 @@ export default class AppointamentController extends AbstractController
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["Journey"])).FirstOrDefault();
 
         if (!user)
-            return this.BadRequest(`User with Id ${userId} not exists`);
+            return this.BadRequest(`Usuário com Id ${userId} não existe`);
 
         appointaments.AddRange(await this._appointamentService.GetByDatesAsync(init, end));
 
         let journey = user.Journey;
 
         if (!journey)
-            return this.BadRequest(`User not have a journey`);
+            return this.BadRequest(`Usuário não possui jornada`);
 
         let result = {} as any;
         result["Appointaments"] = [];
@@ -165,11 +165,11 @@ export default class AppointamentController extends AbstractController
     public async UpdateAsync(@FromBody() appointament: Appointment): Promise<ActionResult> 
     {
         if (appointament.Id <= 0)
-            return this.BadRequest(`The property Id is required`);
+            return this.BadRequest(`O ID é obrigatório`);
 
         await this._appointamentService.UpdateAsync(appointament);
 
-        return this.OK({ Message: 'Appointament updated' });
+        return this.OK({ Message: 'Apontamento atualizado' });
     }
 
 
@@ -188,13 +188,13 @@ export default class AppointamentController extends AbstractController
         let appointament = await this._appointamentService.GetByAndLoadAsync("Id", appointamentId, ["Checkpoints", "User"]);
 
         if (!appointament.Any())
-            return this.NotFound(`Appointament with Id #${appointamentId} not exists`);
+            return this.NotFound(`Apontamento com Id #${appointamentId} não existe`);
 
         appointament.First().Checkpoints = checkpoints;
 
         await this._appointamentService.UpdateAsync(appointament.First());
 
-        return this.OK({ Message: 'Appointament updated' });
+        return this.OK({ Message: 'Apontamento atualizado' });
     }
 
 
@@ -210,12 +210,12 @@ export default class AppointamentController extends AbstractController
         let user = await this._userService.GetByIdAsync(userId);
 
         if (!user)
-            return this.NotFound(`The user with Id #${userId} not exists`);
+            return this.NotFound(`O usuário com Id #${userId} não existe`);
 
         let appointaments = await this._appointamentService.GetByUserAndDatesAsync(user, start, end);
 
         if (!appointaments.Any())
-            return this.NotFound({ Message: `No one appointament found to user with Id #${userId} between ${start.toDateString()} and ${end.toDateString()}` });
+            return this.NotFound({ Message: `Nenhum apontamento encontrado para o usuário com Id #${userId} entre ${start.toDateString()} e ${end.toDateString()}` });
 
         return this.OK(Type.RemoveFieldsRecursive(appointaments.First()));
     }
@@ -234,12 +234,12 @@ export default class AppointamentController extends AbstractController
         let user = await this._userService.GetByIdAsync(userId);
 
         if (!user)
-            return this.NotFound(`The user with Id #${userId} not exists`);
+            return this.NotFound(`O usuário com Id #${userId} não existe`);
 
         let appointament = await this._appointamentService.GetCurrentDayByUserAsync(user);
 
         if (!appointament)
-            return this.NotFound(`No one day is started by user with Id #${userId}`);
+            return this.NotFound(`Nenhum dia é iniciado pelo usuário com Id #${userId}`);
 
         Type.Delete(appointament, 'User');
 

@@ -105,13 +105,13 @@ export default class AcessService extends AbstractAccessService {
     public ValidateObject(obj: Access): void {
 
         if (!this.IsCompatible(obj))
-            throw new InvalidEntityException(`This object is not of ${Access.name} type`);
+            throw new InvalidEntityException(`Este objeto não é do tipo ${Access.name}`);
 
         if(!obj.Username)
-            throw new InvalidEntityException(`The username of ${Access.name} is required`);
+            throw new InvalidEntityException(`O username do ${Access.name} é obrigatório`);
 
         if(!obj.Password)
-            throw new InvalidEntityException(`The password of ${Access.name} is required`);
+            throw new InvalidEntityException(`O password do ${Access.name} é obrigatório`);
         
 
     }    

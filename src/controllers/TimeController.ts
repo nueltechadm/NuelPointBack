@@ -49,7 +49,7 @@ export default class TimeController extends AbstractController
         let time = await this._service.GetByIdAsync(id);
 
         if (!time)
-            return this.NotFound({ Message: "Time not found" });
+            return this.NotFound({ Message: "Horário não encontrada" });
 
         return this.OK(time);
     }
@@ -63,7 +63,7 @@ export default class TimeController extends AbstractController
     {
         let result = await this._service.AddAsync(time);
 
-        return this.OK({ Message: "Time created", Id: result.Id });
+        return this.OK({ Message: "Horário criado", Id: result.Id });
     }
 
     @PUT("update")
@@ -78,13 +78,13 @@ export default class TimeController extends AbstractController
         let exists = await this._service.GetByIdAsync(time.Id);
 
         if (!exists)
-            return this.NotFound({ Message: "Time not found" });
+            return this.NotFound({ Message: "Horário não encontrado" });
 
         Object.assign(exists, time);
 
         await this._service.UpdateAsync(exists);
 
-        return this.OK({ Message: "Time updated" });
+        return this.OK({ Message: "Horário atualizado" });
     }
 
     @DELETE("delete")
@@ -100,11 +100,11 @@ export default class TimeController extends AbstractController
         let del = await this._service.GetByIdAsync(id);
 
         if (!del)
-            return this.NotFound({ Message: "Time not found" });
+            return this.NotFound({ Message: "Horário não encontrado" });
 
         await this._service.DeleteAsync(del);
 
-        return this.OK({ Message: "Time deleted" });
+        return this.OK({ Message: "Horário deletado" });
     }
 
     

@@ -135,10 +135,10 @@ export default class JobRoleService  extends AbstractJobRoleService
     public ValidateObject(obj: JobRole) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`The object is not of ${JobRole.name} type`);        
+            throw new InvalidEntityException(`Este objeto não é do tipo ${JobRole.name}`);        
 
         if(!obj.Description)
-            throw new InvalidEntityException(`The description of ${JobRole.name} is required`);       
+            throw new InvalidEntityException(`A descrição do ${JobRole.name} é necessária`);       
       
     }
 }

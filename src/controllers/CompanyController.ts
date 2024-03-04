@@ -43,7 +43,7 @@ export default class CompanyController extends AbstractController {
 
     @GET("all")     
     @SetDatabaseFromToken()
-    @CompanyController.ProducesType(200, 'Lista de todas as empresas recuperadas registradas no banco de dados' , CompanyPaginatedFilterResponse)  
+    @CompanyController.ProducesType(200, 'Lista de todas as empresas registradas no banco de dados' , CompanyPaginatedFilterResponse)  
     @Description(`Utilize esse metodo para visualizar uma lista de todas empresas registradas no banco de dados`) 
     public async GetAllAsync(): Promise<ActionResult> 
     {             
@@ -54,7 +54,7 @@ export default class CompanyController extends AbstractController {
     @POST("filter")    
     @SetDatabaseFromToken()
     @CompanyController.ReceiveType(CompanyPaginatedFilterRequest)
-    @CompanyController.ProducesType(200, 'Lista de todas as empresas recuperadas pelos filtros' , CompanyPaginatedFilterResponse)
+    @CompanyController.ProducesType(200, 'Lista de todas as empresas recuperadas pelo filtro' , CompanyPaginatedFilterResponse)
     @Description(`Utilize esse metodo para visualizar uma lista de todas empresas recuperadas pelo filtro`)     
     public async PaginatedFilterAsync(@FromBody()params : CompanyPaginatedFilterRequest) : Promise<ActionResult>
     {  
@@ -72,7 +72,7 @@ export default class CompanyController extends AbstractController {
         let company = await this._companyService.GetByIdAsync(id);
 
         if (!company)
-            return this.NotFound({ Message: "Company not found" });
+            return this.NotFound({ Message: "Empresa não encontrada" });
 
         return this.OK(company);
     }
@@ -89,11 +89,11 @@ export default class CompanyController extends AbstractController {
         let exists = await this._companyService.GetByNameAsync(company.Name);
 
         if(exists.Any())
-            return this.BadRequest({Message : `Already exists a company with name : "${company.Name}"`});
+            return this.BadRequest({Message : `Já existe uma empresa com nome : "${company.Name}"`});
 
         await this._companyService.AddAsync(company);
 
-        return this.OK({Message : "Company created", Id : company.Id})
+        return this.OK({Message : "Empresa criada", Id : company.Id})
     }
 
 
@@ -107,21 +107,21 @@ export default class CompanyController extends AbstractController {
     public async UpdateAsync(@FromBody() company: Company) : Promise<ActionResult> 
     {        
         if(!company.Id)
-            return this.BadRequest({ Message: "Id is required" });
+            return this.BadRequest({ Message: "Id é necessário" });
 
         let exists = await this._companyService.GetByAndLoadAsync("Id", company.Id, []);
 
         if (!exists.Any())
-            return this.NotFound({ Message: 'Company not found' }); 
+            return this.NotFound({ Message: 'Empresa não encontrada' }); 
         
         exists = await this._companyService.GetByNameAsync(company.Name);
 
         if(exists.Any(s => s.Id != company.Id))
-            return this.BadRequest({Message : `Already exists a company with name : "${company.Name}"`});
+            return this.BadRequest({Message : `Já existe uma empresa com nome : "${company.Name}"`});
 
         await this._companyService.UpdateObjectAndRelationsAsync(company, ["Contacts", "Address"]);
 
-        return this.OK({Message : 'Company updated'});
+        return this.OK({Message : 'Empresa atualizada'});
     }
 
 
@@ -136,7 +136,7 @@ export default class CompanyController extends AbstractController {
         let companies= await this._companyService.GetByAndLoadAsync("Id", companyId, ["Contacts"]);
 
         if(!companies.Any())
-            return this.NotFound({Message : `Company with Id ${companyId} not exists`});        
+            return this.NotFound({Message : `Empresa com Id ${companyId} não existe`});        
 
         companies.First().Contacts.RemoveAll(s => s.Id == contact.Id);        
 
@@ -144,7 +144,7 @@ export default class CompanyController extends AbstractController {
 
         await this._companyService.UpdateAsync(companies.First());
 
-        return this.OK('Company´s contacts updated');
+        return this.OK('Contatos da empresa atualizados');
     }
 
     @PUT("delete/contact")  
@@ -157,16 +157,16 @@ export default class CompanyController extends AbstractController {
         let company= (await this._companyService.GetByAndLoadAsync("Id", companyId, ["Contacts"])).FirstOrDefault();
 
         if(!company)
-            return this.NotFound({Message : `Company with Id ${companyId} not exists`});        
+            return this.NotFound({Message : `Empresa com Id ${companyId} não existe`});        
 
         if(!company.Contacts.Any(s => s.Id == contactId))
-            return this.NotFound({Message : `Company with Id ${companyId} dot not have a contact with Id ${contactId}`});        
+            return this.NotFound({Message : `Empresa com Id ${companyId} não tem contato com Id ${contactId}`});        
 
         company.Contacts.RemoveAll(s => s.Id == contactId);              
 
         await this._companyService.UpdateAsync(company);
 
-        return this.OK('Company´s contacts updated');
+        return this.OK('Contatos da empresa atualizados');
     }
     
 
@@ -180,13 +180,13 @@ export default class CompanyController extends AbstractController {
         let active = (await this._companyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
 
         if (!active)
-            return this.NotFound({ Message: 'Company not found' });
+            return this.NotFound({ Message: 'Empresa não encontrada' });
 
         active.Active = true;
 
         await this._companyService.UpdateAsync(active);
 
-        return this.OK({Message : 'Company activated'});
+        return this.OK({Message : 'Empresa ativada'});
     }
 
 
@@ -201,13 +201,13 @@ export default class CompanyController extends AbstractController {
         let desactive = (await this._companyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
 
         if (!desactive)
-            return this.NotFound({ Message: 'Company not found' });
+            return this.NotFound({ Message: 'Empresa não encontrada' });
 
         desactive.Active = false;
 
         await this._companyService.UpdateAsync(desactive);
 
-        return this.OK({Message : 'Company desactivated'});
+        return this.OK({Message : 'Empresa desativada'});
     }
 
 
@@ -222,12 +222,12 @@ export default class CompanyController extends AbstractController {
         let company = (await this._companyService.GetByAndLoadAsync("Id", companyId, ["Users"])).FirstOrDefault();
 
         if(!company)
-             return this.NotFound({Message : "Company not found"}); 
+             return this.NotFound({Message : "Empresa não encontrada"}); 
 
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["Company"])).FirstOrDefault();
 
         if(!user)
-            return this.NotFound({Message : "User not found"}); 
+            return this.NotFound({Message : "Usuário não encontrado"}); 
                          
         company.Users.RemoveAll(s => s.Id == userId);
 
@@ -235,7 +235,7 @@ export default class CompanyController extends AbstractController {
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK({Message : `Company updated`});
+        return this.OK({Message : `Empresa atualizada`});
 
     }
 
@@ -251,11 +251,11 @@ export default class CompanyController extends AbstractController {
         let del = (await this._companyService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
 
         if (!del)
-            return this.NotFound({ Message: 'Company not found' });
+            return this.NotFound({ Message: 'Empresa não encontrada' });
 
         await this._companyService.DeleteAsync(del);
 
-        return this.OK({Message : 'Company deleted'});
+        return this.OK({Message : 'Empresa deletada'});
     }
 
 

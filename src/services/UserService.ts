@@ -263,16 +263,16 @@ export default class UserService  extends AbstractUserService
     public override ValidateObject(obj : User) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`This object is not of ${User.name} type`);        
+            throw new InvalidEntityException(`Este objeto não é do tipo ${User.name}`);        
 
         if(!obj.Name && !obj.IsSuperUser())
-          throw new InvalidEntityException(`The name of user is required`);
+          throw new InvalidEntityException(`O nome do usuário é necessário`);
 
         if(!obj.Company && !obj.IsSuperUser())
-          throw new InvalidEntityException("The company of the user is required");
+          throw new InvalidEntityException("A empresa do usuário é necessária");
 
        if(!obj.JobRole && !obj.IsSuperUser())
-          throw new InvalidEntityException("The jobrole of the user is required");    
+          throw new InvalidEntityException("O cargo do usuário é necessário");    
     }
 
     private async GetAccessByIdAsync(id : number) : Promise<Access | undefined>

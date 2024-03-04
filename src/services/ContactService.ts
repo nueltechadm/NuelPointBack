@@ -123,10 +123,10 @@ export default class ContactService  extends AbstractContactService
     public ValidateObject(obj: Contact) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`The object is not of ${Contact.name} type`);
+            throw new InvalidEntityException(`O objeto não é do tipo ${Contact.name}`);
 
         if(!obj.Contact)
-            throw new InvalidEntityException(`The name of ${Contact.name} is required`);
+            throw new InvalidEntityException(`O nome do ${Contact.name} é obrigatório `);
        
     }
 }

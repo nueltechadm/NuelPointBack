@@ -24,7 +24,7 @@ export default class ControlController extends ControllerBase {
         let exist = await this._service.CheckIfDatabaseExists(name);
 
         if(exist)
-            return this.OK({ Message: "Database already exists" });
+            return this.OK({ Message: "O banco de dados já existe" });
 
         (async () => {
 
@@ -48,7 +48,7 @@ export default class ControlController extends ControllerBase {
                 
         })();
 
-        return this.OK({ Message: "Command sent to queue" });
+        return this.OK({ Message: "Comando enviado para queue" });
     }
 
 
@@ -81,7 +81,7 @@ export default class ControlController extends ControllerBase {
             return this.NotFound();         
       
         if(db.Status == DababaseStatus.CREATING)
-            return this.BadRequest({Message : `Can not update a database with status : ${db.Status.toString()}`});
+            return this.BadRequest({Message : `Não é possível atualizar um banco de dados com status : ${db.Status.toString()}`});
 
             (async()=>
             {
@@ -89,7 +89,7 @@ export default class ControlController extends ControllerBase {
 
             })();
 
-            return this.OK({Message : `The database ${name} is updating`});    
+            return this.OK({Message : `O banco de dados ${name} está atualizando`});    
             
     }
 
@@ -104,7 +104,7 @@ export default class ControlController extends ControllerBase {
             return this.NotFound();  
         
         if(db.Status == DababaseStatus.UPDATING)
-            return this.OK({Message : `The database ${name} is already updating`});
+            return this.OK({Message : `O banco de dados ${name} já está sendo atualizado`});
     
         if(db.Status == DababaseStatus.CREATED || db.Status == DababaseStatus.UPDATED || db.Status == DababaseStatus.UPDATEFAIL)
         {            
@@ -114,11 +114,11 @@ export default class ControlController extends ControllerBase {
 
             })();
 
-            return this.OK({Message : `The database ${name} is updating`});
+            return this.OK({Message : `O banco de dados ${name} está sendo atualizado`});
         }
         else
         {
-            return this.BadRequest({Message : `Can not update a database with status : ${db.Status.toString()}`});
+            return this.BadRequest({Message : `Não é possível atualizar um banco de dados com status : ${db.Status.toString()}`});
         } 
             
     }

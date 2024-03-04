@@ -49,8 +49,8 @@ export default class JobRoleController extends AbstractController
 
     @POST("list")
     @SetDatabaseFromToken()
-    @JobRoleController.ProducesType(200, "Uma lista de funções", JobRole)
-    @Description(`Utilize esse metodo para visualizar uma lista de funções recuperadas pelo filtro`)
+    @JobRoleController.ProducesType(200, "Uma lista de cargos", JobRole)
+    @Description(`Utilize esse metodo para visualizar uma lista de cargos recuperados pelo filtro`)
     public async PaginatedFilterAsync(@FromBody() params: JobRolePaginatedFilteRequest): Promise<ActionResult> 
     {
         return this.OK(await this._jobRoleService.PaginatedFilterAsync(params));
@@ -59,8 +59,8 @@ export default class JobRoleController extends AbstractController
 
     @GET("all")
     @SetDatabaseFromToken()
-    @JobRoleController.ProducesType(200, "Todas funções registradas no banco de dados", JobRole)
-    @Description(`Utilize esse metodo para visualizar uma lista de todas funções registradas no banco de dados`)
+    @JobRoleController.ProducesType(200, "Todos cargos registrados no banco de dados", JobRole)
+    @Description(`Utilize esse metodo para visualizar uma lista de todos cargos registrados no banco de dados`)
     public async GetAllAync(): Promise<ActionResult>
     {
         return this.OK(await this._jobRoleService.GetAllAsync());
@@ -70,15 +70,15 @@ export default class JobRoleController extends AbstractController
 
     @GET("getById")
     @SetDatabaseFromToken()
-    @JobRoleController.ProducesType(200, "A função com o Id fornecido", JobRole)
-    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: "Função não encontrada" })
-    @Description(`Utilize esse metodo para visualizar uma função especifica pelo Id`)
+    @JobRoleController.ProducesType(200, "O cargo com o Id fornecido", JobRole)
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: "Cargo não encontrado" })
+    @Description(`Utilize esse metodo para visualizar um cargo especifica pelo Id`)
     public async GetByIdAsync(@FromQuery() id: number): Promise<ActionResult>
     {
         let job = (await this._jobRoleService.GetByAndLoadAsync("Id", id, ["Departament"])).FirstOrDefault();
 
         if (!job)
-            return this.NotFound({ Message: "Job role not found" });
+            return this.NotFound({ Message: "Cargo não encontrado" });
 
         return this.OK(job);
     }
@@ -87,67 +87,67 @@ export default class JobRoleController extends AbstractController
 
     @POST("insert")
     @SetDatabaseFromToken()
-    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: "Função criada", Id: 1 })
-    @Description(`Utilize esse metodo para imserir uma nova função no banco de dados`)
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: "Cargo criado", Id: 1 })
+    @Description(`Utilize esse metodo para inserir um novo cargo no banco de dados`)
     public async InsertAsync(@FromBody() dto: JobRoleDTO): Promise<ActionResult>
     {
         let departament = (await this._departamentService.GetByAndLoadAsync("Id", dto.DepartamentId, [])).FirstOrDefault();
 
         if (!departament)
-            return this.NotFound(`Departament with Id ${dto.DepartamentId}`);
+            return this.NotFound(`Departamento com Id ${dto.DepartamentId}`);
 
         let jobrole = new JobRole(dto.Description, departament);
 
         await this._jobRoleService.AddAsync(jobrole);
 
-        return this.OK({ Message: 'JobRole created', Id: jobrole.Id });
+        return this.OK({ Message: 'Cargo criado', Id: jobrole.Id });
     }
 
 
     @POST("update")
     @SetDatabaseFromToken()
-    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Função atualizada' })
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Cargo atualizado' })
     @JobRoleController.ProducesMessage(400, 'Mensagem de erro', { Message: 'Mensagem descrevendo o erro' })
-    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Função não encontrada' })
-    @Description(`Utilize esse metodo para atualizar uma função do banco de dados`)
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Cargo não encontrado' })
+    @Description(`Utilize esse metodo para atualizar um cargo do banco de dados`)
     public async UpdateAsync(@FromBody() dto: JobRoleDTO): Promise<ActionResult>
     {
         let departament = (await this._departamentService.GetByAndLoadAsync("Id", dto.DepartamentId, [])).FirstOrDefault();
 
         if (!departament)
-            return this.NotFound(`Departament with Id ${dto.DepartamentId}`);
+            return this.NotFound(`Departamento com Id ${dto.DepartamentId}`);
 
         let job = (await this._jobRoleService.GetByAndLoadAsync("Id", dto.Id, ["Departament"])).FirstOrDefault();
 
         if (!job)
-            return this.NotFound(`JobRole with Id ${dto.Id}`);
+            return this.NotFound(`Cargo com Id ${dto.Id}`);
 
         job.Description = dto.Description;
         job.Departament = departament;
 
         await this._jobRoleService.UpdateObjectAndRelationsAsync(job, ["Departament"]);
 
-        return this.OK({ Message: 'JobRole updated' });
+        return this.OK({ Message: 'Cargo atualizado' });
     }
 
 
 
     @PUT("add/user")
     @SetDatabaseFromToken()
-    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Função atualizada' })
-    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Função não encontrada' })
-    @Description(`Utilize esse metodo para adicionar um usuário a uma função`)
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Cargo atualizado' })
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Cargo não encontrado' })
+    @Description(`Utilize esse metodo para adicionar um usuário a um cargo`)
     public async AddUserAsync(@FromQuery() jobRoleId: number, @FromQuery() userId: number): Promise<ActionResult>
     {
         let job = (await this._jobRoleService.GetByAndLoadAsync("Id", jobRoleId, ["Users"])).FirstOrDefault();
 
         if (!job)
-            return this.NotFound({ Message: "Jobrole not found" });
+            return this.NotFound({ Message: "Cargo não encontrado" });
 
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["JobRole"])).FirstOrDefault();
 
         if (!user)
-            return this.NotFound({ Message: "User not found" });
+            return this.NotFound({ Message: "Usuário não encontrado" });
 
         job.Users.RemoveAll(s => s.Id == userId);
 
@@ -155,7 +155,7 @@ export default class JobRoleController extends AbstractController
 
         await this._jobRoleService.UpdateAsync(job);
 
-        return this.OK({ Message: `Jobrole updated` });
+        return this.OK({ Message: `Cargo atualizado` });
 
     }
 
@@ -163,20 +163,20 @@ export default class JobRoleController extends AbstractController
 
     @PUT("remove/user")
     @SetDatabaseFromToken()
-    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Função atualizada' })
-    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Função não encontrada' })
-    @Description(`Utilize esse metodo para remover um usuário de uma função`)
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Cargo atualizado' })
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Cargo não encontrado' })
+    @Description(`Utilize esse metodo para remover um usuário de um cargo`)
     public async RemoveUserAsync(@FromQuery() jobRoleId: number, @FromQuery() userId: number): Promise<ActionResult>
     {
         let job = (await this._jobRoleService.GetByAndLoadAsync("Id", jobRoleId, ["Users"])).FirstOrDefault();
 
         if (!job)
-            return this.NotFound({ Message: "Jobrole not found" });
+            return this.NotFound({ Message: "Cargo não encontrada" });
 
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["JobRole"])).FirstOrDefault();
 
         if (!user)
-            return this.NotFound({ Message: "User not found" });
+            return this.NotFound({ Message: "Usuário não encontrado" });
 
         user.JobRole = undefined;
 
@@ -186,7 +186,7 @@ export default class JobRoleController extends AbstractController
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK({ Message: `Jobrole updated` });
+        return this.OK({ Message: `Cargo atualizado` });
 
     }
 
@@ -195,18 +195,18 @@ export default class JobRoleController extends AbstractController
 
     @DELETE("delete")
     @SetDatabaseFromToken()
-    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Função deletada' })
-    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Função não encontrada' })
-    @Description(`Utilize esse metodo para remover uma função do banco de dados`)
+    @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Cargo deletado' })
+    @JobRoleController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Cargo não encontrado' })
+    @Description(`Utilize esse metodo para remover um cargo do banco de dados`)
     public async DeleteAsync(@FromQuery() id: number): Promise<ActionResult>
     {
         if (!id)
-            return this.BadRequest({ Message: "The ID must be greater than 0" });
+            return this.BadRequest({ Message: "O Id deve ser maior que 0" });
 
         let del = (await this._jobRoleService.GetByAndLoadAsync("Id", id, [])).FirstOrDefault();
 
         if (!del)
-            return this.NotFound({ Message: "Job role not found" });
+            return this.NotFound({ Message: "cargo não encontrado" });
 
         return this.OK(await this._jobRoleService.DeleteAsync(del));
     }

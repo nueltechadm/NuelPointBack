@@ -118,7 +118,7 @@ export default class UserController extends AbstractController
     @SetDatabaseFromToken()
     @UserController.ProducesType(200, 'O usuário recém criado', User)
     @RequestJson(JSON.stringify(Type.CreateTemplateFrom(UserDTO, false, ["Access"], []), null, 2))
-    @Description(`Utilize esse metodo para criad um novo ${User.name}`)
+    @Description(`Utilize esse metodo para criar um novo ${User.name}`)
     public async InsertAsync(@FromBody() userDTO: UserDTO): Promise<ActionResult>
     {
         userDTO.Directory = this.Request.APIAUTH.Link;
@@ -147,14 +147,14 @@ export default class UserController extends AbstractController
     @PUT("contact")
     @SetDatabaseFromToken()
     @UserController.ProducesMessage(200, "Mensagem de sucesso", { Message: "Contato do usuário atualizado" })
-    @UserController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Usuário não encontrada' })
+    @UserController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Usuário não encontrado' })
     @Description(`Utilize esse metodo para adicionar ou editar um ${Contact.name} de um ${User.name}`)
     public async UpdateContact(@FromQuery() userId: number, @FromBody() contact: Contact): Promise<ActionResult>
     {
         let users = await this._userService.GetByAndLoadAsync("Id", userId, ["Contacts"]);
 
         if (!users.Any())
-            return this.NotFound({ Message: `User with Id ${userId} not exists` });
+            return this.NotFound({ Message: `Usuário com Id ${userId} não existe` });
 
         users.First().Contacts.RemoveAll(s => s.Id == contact.Id);
 
@@ -162,31 +162,31 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(users.First());
 
-        return this.OK('User´s contacts updated');
+        return this.OK('Contatos do usuário atualizados');
     }
 
 
 
     @PUT("delete/contact")
     @SetDatabaseFromToken()
-    @UserController.ProducesMessage(200, "Mensagem de sucesso", { Message: "Contato do usuário atualizado" })
-    @UserController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Usuário não encontrada' })
+    @UserController.ProducesMessage(200, "Mensagem de sucesso", { Message: "Contatos do usuário atualizados" })
+    @UserController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Usuário não encontrado' })
     @Description(`Utilize esse metodo para remover um ${Contact.name} de um ${User.name}`)
     public async DeleteContact(@FromQuery() userId: number, @FromQuery() contactId: number): Promise<ActionResult>
     {
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["Contacts"])).FirstOrDefault();
 
         if (!user)
-            return this.NotFound({ Message: `User with Id ${userId} not exists` });
+            return this.NotFound({ Message: `Usuário com Id ${userId} não existe` });
 
         if (!user.Contacts.Any(s => s.Id == contactId))
-            return this.NotFound({ Message: `User with Id ${userId} dot not have a contact with Id ${contactId}` });
+            return this.NotFound({ Message: `Usuário com Id ${userId} não possui contato com Id ${contactId}` });
 
         user.Contacts.RemoveAll(s => s.Id == contactId);
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK('User´s contacts updated');
+        return this.OK('Contatos do usuário atualizados');
     }
 
 
@@ -201,7 +201,7 @@ export default class UserController extends AbstractController
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["Access"])).FirstOrDefault();
 
         if (!user)
-            return this.NotFound({ Message: `User with Id ${userId} not exists` });
+            return this.NotFound({ Message: `Usuário com Id ${userId} não existe` });
 
         access.Id = user.Access.Id;
 
@@ -212,7 +212,7 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK('User´s access updated');
+        return this.OK('Acesso do usuário atualizado');
     }
 
 
@@ -227,18 +227,18 @@ export default class UserController extends AbstractController
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["Journey"])).FirstOrDefault();
 
         if (!user)
-            return this.NotFound({ Message: `User with Id ${userId} not exists` });
+            return this.NotFound({ Message: `Usuário com Id ${userId} não existe` });
 
         let journey = (await this._journeyService.GetByAndLoadAsync("Id", journeyId, [])).FirstOrDefault();
 
         if (!journey)
-            return this.NotFound({ Message: `Journey with Id ${journeyId} not exists` });
+            return this.NotFound({ Message: `Jornada com Id ${journeyId} não existe` });
 
         user.Journey = journey;
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK('User´s journey updated');
+        return this.OK('Jornada do usuário atualizada');
     }
 
 
@@ -253,44 +253,44 @@ export default class UserController extends AbstractController
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["Company"])).FirstOrDefault();
 
         if (!user)
-            return this.NotFound({ Message: `User with Id ${userId} not exists` });
+            return this.NotFound({ Message: `Usuário com Id ${userId} não existe` });
 
         let company = (await this._companyService.GetByAndLoadAsync("Id", companyId, [])).FirstOrDefault();
 
         if (!company)
-            return this.NotFound({ Message: `Company with Id ${companyId} not exists` });
+            return this.NotFound({ Message: `Empresa com Id ${companyId} não existe` });
 
         user.Company = company;
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK('User´s company updated');
+        return this.OK('Empresa do usuário atualizada');
     }
 
 
 
     @PUT("jobRole")
     @SetDatabaseFromToken()
-    @UserController.ProducesMessage(200, "Mensagem de sucesso", { Message: "Função do usuário atualizado" })
+    @UserController.ProducesMessage(200, "Mensagem de sucesso", { Message: "Cargo do usuário atualizado" })
     @UserController.ProducesMessage(404, 'Mensagem de erro', { Message: 'Usuário não encontrada' })
-    @Description(`Utilize esse metodo para atualizar a ${JobRole.name} de um ${User.name}`)
+    @Description(`Utilize esse metodo para atualizar o ${JobRole.name} de um ${User.name}`)
     public async UpdatejobRole(@FromQuery() userId: number, @FromQuery() jobRoleId: number): Promise<ActionResult>
     {
         let user = (await this._userService.GetByAndLoadAsync("Id", userId, ["JobRole"])).FirstOrDefault();
 
         if (!user)
-            return this.NotFound({ Message: `User with Id ${userId} not exists` });
+            return this.NotFound({ Message: `Usuário com Id ${userId} não existe` });
 
         let job = (await this._jobRoleService.GetByAndLoadAsync("Id", jobRoleId, [])).FirstOrDefault();
 
         if (!job)
-            return this.NotFound({ Message: `JobRole with Id ${jobRoleId} not exists` });
+            return this.NotFound({ Message: `Cargo com Id ${jobRoleId} não existe` });
 
         user.JobRole = job;
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK('User´s job updated');
+        return this.OK('Cargo do usuário atualizada');
     }
 
 
@@ -305,12 +305,12 @@ export default class UserController extends AbstractController
     public async UpdateAsync(@FromBody() userDTO: UserDTO): Promise<ActionResult>
     {
         if (userDTO.Id == undefined || userDTO.Id <= 0)
-            return this.BadRequest({ Message: "The ID must be greater than 0" });
+            return this.BadRequest({ Message: "O Id deve ser maior que 0" });
 
         let update = (await this._userService.GetByAndLoadAsync("Id", userDTO.Id, [])).FirstOrDefault();
 
         if (!update)
-            return this.NotFound({ Message: "User not found" });
+            return this.NotFound({ Message: "Usuário não encontrado" });
 
         try
         {
@@ -340,12 +340,12 @@ export default class UserController extends AbstractController
     public async DeleteAsync(@FromQuery() id: number): Promise<ActionResult>
     {
         if (!id)
-            return this.BadRequest({ Message: "The Id must be greater than 0" });
+            return this.BadRequest({ Message: "O Id deve ser maior que 0" });
 
         let del = await this._userService.GetByIdAsync(id);
 
         if (!del)
-            return this.NotFound({ Message: "User not found" });
+            return this.NotFound({ Message: "Usuário não encontrado" });
 
         return this.OK(await this._userService.DeleteAsync(del));
     }

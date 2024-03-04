@@ -119,7 +119,7 @@ export default class TimeService extends AbstractTimeService {
 
     public ValidateObject(obj: Time): void {
         if (!this.IsCompatible(obj))
-            throw new InvalidEntityException(`This object is not of ${Time.name} type`);
+            throw new InvalidEntityException(`Este objeto não é do tipo ${Time.name}`);
 
     }
 }
