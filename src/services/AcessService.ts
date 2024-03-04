@@ -108,10 +108,10 @@ export default class AcessService extends AbstractAccessService {
             throw new InvalidEntityException(`Este objeto não é do tipo ${Access.name}`);
 
         if(!obj.Username)
-            throw new InvalidEntityException(`O username do ${Access.name} é obrigatório`);
+            throw new InvalidEntityException(`O username do ${Access.name} é necessário`);
 
         if(!obj.Password)
-            throw new InvalidEntityException(`O password do ${Access.name} é obrigatório`);
+            throw new InvalidEntityException(`O password do ${Access.name} é necessário`);
         
 
     }    

@@ -124,10 +124,10 @@ export default class DepartamentService  extends AbstractDepartamentService
     public ValidateObject(obj: Departament) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`O objeto não é do tipo ${Departament.name}`);
+            throw new InvalidEntityException(`Este objeto não é do tipo ${Departament.name}`);
 
         if(!obj.Description)
-            throw new InvalidEntityException(`O nome do ${Departament.name} é obrigatório`);
+            throw new InvalidEntityException(`O nome do ${Departament.name} é necessário`);
        
     }
 }

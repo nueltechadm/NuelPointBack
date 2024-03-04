@@ -121,10 +121,10 @@ export default class DayOfWeekService  extends AbstractDayOfWeekService
     public ValidateObject(obj: DayOfWeek) : void
     {
         if(!this.IsCompatible(obj))
-            throw new InvalidEntityException(`O objeto não é do tipo ${DayOfWeek.name}`);
+            throw new InvalidEntityException(`Este objeto não é do tipo ${DayOfWeek.name}`);
 
         if(!obj.DayName)
-            throw new InvalidEntityException(`O nome do ${DayOfWeek.name} é obrigatório`);
+            throw new InvalidEntityException(`O nome do ${DayOfWeek.name} é necessário`);
 
         if(obj.Day < Days.ALL || obj.Day > Days.SATURDAY)
             throw new InvalidEntityException(`O dia ${obj.Day} não existe`);
