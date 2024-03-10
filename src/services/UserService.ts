@@ -221,8 +221,12 @@ export default class UserService  extends AbstractUserService
             .Load("JobRole")
             .Load("Journey");
         }
+        
 
         let users = await query.OrderBy("Name").Offset(offset).Limit(request.Quantity).ToListAsync();
+
+        if(request.LoadRelations)
+            await this._context.Collection(JobRole).ReloadCachedRealitionsAsync(users.Where(s => s.JobRole != undefined).Select(s => s.JobRole!), ["Departament"]);
 
         let result = new PaginatedFilterResult<User>();
         result.Page = request.Page;

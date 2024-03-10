@@ -143,6 +143,46 @@ export default class UserController extends AbstractController
 
 
 
+    @PUT("update")
+    @SetDatabaseFromToken()
+    @RequestJson(JSON.stringify(Type.CreateTemplateFrom(UserDTO, false, ["Access"], []), null, 2))
+    @UserController.ProducesType(200, "O usuário recém-atualizado", User)
+    @UserController.ProducesMessage(400, "Uma mensagem dizendo o que esta faltando", { Message: "O Id precisa ser maior que 0" })
+    @UserController.ProducesMessage(404, "Mensagem de erro", { Message: "Usuário não encontrado" })
+    @Description(`Utilize esse metodo para atualizar apenas dados do ${User.name}. Nenhuma das relações será atualizada`)
+    public async UpdateAsync(@FromBody() userDTO: UserDTO): Promise<ActionResult>
+    {
+        if (userDTO.Id == undefined || userDTO.Id <= 0)
+            return this.BadRequest({ Message: "O Id deve ser maior que 0" });
+
+        let fields: (keyof User)[] = ["Access", "Company", "JobRole", "Journey"];
+
+        let update = (await this._userService.GetByAndLoadAsync("Id", userDTO.Id, fields)).FirstOrDefault();
+
+        if (!update)
+            return this.NotFound({ Message: "Usuário não encontrado" });
+
+        try
+        {
+            await this.ValidateUserDTO(userDTO);
+        }
+        catch (e)
+        {
+            if (e instanceof InvalidEntityException)
+                return this.BadRequest(e.Message);
+            throw e;
+        }
+
+        Object.assign(update, userDTO);
+
+        await this._userService.UpdateObjectAndRelationsAsync(update!, fields);
+
+        return this.OK({ Message: "Usuário atualizado com sucesso" });
+    }
+
+
+
+
 
     @PUT("contact")
     @SetDatabaseFromToken()
@@ -296,40 +336,6 @@ export default class UserController extends AbstractController
 
 
 
-    @PUT("update")
-    @SetDatabaseFromToken()
-    @UserController.ProducesType(200, "O usuário recém-atualizado", User)
-    @UserController.ProducesMessage(400, "Uma mensagem dizendo o que esta faltando", { Message: "O Id precisa ser maior que 0" })
-    @UserController.ProducesMessage(404, "Mensagem de erro", { Message: "Usuário não encontrado" })
-    @Description(`Utilize esse metodo para atualizar apenas dados do ${User.name}. Nenhuma das relações será atualizada`)
-    public async UpdateAsync(@FromBody() userDTO: UserDTO): Promise<ActionResult>
-    {
-        if (userDTO.Id == undefined || userDTO.Id <= 0)
-            return this.BadRequest({ Message: "O Id deve ser maior que 0" });
-
-        let update = (await this._userService.GetByAndLoadAsync("Id", userDTO.Id, [])).FirstOrDefault();
-
-        if (!update)
-            return this.NotFound({ Message: "Usuário não encontrado" });
-
-        try
-        {
-            await this.ValidateUserDTO(userDTO);
-        }
-        catch (e)
-        {
-            if (e instanceof InvalidEntityException)
-                return this.BadRequest(e.Message);
-            throw e;
-        }
-
-        Object.assign(update, userDTO);
-
-        await this._userService.UpdateObjectAndRelationsAsync(update!, [])
-
-        return this.OK({ Message: "Usuário atualizado com sucesso" });
-    }
-
 
 
     @DELETE("delete")
@@ -381,7 +387,7 @@ export default class UserController extends AbstractController
                 throw new InvalidEntityException(`A empresa com Id ${userDTO.CompanyId} não existe na base de dados`);
         }
 
-        
+
 
         if (userDTO.JobRoleId <= 0 && !userDTO.IsSuperUser())
             throw new InvalidEntityException(`JobRoleId é obrigatorio para cadastrar novos usuários`);

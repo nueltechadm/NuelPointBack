@@ -14,6 +14,7 @@ import DayOfWeek from "@src/core/entities/DayOfWeek";
 export default class JourneyService  extends AbstractJorneyService
 {
     
+    
     @Inject()
     private _context : AbstractDBContext;
 
@@ -72,6 +73,11 @@ export default class JourneyService  extends AbstractJorneyService
         this.ValidateObject(obj);
 
         return await this._context.Collection(Journey).UpdateObjectAndRelationsAsync(obj, relations);
+    }
+
+    public async GetAllAsync(): Promise<Journey[]>
+    {
+        return await this._context.Collection(Journey).Load("Company").ToListAsync();
     }
 
     public async GetByAndLoadAsync<K extends keyof Journey>(key: K, value: Journey[K], load: (keyof Journey)[]): Promise<Journey[]> 

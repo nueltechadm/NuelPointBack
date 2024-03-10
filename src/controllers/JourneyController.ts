@@ -63,6 +63,17 @@ export default class JourneyController extends AbstractController
 
 
 
+    @GET("get-all")
+    @SetDatabaseFromToken()
+    @JourneyController.ProducesType(200, "Uma lista de jornadas", Journey)
+    @Description(`Utilize esse metodo para visualizar uma lista de todas as jornadas`)
+    public async GetAllAsync(): Promise<ActionResult> 
+    {
+        return this.OK(await this._journeyService.GetAllAsync());
+    }
+
+
+
     @GET("getById")
     @SetDatabaseFromToken()
     @JourneyController.ProducesType(200, "A jornada com o Id fornecido", Journey)

@@ -4,6 +4,7 @@ import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "
 export default abstract class AbstractJorneyService extends AbstractService<Journey, PaginatedFilterRequest, PaginatedFilterResult<Journey>>
 {
     abstract GetByIdAsync(id : number) : Promise<Journey | undefined>;    
+    abstract GetAllAsync() : Promise<Journey[]>;    
 }
 
 export /*sealed */ class JourneyPaginatedFilterRequest extends PaginatedFilterRequest

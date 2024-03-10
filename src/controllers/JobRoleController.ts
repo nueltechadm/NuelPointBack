@@ -104,7 +104,7 @@ export default class JobRoleController extends AbstractController
     }
 
 
-    @POST("update")
+    @PUT("update")
     @SetDatabaseFromToken()
     @JobRoleController.ProducesMessage(200, 'Mensagem de sucesso', { Message: 'Cargo atualizado' })
     @JobRoleController.ProducesMessage(400, 'Mensagem de erro', { Message: 'Mensagem descrevendo o erro' })

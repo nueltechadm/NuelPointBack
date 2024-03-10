@@ -90,7 +90,7 @@ export default class JobRoleService  extends AbstractJobRoleService
 
     public async GetAllAsync(): Promise<JobRole[]>
     {
-        return await this._context.Collection(JobRole).ToListAsync();
+        return await this._context.Collection(JobRole).Load("Departament").ToListAsync();
     }
 
 
