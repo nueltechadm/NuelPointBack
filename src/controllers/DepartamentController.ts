@@ -74,7 +74,7 @@ export default class DepartamentController extends AbstractController {
         let fromDB = await this._departamentService.GetByAndLoadAsync("Description", departament.Description.Trim(), []);
 
         if(fromDB.Any(s => s.Id != departament.Id))
-            return this.BadRequest(`Departamento ${departament.Description} já existe no banco de dados`);
+            return this.BadRequest({ Message:`Departamento ${departament.Description} já existe no banco de dados`});
 
         await this._departamentService.AddAsync(departament);
 
@@ -94,12 +94,12 @@ export default class DepartamentController extends AbstractController {
         let exists = await this._departamentService.GetByAndLoadAsync("Id", departament.Id, []);
 
         if(!exists.Any())
-            return this.NotFound(`Departamento ${departament.Description} não existe no banco de dados`);     
+            return this.NotFound({ Message:`Departamento ${departament.Description} não existe no banco de dados`});     
 
         let fromDB = await this._departamentService.GetByAndLoadAsync("Description", departament.Description.Trim(), []);
 
         if(fromDB.Any(s => s.Id != departament.Id))
-            return this.BadRequest(`Departamento ${departament.Description} já existe no banco de dados`);
+            return this.BadRequest({ Message:`Departamento ${departament.Description} já existe no banco de dados`});
 
         await this._departamentService.UpdateAsync(departament);
 

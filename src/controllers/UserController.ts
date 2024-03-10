@@ -202,7 +202,7 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(users.First());
 
-        return this.OK('Contatos do usuário atualizados');
+        return this.OK({ Message:'Contatos do usuário atualizados'});
     }
 
 
@@ -226,7 +226,7 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK('Contatos do usuário atualizados');
+        return this.OK({ Message:'Contatos do usuário atualizados'});
     }
 
 
@@ -252,7 +252,7 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK('Acesso do usuário atualizado');
+        return this.OK({ Message:'Acesso do usuário atualizado'});
     }
 
 
@@ -278,7 +278,7 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK('Jornada do usuário atualizada');
+        return this.OK({ Message:'Jornada do usuário atualizada'});
     }
 
 
@@ -330,7 +330,7 @@ export default class UserController extends AbstractController
 
         await this._userService.UpdateAsync(user);
 
-        return this.OK('Cargo do usuário atualizada');
+        return this.OK({ Message:'Cargo do usuário atualizada'});
     }
 
 

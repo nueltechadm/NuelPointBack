@@ -174,7 +174,7 @@ export default class AppointmentService extends AbstractAppointmentService {
             throw new InvalidEntityException(`Este objeto não é do tipo ${Appointment.name}`);
 
         if (!obj.User)
-            throw new InvalidEntityException(`Usuário do apontamento é obrigatório`);        
+            throw new InvalidEntityException(`Usuário do apontamento é necessário`);        
     }
 
 }
