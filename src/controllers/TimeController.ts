@@ -107,7 +107,7 @@ export default class TimeController extends AbstractController
         return this.OK({ Message: "Horário deletado" });
     }
 
-    
+
 
     @GET("getJson")
     @SetDatabaseFromToken()

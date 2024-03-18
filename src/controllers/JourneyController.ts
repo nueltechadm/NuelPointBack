@@ -39,8 +39,8 @@ export default class JourneyController extends AbstractController
         journeyService: AbstractJourneyService,
         timeService: AbstractTimeService,
         companyService: AbstractCompanyService,
-        dayOfWeekService: AbstractDayOfWeekService, 
-        userService : AbstractUserService
+        dayOfWeekService: AbstractDayOfWeekService,
+        userService: AbstractUserService
     ) 
     {
         super();
@@ -106,7 +106,7 @@ export default class JourneyController extends AbstractController
 
         if (!company)
             return this.BadRequest(`${Company.name} com Id ${dto.CompanyId} não existe`);
-       
+
         let days: DayOfWeek[] = [];
         let journey = new Journey(dto.Description, company);
 
@@ -143,12 +143,12 @@ export default class JourneyController extends AbstractController
 
         journey.DaysOfWeek = days;
 
-        if(dto.UsersIds && dto.UsersIds.Any())
+        if (dto.UsersIds && dto.UsersIds.Any())
         {
             journey.Users = await this._userService.GetByIdsAsync(dto.UsersIds);
         }
 
-        await this._journeyService.AddAsync(journey);        
+        await this._journeyService.AddAsync(journey);
 
         return this.OK({ Message: `Jornada criada com sucesso`, Id: journey.Id });
     }
