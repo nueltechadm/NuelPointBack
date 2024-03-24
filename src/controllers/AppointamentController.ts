@@ -79,7 +79,7 @@ export default class AppointamentController extends AbstractController
         if (!currentDayOfUser)
             currentDayOfUser = new Appointment(user);
 
-        let checkpoint = new Checkpoint(user, dto.X, dto.Y, currentDayOfUser, user.Company, this.Request.APIAUTH.Link);
+        let checkpoint = new Checkpoint(user, dto.X, dto.Y, currentDayOfUser, user.Company);
 
         let image = await this._fileService.ComputeNextFileNameAsync(checkpoint);
 

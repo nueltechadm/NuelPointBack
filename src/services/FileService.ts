@@ -11,181 +11,199 @@ import FileCastException from '@src/exceptions/FileCastException';
 
 export default class FileService extends AbstractFileService
 {
-    
-      
 
-    public override CreateDirectoryAsync(path: string): Promise<void> {
+
+
+    public override CreateDirectoryAsync(path: string): Promise<void>
+    {
 
         return new Promise<void>(async (resolve, reject) => 
-        {           
-            try{
+        {
+            try
+            {
 
-               if(!await this.DirectoryExistsAsync(path))
-               {
-                    File.mkdirSync(path, {recursive: true});
+                if (!await this.DirectoryExistsAsync(path))
+                {
+                    File.mkdirSync(path, { recursive: true });
                     return resolve();
-               }                    
-                
+                }
+
                 return resolve();
 
-            }catch(err)
+            } catch (err)
             {
                 return reject(new FileException((err as Error).message));
             }
         });
     }
-    
-    public FileExistsAsync(file: string): Promise<boolean> {
+
+    public FileExistsAsync(file: string): Promise<boolean>
+    {
         return new Promise<boolean>(async (resolve, reject) => 
-        {           
-            try{
+        {
+            try
+            {
 
                 return resolve(File.existsSync(file) && File.lstatSync(file).isFile());
 
-            }catch(err)
+            } catch (err)
             {
                 return reject(new FileException((err as Error).message));
             }
         });
     }
 
-    public DirectoryExistsAsync(path: string): Promise<boolean> {
+    public DirectoryExistsAsync(path: string): Promise<boolean>
+    {
         return new Promise<boolean>(async (resolve, reject) => 
-        {            
-            try{
-                
+        {
+            try
+            {
+
                 return resolve(File.existsSync(path) && File.lstatSync(path).isDirectory());
 
-            }catch(err)
+            } catch (err)
             {
                 return reject(new FileException((err as Error).message));
             }
         });
     }
 
-    public SaveImageFromBase64Async(path: string, base64: string): Promise<string> {
-        
-        return new Promise<string>((resolve, reject) => {
+    public SaveImageFromBase64Async(path: string, base64: string): Promise<string>
+    {
 
-            try{
+        return new Promise<string>((resolve, reject) =>
+        {
+
+            try
+            {
 
                 let bytes = Buffer.from(base64, 'base64');
 
                 File.writeFile(path, bytes, 'utf-8', (err) => 
                 {
-                    if(err)
+                    if (err)
                         return reject(new FileCastException(err.message));
 
                     return resolve(path);
                 })
 
-            }catch(e)
+            } catch (e)
             {
                 return reject(new FileException((e as Error).message));
             }
         });
-        
+
     }
 
-    public GetAllFilesAsync(origin: string): Promise<string[]> {
-        
-        return new Promise<string[]>(async (resolve, reject) => 
-        {
-            if(!File.existsSync(origin))
-               return reject(new Error(`The path ${origin} not exists`));
-
-            try{
-
-            let files = await FileAsync.readdir(origin, {withFileTypes : true});
-
-            return resolve(files.filter(u => u.isFile()).map(u => Path.join(origin, u.name)));
-
-            }catch(err)
-            {
-                return reject(new FileException((err as Error).message));
-            }
-        });
-    }
-
-    public GetAllFordersAsync(origin: string): Promise<string[]> {
+    public GetAllFilesAsync(origin: string): Promise<string[]>
+    {
 
         return new Promise<string[]>(async (resolve, reject) => 
         {
-            if(!File.existsSync(origin))
+            if (!File.existsSync(origin))
                 return reject(new Error(`The path ${origin} not exists`));
 
-            try{
+            try
+            {
 
-            let files = await FileAsync.readdir(origin, {withFileTypes : true});           
+                let files = await FileAsync.readdir(origin, { withFileTypes: true });
 
-            return resolve(files.filter(u => u.isDirectory()).map(u => Path.join(origin, u.name)));
+                return resolve(files.filter(u => u.isFile()).map(u => Path.join(origin, u.name)));
 
-            }catch(err)
+            } catch (err)
             {
                 return reject(new FileException((err as Error).message));
             }
         });
     }
 
-    public CopyAsync(origin: string, dest: string): Promise<void> {
-     
-        return new Promise<void>(async (resolve, reject)=>
+    public GetAllFordersAsync(origin: string): Promise<string[]>
+    {
+
+        return new Promise<string[]>(async (resolve, reject) => 
         {
-            try{
+            if (!File.existsSync(origin))
+                return reject(new Error(`The path ${origin} not exists`));
+
+            try
+            {
+
+                let files = await FileAsync.readdir(origin, { withFileTypes: true });
+
+                return resolve(files.filter(u => u.isDirectory()).map(u => Path.join(origin, u.name)));
+
+            } catch (err)
+            {
+                return reject(new FileException((err as Error).message));
+            }
+        });
+    }
+
+    public CopyAsync(origin: string, dest: string): Promise<void>
+    {
+
+        return new Promise<void>(async (resolve, reject) =>
+        {
+            try
+            {
                 await File.copyFile(origin, dest, (err) => 
                 {
-                    if(err) 
+                    if (err)
                         throw err;
 
                     resolve();
                 })
 
-            }catch(err)
+            } catch (err)
             {
                 return reject(new FileException((err as Error).message));
             }
         });
-        
-    }      
 
-    public DeleteAsync(file: string): Promise<void> {
-     
-        return new Promise<void>(async (resolve, reject)=>
+    }
+
+    public DeleteAsync(file: string): Promise<void>
+    {
+
+        return new Promise<void>(async (resolve, reject) =>
         {
-            try{
+            try
+            {
                 await File.unlink(file, (err) => 
                 {
-                    if(err) 
+                    if (err)
                         throw err;
 
                     resolve();
                 })
 
-            }catch(err)
+            } catch (err)
             {
                 return reject(new FileException((err as Error).message));
             }
         });
-        
-    }      
+
+    }
 
     public async GetStorageDirectoryAsync(): Promise<string> 
     {
-       let dir = Path.join(Application.Configurations.RootPath, "storage");
+        let dir = Path.join(Application.Configurations.RootPath, "storage");
 
-       if(!await this.DirectoryExistsAsync(dir))
+        if (!await this.DirectoryExistsAsync(dir))
             await this.CreateDirectoryAsync(dir);
 
         return dir;
     }
-       
 
 
-    public async ComputeDirectoryAsync(checkpoint: Checkpoint): Promise<string> {
-       
-        if(!checkpoint.User)
+
+    public async ComputeDirectoryAsync(checkpoint: Checkpoint): Promise<string>
+    {
+
+        if (!checkpoint.User)
             throw new Exception("O usuário é necessario para calcular o caminho do ponto");
-        
+
         let date = checkpoint.Date;
         let dateStr = `_${date.getFullYear()}_${date.getMonth()}_${date.getDate()}`;
         let path = Path.join(await this.GetStorageDirectoryAsync(), `_${checkpoint.Link.toLowerCase()}`, `_${checkpoint.User.Directory}_`, dateStr);
@@ -197,7 +215,8 @@ export default class FileService extends AbstractFileService
     }
 
 
-    public async ComputeNextFileNameAsync(checkpoint: Checkpoint): Promise<string> {
+    public async ComputeNextFileNameAsync(checkpoint: Checkpoint): Promise<string>
+    {
 
         let path = await this.ComputeDirectoryAsync(checkpoint);
 
@@ -207,7 +226,7 @@ export default class FileService extends AbstractFileService
 
         return Path.join(path, name);
     }
-    
+
 }
 
 

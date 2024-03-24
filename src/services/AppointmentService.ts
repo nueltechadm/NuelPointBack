@@ -2,46 +2,54 @@ import { Inject } from 'web_api_base';
 import Appointment from "@entities/Appointment";
 import { Operation } from "myorm_core";
 import InvalidEntityException from "../exceptions/InvalidEntityException";
-import AbstractAppointmentService  from "@contracts/AbstractAppointmentService";
+import AbstractAppointmentService from "@contracts/AbstractAppointmentService";
 import User from "@entities/User";
 import AbstractDBContext from "@data-contracts/AbstractDBContext";
 import { PaginatedFilterResult, PaginatedFilterRequest } from '@contracts/AbstractService';
 import Checkpoint from '@src/core/entities/Checkpoint';
 
 
-export default class AppointmentService extends AbstractAppointmentService {
-          
+export default class AppointmentService extends AbstractAppointmentService
+{
+
 
     @Inject()
     private _context: AbstractDBContext;
 
-    constructor(context: AbstractDBContext) {
+    constructor(context: AbstractDBContext)
+    {
         super();
         this._context = context;
     }
 
-    public async CountAsync(): Promise<number> {
+    public async CountAsync(): Promise<number>
+    {
         return await this._context.Collection(Appointment).CountAsync();
     }
 
-    public override async SetClientDatabaseAsync(client: string): Promise<void> {       
+    public override async SetClientDatabaseAsync(client: string): Promise<void>
+    {
         await this._context.SetDatabaseAsync(client);
     }
 
-    public override IsCompatible(obj: any): obj is Appointment {
-        return  obj.constructor == Appointment && ("User" in obj || "UserId" in obj) && "Checkpoints" in obj;
+    public override IsCompatible(obj: any): obj is Appointment
+    {
+        return obj.constructor == Appointment && ("User" in obj || "UserId" in obj) && "Checkpoints" in obj;
     }
 
-    public override async ExistsAsync(id: number): Promise<boolean> {
-        
+    public override async ExistsAsync(id: number): Promise<boolean>
+    {
+
         return (await this._context.Collection(Appointment).WhereField("Id").IsEqualTo(id).CountAsync()) > 0;
     }
 
-    public override async GetByIdAsync(id: number): Promise<Appointment | undefined> {
+    public override async GetByIdAsync(id: number): Promise<Appointment | undefined>
+    {
         return await this._context.Collection(Appointment).WhereField("Id").IsEqualTo(id).LoadRelationOn("User").FirstOrDefaultAsync();
     }
 
-    public override async AddAsync(obj: Appointment): Promise<Appointment> {
+    public override async AddAsync(obj: Appointment): Promise<Appointment>
+    {
 
         this.ValidateObject(obj);
 
@@ -51,7 +59,8 @@ export default class AppointmentService extends AbstractAppointmentService {
         return this._context.Collection(Appointment).AddAsync(obj);
     }
 
-    public override async UpdateAsync(obj: Appointment): Promise<Appointment> {
+    public override async UpdateAsync(obj: Appointment): Promise<Appointment>
+    {
 
         if (!this.IsCompatible(obj))
             throw new InvalidEntityException(`This object is not of ${Appointment.name} type`);
@@ -59,20 +68,22 @@ export default class AppointmentService extends AbstractAppointmentService {
         return await this._context.Collection(Appointment).UpdateAsync(obj);
     }
 
-    public override async UpdateObjectAndRelationsAsync<U extends keyof Appointment>(obj: Appointment, relations: U[]): Promise<Appointment> {
+    public override async UpdateObjectAndRelationsAsync<U extends keyof Appointment>(obj: Appointment, relations: U[]): Promise<Appointment>
+    {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Appointment).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public override async DeleteAsync(obj: Appointment): Promise<Appointment> {
+    public override async DeleteAsync(obj: Appointment): Promise<Appointment>
+    {
         return this._context.Collection(Appointment).DeleteAsync(obj);
     }
 
-    public override async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Appointment>> 
+    public override async PaginatedFilterAsync(request: PaginatedFilterRequest): Promise<PaginatedFilterResult<Appointment>> 
     {
-        let offset = (request.Page - 1) * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity;
 
         let total = await this._context.Collection(Appointment).CountAsync();
 
@@ -86,20 +97,21 @@ export default class AppointmentService extends AbstractAppointmentService {
 
         return result;
     }
-    
+
     public async GetByAndLoadAsync<K extends keyof Appointment>(key: K, value: Appointment[K], load: (keyof Appointment)[]): Promise<Appointment[]> 
     {
-       this._context.Collection(Appointment).Where({Field : key, Value : value});
+        this._context.Collection(Appointment).Where({ Field: key, Value: value });
 
-       for(let l of load)
+        for (let l of load)
             this._context.Collection(Appointment).Load(l);
-        
-       return await this._context.Collection(Appointment).ToListAsync();
-    } 
+
+        return await this._context.Collection(Appointment).ToListAsync();
+    }
 
 
-    public async GetCurrentDayByUserAsync(user: User): Promise<Appointment | undefined> {
-        
+    public async GetCurrentDayByUserAsync(user: User): Promise<Appointment | undefined>
+    {
+
         return await this._context.Collection(Appointment)
             .Where({
                 Field: "User",
@@ -108,15 +120,16 @@ export default class AppointmentService extends AbstractAppointmentService {
             .And({
                 Field: "Date",
                 Value: new Date()
-            })            
+            })
             .Load("User")
             .Load("Checkpoints")
             .OrderDescendingBy("Date")
             .FirstOrDefaultAsync();
     }
 
-    public async GetByDatesAsync(start: Date, end: Date): Promise<Appointment[]> {
-       
+    public async GetByDatesAsync(start: Date, end: Date): Promise<Appointment[]>
+    {
+
         let list = await this._context.Collection(Appointment)
             .Where({
                 Field: "Date",
@@ -126,7 +139,7 @@ export default class AppointmentService extends AbstractAppointmentService {
             .And({
                 Field: "Date",
                 Kind: Operation.SMALLEROREQUALS,
-                Value: end 
+                Value: end
             })
             .Load("User")
             .Load("Checkpoints")
@@ -138,8 +151,9 @@ export default class AppointmentService extends AbstractAppointmentService {
         return list;
     }
 
-    public async GetByUserAndDatesAsync(user : User, start: Date, end: Date): Promise<Appointment[]> {
-       
+    public async GetByUserAndDatesAsync(user: User, start: Date, end: Date): Promise<Appointment[]>
+    {
+
 
         let list = await this._context.Collection(Appointment)
             .Where({
@@ -154,7 +168,7 @@ export default class AppointmentService extends AbstractAppointmentService {
             .And({
                 Field: "Date",
                 Kind: Operation.SMALLEROREQUALS,
-                Value: end 
+                Value: end
             })
             .Load("User")
             .Load("Checkpoints")
@@ -166,15 +180,16 @@ export default class AppointmentService extends AbstractAppointmentService {
         return list;
     }
 
-    
 
-    public ValidateObject(obj: Appointment): void {
+
+    public ValidateObject(obj: Appointment): void
+    {
 
         if (!this.IsCompatible(obj))
             throw new InvalidEntityException(`Este objeto não é do tipo ${Appointment.name}`);
 
         if (!obj.User)
-            throw new InvalidEntityException(`Usuário do apontamento é necessário`);        
+            throw new InvalidEntityException(`Usuário do apontamento é necessário`);
     }
 
 }

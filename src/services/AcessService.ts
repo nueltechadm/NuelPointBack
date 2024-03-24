@@ -9,85 +9,96 @@ import { PaginatedFilterRequest, PaginatedFilterResult } from '@contracts/Abstra
 
 
 
-export default class AcessService extends AbstractAccessService {
-       
+export default class AcessService extends AbstractAccessService
+{
+
     @Inject()
     private _context: AbstractDBContext;
 
-    constructor(context: AbstractDBContext) {
+    constructor(context: AbstractDBContext)
+    {
         super();
         this._context = context;
     }
 
-    public async SetClientDatabaseAsync(client: string): Promise<void> {       
+    public async SetClientDatabaseAsync(client: string): Promise<void>
+    {
         await this._context.SetDatabaseAsync(client);
     }
 
-    public IsCompatible(obj: any): obj is Access {
+    public IsCompatible(obj: any): obj is Access
+    {
         return Type.HasKeys<Access>(obj, "Username", "User");
     }
 
 
-    public async ExistsAsync(id: number): Promise<boolean> {
-         
-        return (await this._context.Collection(Access).Where({Field: "Id", Value : id}).CountAsync()) > 0;
+    public async ExistsAsync(id: number): Promise<boolean>
+    {
+
+        return (await this._context.Collection(Access).Where({ Field: "Id", Value: id }).CountAsync()) > 0;
 
     }
-  
-    
-    public async CountAsync(): Promise<number> {
+
+
+    public async CountAsync(): Promise<number>
+    {
 
         return await this._context.Collection(Access).CountAsync();
     }
-    
+
 
     public async GetByAndLoadAsync<K extends keyof Access>(key: K, value: Access[K], load: K[]): Promise<Access[]> 
     {
-       this._context.Collection(Access).Where({Field : key, Value : value});
+        this._context.Collection(Access).Where({ Field: key, Value: value });
 
-       for(let l of load)
+        for (let l of load)
             this._context.Collection(Access).Load(l);
-        
-       return await this._context.Collection(Access).ToListAsync();
-    } 
 
-    public async GetByIdAsync(id: number): Promise<Access | undefined> {
+        return await this._context.Collection(Access).ToListAsync();
+    }
+
+    public async GetByIdAsync(id: number): Promise<Access | undefined>
+    {
 
 
         return await this._context.Collection(Access)
-                                  .Where({Field:"Id", Value: id})
-                                  .LoadRelationOn("User")
-                                  .FirstOrDefaultAsync();
+            .Where({ Field: "Id", Value: id })
+            .LoadRelationOn("User")
+            .FirstOrDefaultAsync();
     }
 
-    public async AddAsync(obj: Access): Promise<Access> {
+    public async AddAsync(obj: Access): Promise<Access>
+    {
 
         this.ValidateObject(obj);
 
         return this._context.Collection(Access).AddAsync(obj);
     }
 
-    public async UpdateAsync(obj: Access): Promise<Access> {
+    public async UpdateAsync(obj: Access): Promise<Access>
+    {
 
         this.ValidateObject(obj);
 
         return this._context.Collection(Access).UpdateAsync(obj);
     }
 
-    public async UpdateObjectAndRelationsAsync<U extends keyof Access>(obj: Access, relations: U[]): Promise<Access> {
+    public async UpdateObjectAndRelationsAsync<U extends keyof Access>(obj: Access, relations: U[]): Promise<Access>
+    {
 
         this.ValidateObject(obj);
 
         return await this._context.Collection(Access).UpdateObjectAndRelationsAsync(obj, relations);
     }
 
-    public async DeleteAsync(obj: Access): Promise<Access> {
+    public async DeleteAsync(obj: Access): Promise<Access>
+    {
         return this._context.Collection(Access).DeleteAsync(obj);
     }
-    
-    public async PaginatedFilterAsync(request : PaginatedFilterRequest) : Promise<PaginatedFilterResult<Access>> 
+
+    public async PaginatedFilterAsync(request: PaginatedFilterRequest): Promise<PaginatedFilterResult<Access>> 
     {
-        let offset = (request.Page - 1) * request.Quantity; 
+        let offset = (request.Page - 1) * request.Quantity;
 
         let total = await this._context.Collection(Access).CountAsync();
 
@@ -102,19 +113,20 @@ export default class AcessService extends AbstractAccessService {
         return result;
     }
 
-    public ValidateObject(obj: Access): void {
+    public ValidateObject(obj: Access): void
+    {
 
         if (!this.IsCompatible(obj))
             throw new InvalidEntityException(`Este objeto não é do tipo ${Access.name}`);
 
-        if(!obj.Username)
+        if (!obj.Username)
             throw new InvalidEntityException(`O username do ${Access.name} é necessário`);
 
-        if(!obj.Password)
+        if (!obj.Password)
             throw new InvalidEntityException(`O password do ${Access.name} é necessário`);
-        
 
-    }    
+
+    }
 
 }
 

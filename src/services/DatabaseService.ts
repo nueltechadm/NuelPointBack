@@ -8,38 +8,41 @@ import AbstractControlContext from '@data-contracts/AbstractControlContext';
 import AbstractDBContext from '@data-contracts/AbstractDBContext';
 
 
-export default class DatabaseService extends AbstractDatabaseService{
-   
-   
+export default class DatabaseService extends AbstractDatabaseService
+{
+
+
     @Inject()
     private _context: AbstractDBContext;
 
     @Inject()
     private _controlContext: AbstractControlContext;
 
-    constructor(context: AbstractDBContext, controlContext: AbstractControlContext) {
+    constructor(context: AbstractDBContext, controlContext: AbstractControlContext)
+    {
 
         super();
         this._context = context;
         this._controlContext = controlContext;
     }
 
-    public async GetAllDabasesAsync() : Promise<Database[]>
+    public async GetAllDabasesAsync(): Promise<Database[]>
     {
         return this._controlContext.Collection(Database).ToListAsync();
     }
 
-    public async UpdateDatabaseAsync(db: Database): Promise<void> {
-        
+    public async UpdateDatabaseAsync(db: Database): Promise<void>
+    {
+
         await this._controlContext.Collection(Database).UpdateAsync(db);
     }
 
-    public async GetDabaseAsync(dabataseName : string) : Promise<Database | undefined>
+    public async GetDabaseAsync(dabataseName: string): Promise<Database | undefined>
     {
         return this._controlContext.Collection(Database).WhereField("Name").IsEqualTo(dabataseName.Trim()).FirstOrDefaultAsync();
     }
 
-    public async CheckIfDatabaseExists(dabataseName : string) : Promise<boolean>
+    public async CheckIfDatabaseExists(dabataseName: string): Promise<boolean>
     {
         return (await this._controlContext.Collection(Database).ToListAsync()).filter(s => s.Name == dabataseName.Trim() && s.Status == DababaseStatus.CREATED).length > 0;
     }
@@ -51,30 +54,32 @@ export default class DatabaseService extends AbstractDatabaseService{
 
         await this._controlContext.Collection(Database).UpdateAsync(db);
 
-        try{
+        try
+        {
 
             await this._context.SetDatabaseAsync(db.Name);
             await this._context.UpdateDatabaseAsync();
-            db.Status = DababaseStatus.UPDATED;                
+            db.Status = DababaseStatus.UPDATED;
 
-        }catch(err)
+        } catch (err)
         {
             db.Status = DababaseStatus.UPDATEFAIL;
             db.Warning = (err as any).message;
         }
-            
+
         db.LasUpdate = new Date();
         await this._controlContext.Collection(Database).UpdateAsync(db);
     }
 
-    public async CreateDabaseAsync(dabataseName: string): Promise<void> {
+    public async CreateDabaseAsync(dabataseName: string): Promise<void>
+    {
 
 
         let db = await this._controlContext.Collection(Database).Where({ Field: 'Name', Value: dabataseName.Trim() }).FirstOrDefaultAsync();
 
         if (!db) 
         {
-            await (this._context as any)["_manager"].CreateDataBaseAsync(dabataseName);            
+            await (this._context as any)["_manager"].CreateDataBaseAsync(dabataseName);
 
             await this._context.SetDatabaseAsync(dabataseName);
 
@@ -82,15 +87,16 @@ export default class DatabaseService extends AbstractDatabaseService{
 
             await this._controlContext.Collection(Database).AddAsync(newDb);
 
-            try{
+            try
+            {
 
                 await this._context.UpdateDatabaseAsync();
 
-            }catch(err)
+            } catch (err)
             {
                 db = await this._controlContext.Collection(Database).Where({ Field: 'Name', Value: dabataseName }).FirstOrDefaultAsync();
-                
-                if(db)
+
+                if (db)
                 {
                     db.Status = DababaseStatus.UPDATEFAIL;
                     db.Warning = (err as any).message;
@@ -99,23 +105,23 @@ export default class DatabaseService extends AbstractDatabaseService{
 
             newDb.Status = DababaseStatus.CREATED;
 
-            await this._controlContext.Collection(Database).UpdateAsync(newDb);     
-            
+            await this._controlContext.Collection(Database).UpdateAsync(newDb);
+
             await this.CreateDefaultUserAsync(dabataseName);
 
         }
-    }    
+    }
 
 
 
-    public async CreateDefaultUserAsync(dabataseName : string) : Promise<void>
+    public async CreateDefaultUserAsync(dabataseName: string): Promise<void>
     {
         let user = Reflect.construct(User, []) as User;
 
-        user.Name = dabataseName.Trim(); 
+        user.Name = dabataseName.Trim();
 
-        user.Access = new Access(user, dabataseName, MD5(`${dabataseName}123`), PERFILTYPE.SUPER);        
-        
+        user.Access = new Access(user, dabataseName, MD5(`${dabataseName}123`), PERFILTYPE.SUPER);
+
         await this._context.SetDatabaseAsync(dabataseName);
 
         await this._context.Collection(User).AddAsync(user);

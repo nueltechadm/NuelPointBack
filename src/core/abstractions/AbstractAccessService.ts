@@ -6,5 +6,5 @@ import AbstractService, { PaginatedFilterRequest, PaginatedFilterResult } from "
 export default abstract class AbstractAccessService extends AbstractService<Access, PaginatedFilterRequest, PaginatedFilterResult<Access>>
 {
     abstract GetByIdAsync(id: number): Promise<Access | undefined>;
-    
+
 }
